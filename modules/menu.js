@@ -19,6 +19,7 @@ module.exports = createMenu;
 // Creates the menu with the data from ./data.js.
 
 function createMenu(data) {
+  return console.log("afj");
   try {
     console.log("-------------------------------------");
     console.log("-----------------CPU-Y---------------");

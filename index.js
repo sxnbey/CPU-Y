@@ -37,7 +37,7 @@ module.exports = system;
 // Creates the overlay with the imported data.
 
 async function run() {
-  const data = await createData();
+  // const data = await createData();
 
-  createMenu(data);
+  createMenu(await createData());
 }
