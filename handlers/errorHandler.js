@@ -1,18 +1,10 @@
 /************************************************************************************************\
-*                                     DECLARATION & IMPORTS                                      *
-\************************************************************************************************/
-
-// Creates the functions object which is to be exported later.
-
-const functions = {};
-
-/************************************************************************************************\
 *                                            EXPORTS                                             *
 \************************************************************************************************/
 
-// Exports the functions object.
+// Exports the error handler.
 
-module.exports = functions;
+module.exports = errorHandler;
 
 /************************************************************************************************\
 *                                           FUNCTIONS                                            *
@@ -20,8 +12,8 @@ module.exports = functions;
 
 // This function handles all error.
 
-functions.handleError = function (layer, error, stack) {
-  // Imports all errors.
+function errorHandler(layer, error, stack) {
+  // Import the errprs.
 
   const errors = require("../data/errors.json");
 
@@ -31,6 +23,7 @@ functions.handleError = function (layer, error, stack) {
 
   // The error message.
 
+  console.clear();
   console.log("\n");
   console.log("Beim Bearbeiten deiner Anfrage ist ein Fehler aufgetreten.");
   console.log("\n");
@@ -43,5 +36,6 @@ functions.handleError = function (layer, error, stack) {
 
   function fileAndLine() {
     if (stack[1]) return stack[1].trim().replace(/^at\s+/g, "");
+    else return "/";
   }
-};
+}

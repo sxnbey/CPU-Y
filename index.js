@@ -5,10 +5,9 @@
 // Imports all needed modules to run the program.
 
 const createData = require("./modules/data.js");
-const createMenu = require("./modules/menu.js");
-const functions = require("./modules/functions.js");
-const errors = require("./data/errors.json");
-const system = { functions: { functions }, errors: errors };
+const createUi = require("./modules/ui.js");
+const functions = require("./scripts/functions.js");
+const handlers = require("./handlers/handler.js");
 
 /************************************************************************************************\
 *                                              MAIN                                              *
@@ -16,19 +15,13 @@ const system = { functions: { functions }, errors: errors };
 
 // Clears the console.
 
-console.clear();
+functions.cpuyBanner();
+
+console.log("Please wait while CPU-Y is fetching your system information...");
 
 // Runs the program.
 
 run();
-
-/************************************************************************************************\
-*                                            EXPORTS                                             *
-\************************************************************************************************/
-
-// Exports the system object so I can use it in other files.
-
-module.exports = system;
 
 /************************************************************************************************\
 *                                           FUNCTIONS                                            *
@@ -39,5 +32,5 @@ module.exports = system;
 async function run() {
   // const data = await createData();
 
-  createMenu(await createData());
+  createUi(await createData());
 }
