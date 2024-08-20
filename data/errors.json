@@ -1,0 +1,30 @@
+{
+  "01": [
+    {
+      "code": "001",
+      "name": "ERR_RETR_SYSINF",
+      "layer": "DATA",
+      "severity": "CRITICAL",
+      "explanation": "Systeminformationen konnten nicht abgerufen werden.",
+      "help": ["Node.js-Modul 'systeminformation' neu installieren."]
+    },
+    {
+      "code": "002",
+      "name": "ERR_EVAL_SYSINF",
+      "layer": "DATA",
+      "severity": "CRITICAL",
+      "explanation": "Systeminformationen konnten nicht ausgewertet werden.",
+      "help": []
+    }
+  ],
+  "02": [
+    {
+      "code": "001",
+      "name": "ERR_RENDER_UI",
+      "layer": "UI",
+      "severity": "CRITICAL",
+      "explanation": "Benutzeroberfläche konnte nicht gerendert werden.",
+      "help": []
+    }
+  ]
+}
