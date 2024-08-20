@@ -40,7 +40,7 @@ async function createData() {
     };
     system.cpu.load = (await sysin.currentLoad()).currentLoad;
   } catch (e) {
-    functions.handleError("01", "001");
+    functions.handleError("01", "001", e.stack.split("\n"));
 
     process.exit();
   }
@@ -129,7 +129,7 @@ async function createData() {
       },
     };
   } catch (e) {
-    functions.handleError("01", "001");
+    functions.handleError("01", "001", e.stack.split("\n"));
 
     process.exit();
   }

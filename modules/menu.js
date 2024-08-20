@@ -70,7 +70,7 @@ function createMenu(data) {
     console.log("-------------------------------------");
     console.log("-------------------------------------");
   } catch (e) {
-    functions.handleError("02", "001");
+    functions.handleError("02", "001", e.stack.split("\n"));
 
     process.exit();
   }
