@@ -34,18 +34,18 @@ function createUi(data) {
     console.log("Welcome to CPU-Y!");
     console.log("\n");
     console.log(
-      'If it\'s your first time using CPU-Y, type "help" for more information on how to use this program.'
+      'If it\'s your first time using CPU-Y, type "help" for more information on how to use this program.' +
+        "\n" +
+        "But if you already know how it works, ignore the sentence above and just type any command you need below."
     );
+    console.log("\n");
 
-    rl.question(
-      `But if you already know how it works, ignore the sentence above and just type any command you need below:\n\n`,
-      (res) => {
-        if (res == "help") {
-          console.log("\n");
-          console.log("Höhö hier gibts keine Hilfe gerade hehehhehehehehe");
-        } else console.log("digga du hast nicht help eingegeben");
-      }
-    );
+    rl.question("Your command:\n", (res) => {
+      if (res == "help") {
+        console.log("\n");
+        console.log("Höhö hier gibts keine Hilfe gerade hehehhehehehehe");
+      } else console.log("digga du hast nicht help eingegeben");
+    });
 
     // console.log("-------------------------------------");
     // console.log("-----------------CPU-Y---------------");

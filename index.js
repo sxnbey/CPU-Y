@@ -13,7 +13,7 @@ const handlers = require("./handlers/handler.js");
 *                                              MAIN                                              *
 \************************************************************************************************/
 
-// Clears the console.
+// Creates the banner.
 
 functions.cpuyBanner();
 

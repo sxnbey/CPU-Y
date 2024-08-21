@@ -13,7 +13,7 @@ module.exports = errorHandler;
 // This function handles all error.
 
 function errorHandler(layer, error, stack) {
-  // Import the errprs.
+  // Import the errors.
 
   const errors = require("../data/errors.json");
 
