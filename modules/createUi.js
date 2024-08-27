@@ -1,35 +1,27 @@
 /************************************************************************************************\
-*                                     DECLARATION & IMPORTS                                      *
+*                                   DECLARATION, IM- & EXPORTS                                   *
 \************************************************************************************************/
 
-// Imports the needed module and the client.
+// Imports the module to respond to console inputs.
 
 const readline = require("readline");
-const functions = require("../scripts/functions.js");
-const handlers = require("../handlers/handler.js");
-
-/************************************************************************************************\
-*                                            EXPORTS                                             *
-\************************************************************************************************/
-
-// Exports the createUi function so it can be used in ../index.js.
 
 module.exports = createUi;
 
 /************************************************************************************************\
-*                                          FUNCTIONS                                             *
+*                                              MAIN                                              *
 \************************************************************************************************/
 
 // Creates the UI.
 
-function createUi(data) {
+function createUi(system, data) {
   try {
     const rl = readline.createInterface({
       input: process.stdin,
       output: process.stdout,
     });
 
-    functions.cpuyBanner();
+    system.functions.cpuyBanner();
 
     console.log("Welcome to CPU-Y!");
     console.log("\n");
@@ -95,7 +87,7 @@ function createUi(data) {
     // console.log("-------------------------------------");
     // console.log("-------------------------------------");
   } catch (e) {
-    handlers.errorHandler("02", "001", e.stack.split("\n"));
+    system.handlers.errorHandler("02", "001", e.stack.split("\n"));
 
     process.exit();
   }

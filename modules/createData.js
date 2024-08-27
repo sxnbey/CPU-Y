@@ -1,33 +1,26 @@
 /************************************************************************************************\
-*                                     DECLARATION & IMPORTS                                      *
+*                                   DECLARATION, IM- & EXPORTS                                   *
 \************************************************************************************************/
 
-// Imports the client and the systeminformation modules which is the source of all the system information.
+// Imports the systeminformation module which is the source of all the system information.
 
 const sysin = require("systeminformation");
-const handlers = require("../handlers/handler.js");
-
-/************************************************************************************************\
-*                                            EXPORTS                                             *
-\************************************************************************************************/
-
-// Exports the createData function so it can be used in ../index.js.
 
 module.exports = createData;
 
 /************************************************************************************************\
-*                                          FUNCTIONS                                             *
+*                                              MAIN                                              *
 \************************************************************************************************/
 
 // Creates the data that will be shown.
 
-async function createData() {
+async function createData(system) {
   // Raw system information.
 
-  let system;
+  let sysinf;
 
   try {
-    system = {
+    sysinf = {
       cpu: await sysin.cpu(),
       system: await sysin.system(),
       memory: await sysin.mem(),
@@ -40,9 +33,9 @@ async function createData() {
         displays: (await sysin.graphics()).displays,
       },
     };
-    system.cpu.load = (await sysin.currentLoad()).currentLoad;
+    sysinf.cpu.load = (await sysin.currentLoad()).currentLoad;
   } catch (e) {
-    handlers.errorHandler("01", "001", e.stack.split("\n"));
+    system.handlers.errorHandler("01", "001", e.stack.split("\n"));
 
     process.exit();
   }
@@ -51,46 +44,46 @@ async function createData() {
 
   try {
     return {
-      hasBattery: system.battery.hasBattery,
+      hasBattery: sysinf.battery.hasBattery,
       system: function () {
         return (
-          `Device: ${system.system.model}` +
+          `Device: ${sysinf.sysinf.model}` +
           "\n" +
-          `UUID: ${system.system.uuid}` +
+          `UUID: ${sysinf.sysinf.uuid}` +
           "\n" +
-          `Platform: ${system.os.platform}` +
+          `Platform: ${sysinf.os.platform}` +
           "\n" +
-          `Distribution: ${system.os.distro}` +
+          `Distribution: ${sysinf.os.distro}` +
           "\n" +
-          `Hostname: ${system.os.hostname}`
+          `Hostname: ${sysinf.os.hostname}`
         );
       },
       cpu: function () {
         return (
-          `CPU: ${system.cpu.manufacturer} ${system.cpu.brand}` +
+          `CPU: ${sysinf.cpu.manufacturer} ${sysinf.cpu.brand}` +
           "\n" +
-          `Sockel: ${system.cpu.socket}` +
+          `Sockel: ${sysinf.cpu.socket}` +
           "\n" +
-          `Cores: ${system.cpu.cores}` +
+          `Cores: ${sysinf.cpu.cores}` +
           "\n" +
-          `Physical: ${system.cpu.physicalCores}` +
+          `Physical: ${sysinf.cpu.physicalCores}` +
           "\n" +
-          `Clock rate: ${system.cpu.speed} GHz` +
+          `Clock rate: ${sysinf.cpu.speed} GHz` +
           "\n" +
-          `Load: ${Math.round(system.cpu.load * 100) / 100}%`
+          `Load: ${Math.round(sysinf.cpu.load * 100) / 100}%`
         );
       },
       ram: function () {
         let ram =
           `Total: ${
-            Math.round((system.memory.total / 1024 / 1024 / 1024) * 100) / 100
+            Math.round((sysinf.memory.total / 1024 / 1024 / 1024) * 100) / 100
           } GB` +
           "\n" +
           `Available: ${
-            Math.round((system.memory.free / 1024 / 1024 / 1024) * 100) / 100
+            Math.round((sysinf.memory.free / 1024 / 1024 / 1024) * 100) / 100
           } GB`;
 
-        system.ram.forEach(
+        sysinf.ram.forEach(
           (i, n) =>
             (ram +=
               `\n\n\nRAM-Stick ${++n}: ${i.bank}` +
@@ -116,23 +109,23 @@ async function createData() {
       },
       graphics: function () {
         return (
-          `Display device: ${system.graphics.controller.model}` +
+          `Display device: ${sysinf.graphics.controller.model}` +
           "\n" +
-          `Chip manufacturer: ${system.graphics.controller.vendor}` +
+          `Chip manufacturer: ${sysinf.graphics.controller.vendor}` +
           "\n" +
-          `VRAM: ${system.graphics.controller.vram} MB` +
+          `VRAM: ${sysinf.graphics.controller.vram} MB` +
           "\n" +
           `Dynamic VRAM: ${
-            system.graphics.controller.vramDynamic ? "Yes" : "No"
+            sysinf.graphics.controller.vramDynamic ? "Yes" : "No"
           }` +
           "\n" +
-          `Bus: ${system.graphics.controller.bus}`
+          `Bus: ${sysinf.graphics.controller.bus}`
         );
       },
       displays: function () {
         let displays = "";
 
-        system.graphics.displays.forEach(
+        sysinf.graphics.displays.forEach(
           (i, n) =>
             (displays +=
               `Display ${++n}: ${i.deviceName}` +
@@ -149,7 +142,7 @@ async function createData() {
                 "\n" +
                 `Refresh rate: ${i.currentRefreshRate} Hz` +
                 "\n" +
-                system.graphics.displays.length >
+                sysinf.graphics.displays.length >
               n
                 ? "\n\n"
                 : "")
@@ -159,41 +152,41 @@ async function createData() {
       },
       battery: function () {
         return (
-          `Battery charge: ${system.battery.percent}%` +
+          `Battery charge: ${sysinf.battery.percent}%` +
           "\n" +
-          `Charging: ${system.battery.isCharging ? "Yes" : "No"}`
+          `Charging: ${sysinf.battery.isCharging ? "Yes" : "No"}`
         );
       },
       network: function () {
         return (
-          `Standard network interface: ${system.network.iface}` +
+          `Standard network interface: ${sysinf.network.iface}` +
           "\n" +
-          `Name: ${system.network.ifaceName}` +
+          `Name: ${sysinf.network.ifaceName}` +
           "\n" +
-          `MAC adress: ${system.network.mac}` +
+          `MAC adress: ${sysinf.network.mac}` +
           "\n" +
           `DNS suffix: ${
-            system.network.dnsSuffix ? system.network.dnsSuffix : "/"
+            sysinf.network.dnsSuffix ? sysinf.network.dnsSuffix : "/"
           }` +
           "\n" +
-          `IPv4 adress: ${system.network.ip4}` +
+          `IPv4 adress: ${sysinf.network.ip4}` +
           "\n" +
-          `IPv4 subnet mask: ${system.network.ip4subnet}` +
+          `IPv4 subnet mask: ${sysinf.network.ip4subnet}` +
           "\n" +
-          `IPv6 adresse: ${system.network.ip6}` +
+          `IPv6 adresse: ${sysinf.network.ip6}` +
           "\n" +
-          `IPv6 subnet mask: ${system.network.ip6subnet}` +
+          `IPv6 subnet mask: ${sysinf.network.ip6subnet}` +
           "\n" +
           `Connection type: ${
-            { wireless: "Wireless", wired: "Wired" }[system.network.type]
+            { wireless: "Wireless", wired: "Wired" }[sysinf.network.type]
           }` +
           "\n" +
-          `Speed: ${system.network.speed} Mbit/s`
+          `Speed: ${sysinf.network.speed} Mbit/s`
         );
       },
     };
   } catch (e) {
-    handlers.errorHandler("01", "002", e.stack.split("\n"));
+    system.handlers.errorHandler("01", "002", e.stack.split("\n"));
 
     process.exit();
   }

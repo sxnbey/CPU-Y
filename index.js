@@ -2,20 +2,24 @@
 *                                     DECLARATION & IMPORTS                                      *
 \************************************************************************************************/
 
-// Imports all needed modules to run the program.
+const system = {
+  functions: {},
+};
+const loader = require("./loader.js");
 
-const createData = require("./modules/data.js");
-const createUi = require("./modules/ui.js");
-const functions = require("./scripts/functions.js");
-const handlers = require("./handlers/handler.js");
+require("./scripts/functions.js")(system);
 
 /************************************************************************************************\
 *                                              MAIN                                              *
 \************************************************************************************************/
 
+// Loads all modules, handlers etc.
+
+loader(system);
+
 // Creates the banner.
 
-functions.cpuyBanner();
+system.functions.cpuyBanner();
 
 console.log("Please wait while CPU-Y is fetching your system information...");
 
@@ -30,7 +34,7 @@ run();
 // Creates the overlay with the imported data.
 
 async function run() {
-  // const data = await createData();
+  const data = await system.modules.createData(system);
 
-  createUi(await createData());
+  system.modules.createUi(system, data);
 }

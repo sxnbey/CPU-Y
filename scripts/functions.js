@@ -1,28 +1,9 @@
-/************************************************************************************************\
-*                                     DECLARATION & IMPORTS                                      *
-\************************************************************************************************/
+module.exports = (system) => {
+  system.functions.cpuyBanner = function () {
+    // This functions creates the CPU-Y banner.
 
-// Creates the functions object which is to be exported later.
-
-const functions = {};
-
-/************************************************************************************************\
-*                                            EXPORTS                                             *
-\************************************************************************************************/
-
-// Exports the functions object.
-
-module.exports = functions;
-
-/************************************************************************************************\
-*                                           FUNCTIONS                                            *
-\************************************************************************************************/
-
-// This functions creates the CPU-Y banner.
-
-functions.cpuyBanner = function () {
-  console.clear();
-  console.log(`
+    console.clear();
+    console.log(`
   ______   _______   __    __       __      __ 
  /      \\ |       \\ |  \\  |  \\     |  \\    /  \\
 |  $$$$$$\\| $$$$$$$\\| $$  | $$      \\$$\\  /  $$
@@ -35,4 +16,5 @@ functions.cpuyBanner = function () {
                                                
                                                
 `);
+  };
 };
