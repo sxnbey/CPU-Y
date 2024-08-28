@@ -12,19 +12,33 @@ function commandHandler(system) {
 
   rl.addListener("line", (msg) => {
     const args = msg.trim().split(" ");
-
-    let command = args.shift();
-    command = system.commands.find(
-      (i) => i.config.name == command || i.config.aliases.includes(command)
+    const inputCmd = args.shift();
+    const command = system.commands.find(
+      (i) => i.config.name == inputCmd || i.config.aliases.includes(inputCmd)
     );
-    command.run(system, args);
+
+    if (command) command.run(system, args);
+    else {
+      system.functions.cpuyBanner();
+
+      console.log(
+        `Command "${inputCmd}" couldn't be found.` +
+          "\n" +
+          'Type "help" for help.'
+      );
+    }
+
+    if (!["exit", "reload"].includes(inputCmd)) {
+      system.other.lastCommand = command ? command : null;
+      system.other.lastCommand.args = args;
+    }
 
     prompt();
   });
 
   rl.addListener("close", () => {
-    console.log("\n");
-    console.log("Exiting...");
+    console.log("Goodbye!");
+
     process.exit(0);
   });
 }

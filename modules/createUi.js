@@ -75,7 +75,5 @@ function createUi(system) {
     // console.log("-------------------------------------");
   } catch (e) {
     system.handlers.errorHandler("02", "001", e.stack.split("\n"));
-
-    process.exit();
   }
 }

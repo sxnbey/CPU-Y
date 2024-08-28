@@ -36,8 +36,6 @@ async function createData(system) {
     sysinf.cpu.load = (await sysin.currentLoad()).currentLoad;
   } catch (e) {
     system.handlers.errorHandler("01", "001", e.stack.split("\n"));
-
-    process.exit();
   }
 
   // The finished system information.
@@ -86,11 +84,11 @@ async function createData(system) {
               "\n" +
               `Serial number: ${i.serialNum}` +
               "\n" +
-              `Größe: ${
+              `Size: ${
                 Math.round((i.size / 1024 / 1024 / 1024) * 100) / 100
               } GB` +
               "\n" +
-              `Typ: ${i.type}` +
+              `Type: ${i.type}` +
               "\n" +
               `Form factor: ${i.formFactor}` +
               "\n" +
@@ -172,7 +170,5 @@ async function createData(system) {
     };
   } catch (e) {
     system.handlers.errorHandler("01", "002", e.stack.split("\n"));
-
-    process.exit();
   }
 }

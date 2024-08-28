@@ -1,10 +1,11 @@
 /************************************************************************************************\
-*                                     DECLARATION & IMPORTS                                      *
+*                                   DECLARATION, IM- & EXPORTS                                   *
 \************************************************************************************************/
 
 const system = {
   functions: {},
   sysinf: {},
+  other: { lastCommand: {}, winTooSmall: false },
 };
 const loader = require("./loader.js");
 
@@ -31,15 +32,13 @@ console.log("Please wait while CPU-Y is fetching your system information...");
   await system.modules.createData(system);
 
   // Runs the program.
-  run();
+  system.functions.run();
 })();
 
-/************************************************************************************************\
-*                                           FUNCTIONS                                            *
-\************************************************************************************************/
+process.stdout.addListener("resize", () => {
+  if (process.stdout.columns < 47 && !system.other.winTooSmall)
+    system.functions.winTooSmall();
 
-// Creates the overlay with the imported data.
-
-async function run() {
-  system.modules.createUi(system);
-}
+  if (process.stdout.columns >= 47 && system.other.winTooSmall)
+    system.functions.winReturn();
+});
