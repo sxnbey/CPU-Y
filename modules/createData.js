@@ -40,40 +40,34 @@ async function createData(system) {
     process.exit();
   }
 
-  // Returns the finished system information.
+  // The finished system information.
 
   try {
-    return {
+    system.sysinf = {
       hasBattery: sysinf.battery.hasBattery,
-      system: function () {
-        return (
-          `Device: ${sysinf.sysinf.model}` +
-          "\n" +
-          `UUID: ${sysinf.sysinf.uuid}` +
-          "\n" +
-          `Platform: ${sysinf.os.platform}` +
-          "\n" +
-          `Distribution: ${sysinf.os.distro}` +
-          "\n" +
-          `Hostname: ${sysinf.os.hostname}`
-        );
-      },
-      cpu: function () {
-        return (
-          `CPU: ${sysinf.cpu.manufacturer} ${sysinf.cpu.brand}` +
-          "\n" +
-          `Sockel: ${sysinf.cpu.socket}` +
-          "\n" +
-          `Cores: ${sysinf.cpu.cores}` +
-          "\n" +
-          `Physical: ${sysinf.cpu.physicalCores}` +
-          "\n" +
-          `Clock rate: ${sysinf.cpu.speed} GHz` +
-          "\n" +
-          `Load: ${Math.round(sysinf.cpu.load * 100) / 100}%`
-        );
-      },
-      ram: function () {
+      system:
+        `Device: ${sysinf.system.model}` +
+        "\n" +
+        `UUID: ${sysinf.system.uuid}` +
+        "\n" +
+        `Platform: ${sysinf.os.platform}` +
+        "\n" +
+        `Distribution: ${sysinf.os.distro}` +
+        "\n" +
+        `Hostname: ${sysinf.os.hostname}`,
+      cpu:
+        `CPU: ${sysinf.cpu.manufacturer} ${sysinf.cpu.brand}` +
+        "\n" +
+        `Sockel: ${sysinf.cpu.socket}` +
+        "\n" +
+        `Cores: ${sysinf.cpu.cores}` +
+        "\n" +
+        `Physical: ${sysinf.cpu.physicalCores}` +
+        "\n" +
+        `Clock rate: ${sysinf.cpu.speed} GHz` +
+        "\n" +
+        `Load: ${Math.round(sysinf.cpu.load * 100) / 100}%`,
+      ram: (function () {
         let ram =
           `Total: ${
             Math.round((sysinf.memory.total / 1024 / 1024 / 1024) * 100) / 100
@@ -106,23 +100,20 @@ async function createData(system) {
         );
 
         return ram;
-      },
-      graphics: function () {
-        return (
-          `Display device: ${sysinf.graphics.controller.model}` +
-          "\n" +
-          `Chip manufacturer: ${sysinf.graphics.controller.vendor}` +
-          "\n" +
-          `VRAM: ${sysinf.graphics.controller.vram} MB` +
-          "\n" +
-          `Dynamic VRAM: ${
-            sysinf.graphics.controller.vramDynamic ? "Yes" : "No"
-          }` +
-          "\n" +
-          `Bus: ${sysinf.graphics.controller.bus}`
-        );
-      },
-      displays: function () {
+      })(),
+      graphics:
+        `Display device: ${sysinf.graphics.controller.model}` +
+        "\n" +
+        `Chip manufacturer: ${sysinf.graphics.controller.vendor}` +
+        "\n" +
+        `VRAM: ${sysinf.graphics.controller.vram} MB` +
+        "\n" +
+        `Dynamic VRAM: ${
+          sysinf.graphics.controller.vramDynamic ? "Yes" : "No"
+        }` +
+        "\n" +
+        `Bus: ${sysinf.graphics.controller.bus}`,
+      displays: (function () {
         let displays = "";
 
         sysinf.graphics.displays.forEach(
@@ -149,41 +140,35 @@ async function createData(system) {
         );
 
         return displays;
-      },
-      battery: function () {
-        return (
-          `Battery charge: ${sysinf.battery.percent}%` +
-          "\n" +
-          `Charging: ${sysinf.battery.isCharging ? "Yes" : "No"}`
-        );
-      },
-      network: function () {
-        return (
-          `Standard network interface: ${sysinf.network.iface}` +
-          "\n" +
-          `Name: ${sysinf.network.ifaceName}` +
-          "\n" +
-          `MAC adress: ${sysinf.network.mac}` +
-          "\n" +
-          `DNS suffix: ${
-            sysinf.network.dnsSuffix ? sysinf.network.dnsSuffix : "/"
-          }` +
-          "\n" +
-          `IPv4 adress: ${sysinf.network.ip4}` +
-          "\n" +
-          `IPv4 subnet mask: ${sysinf.network.ip4subnet}` +
-          "\n" +
-          `IPv6 adresse: ${sysinf.network.ip6}` +
-          "\n" +
-          `IPv6 subnet mask: ${sysinf.network.ip6subnet}` +
-          "\n" +
-          `Connection type: ${
-            { wireless: "Wireless", wired: "Wired" }[sysinf.network.type]
-          }` +
-          "\n" +
-          `Speed: ${sysinf.network.speed} Mbit/s`
-        );
-      },
+      })(),
+      battery:
+        `Battery charge: ${sysinf.battery.percent}%` +
+        "\n" +
+        `Charging: ${sysinf.battery.isCharging ? "Yes" : "No"}`,
+      network:
+        `Standard network interface: ${sysinf.network.iface}` +
+        "\n" +
+        `Name: ${sysinf.network.ifaceName}` +
+        "\n" +
+        `MAC adress: ${sysinf.network.mac}` +
+        "\n" +
+        `DNS suffix: ${
+          sysinf.network.dnsSuffix ? sysinf.network.dnsSuffix : "/"
+        }` +
+        "\n" +
+        `IPv4 adress: ${sysinf.network.ip4}` +
+        "\n" +
+        `IPv4 subnet mask: ${sysinf.network.ip4subnet}` +
+        "\n" +
+        `IPv6 adresse: ${sysinf.network.ip6}` +
+        "\n" +
+        `IPv6 subnet mask: ${sysinf.network.ip6subnet}` +
+        "\n" +
+        `Connection type: ${
+          { wireless: "Wireless", wired: "Wired" }[sysinf.network.type]
+        }` +
+        "\n" +
+        `Speed: ${sysinf.network.speed} Mbit/s`,
     };
   } catch (e) {
     system.handlers.errorHandler("01", "002", e.stack.split("\n"));

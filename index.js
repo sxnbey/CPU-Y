@@ -4,6 +4,7 @@
 
 const system = {
   functions: {},
+  sysinf: {},
 };
 const loader = require("./loader.js");
 
@@ -13,19 +14,25 @@ require("./scripts/functions.js")(system);
 *                                              MAIN                                              *
 \************************************************************************************************/
 
-// Loads all modules, handlers etc.
-
-loader(system);
-
 // Creates the banner.
 
 system.functions.cpuyBanner();
 
+// Loads all modules, handlers and commands.
+
+loader(system);
+
+console.log("\n");
 console.log("Please wait while CPU-Y is fetching your system information...");
 
-// Runs the program.
+// Fetches the system information in an async function because I don't like then(). You'll never catch me using then(), that's a promise AHAHHAHHAHahha
 
-run();
+(async () => {
+  await system.modules.createData(system);
+
+  // Runs the program.
+  run();
+})();
 
 /************************************************************************************************\
 *                                           FUNCTIONS                                            *
@@ -34,7 +41,5 @@ run();
 // Creates the overlay with the imported data.
 
 async function run() {
-  const data = await system.modules.createData(system);
-
-  system.modules.createUi(system, data);
+  system.modules.createUi(system);
 }

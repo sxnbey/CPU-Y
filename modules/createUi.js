@@ -14,13 +14,8 @@ module.exports = createUi;
 
 // Creates the UI.
 
-function createUi(system, data) {
+function createUi(system) {
   try {
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
-    });
-
     system.functions.cpuyBanner();
 
     console.log("Welcome to CPU-Y!");
@@ -30,7 +25,8 @@ function createUi(system, data) {
         "\n" +
         "But if you already know how it works, ignore the sentence above and just type any command you need below."
     );
-    console.log("\n");
+
+    return system.handlers.commandHandler(system);
 
     rl.question("Your command:\n", (res) => {
       if (res == "help") {

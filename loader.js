@@ -1,27 +1,33 @@
 const fs = require("fs");
-const path = require("path");
 
 function loadAll(system) {
-  const directories = ["modules", "handlers"];
+  const dirs = ["modules", "handlers", "commands"];
 
-  directories.forEach((dir) => {
+  dirs.forEach((dir) => {
     const key = dir;
-    system[key] = {};
+    const dirPath = `./${dir}/`;
 
-    const fullPath = path.join(__dirname, dir);
+    system[key] = dir == "commands" ? [] : {};
 
-    fs.readdirSync(fullPath).forEach((file) => {
-      const filePath = path.join(fullPath, file);
+    if (dir == "commands") loadCommands(system[key], dirPath);
+    else
+      fs.readdirSync(dirPath).forEach((i) => {
+        system[key][i.split(".")[0]] = require(dirPath + i);
+      });
 
-      if (file.endsWith(".js")) {
-        const fileName = path.basename(file, ".js");
+    console.log(`${key.charAt(0).toUpperCase() + key.slice(1)} loaded.`);
+  });
+}
 
-        // Lädt das Modul/Handler, aber führt es nicht aus
-        const moduleFunction = require(filePath);
+function loadCommands(arr, dirPath) {
+  fs.readdirSync(dirPath).forEach((i) => {
+    if (!i.endsWith(".js")) return loadCommands(arr, dirPath + i + "/");
 
-        // Speichert die Funktion oder Klasse im system-Objekt
-        system[key][fileName] = moduleFunction;
-      }
+    const command = require(dirPath + i);
+
+    arr.push({
+      config: command.config,
+      run: command.run,
     });
   });
 }
