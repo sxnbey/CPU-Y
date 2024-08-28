@@ -4,8 +4,6 @@
 
 // Imports the module to respond to console inputs.
 
-const readline = require("readline");
-
 module.exports = createUi;
 
 /************************************************************************************************\
@@ -27,13 +25,6 @@ function createUi(system) {
     );
 
     return system.handlers.commandHandler(system);
-
-    rl.question("Your command:\n", (res) => {
-      if (res == "help") {
-        console.log("\n");
-        console.log("Höhö hier gibts keine Hilfe gerade hehehhehehehehe");
-      } else console.log("digga du hast nicht help eingegeben");
-    });
 
     // console.log("-------------------------------------");
     // console.log("-----------------CPU-Y---------------");

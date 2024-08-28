@@ -23,6 +23,7 @@ function commandHandler(system) {
   });
 
   rl.addListener("close", () => {
+    console.log("\n");
     console.log("Exiting...");
     process.exit(0);
   });
