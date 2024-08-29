@@ -1,3 +1,9 @@
+/************************************************************************************************\
+*                                   DECLARATION, IM- & EXPORTS                                   *
+\************************************************************************************************/
+
+// Imports readline and creates a readline interface so I can interact with responses in the console.
+
 const readline = require("readline");
 const rl = readline.createInterface({
   input: process.stdin,
@@ -7,10 +13,16 @@ const rl = readline.createInterface({
 
 module.exports = commandHandler;
 
+/************************************************************************************************\
+*                                              MAIN                                              *
+\************************************************************************************************/
+
 function commandHandler(system, promptOnly = false) {
   prompt();
 
   if (promptOnly) return;
+
+  // Triggers whenever a line has been entered in the console.
 
   rl.addListener("line", (msg) => {
     const args = msg.trim().split(" ");
@@ -38,12 +50,16 @@ function commandHandler(system, promptOnly = false) {
     prompt();
   });
 
+  // Triggers on CTRL + C.
+
   rl.addListener("close", () => {
     console.log("Goodbye!");
 
     process.exit(0);
   });
 }
+
+// This function creates the "> " in the console.
 
 function prompt() {
   console.log("\n");

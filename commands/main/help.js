@@ -14,8 +14,6 @@ module.exports.run = (system, args) => {
       "\n" +
       "  But it's recommended to always keep it as wide as the visible text for CPU-Y to work as intended." +
       "\n" +
-      '- After resizing the window the text can look distorted. To fix it, type "reload".' +
-      "\n" +
       '- All commands can be viewed with "commands".' +
       "\n" +
       '- To properly close CPU-Y, use CTRL + C or type "exit".' +
@@ -27,3 +25,5 @@ module.exports.run = (system, args) => {
       "  {} => necessary - [] => optional"
   );
 };
+
+// ALL COMMANDS (lol 1?) ARE WORK IN PROGRESSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS

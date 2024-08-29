@@ -1,7 +1,5 @@
 module.exports = (system) => {
   system.functions.cpuyBanner = function () {
-    // This functions creates the CPU-Y banner.
-
     console.clear();
     console.log(`
   ______   _______   __    __       __      __ 
@@ -21,12 +19,11 @@ module.exports = (system) => {
   // This functions reloads the window.
 
   system.functions.reload = function () {
-    console.log("wsg");
-    // Checks if the width is too small, because the window has to be reloaded after a window resize.
+    // Checks whether the width is too small, as the window has to be reloaded after resizing.
 
     if (process.stdout.columns < 47) return system.functions.winTooSmall();
 
-    // Runs the last command or returns back to the main page.
+    // Runs the last command or returns back to the main page/command/wtv.
 
     if (system.other.lastCommand.run)
       system.other.lastCommand.run(system, system.other.lastCommand.args);
@@ -35,13 +32,13 @@ module.exports = (system) => {
     system.handlers.commandHandler(system, true);
   };
 
-  // Starts the program.
+  // Starts the CPU-Y.
 
   system.functions.run = function () {
     system.modules.createMainPage(system);
   };
 
-  // The function to display the text when the window width is below 47.
+  // The function to display the please-make-the-window-wider-text when the window width is below 47.
 
   system.functions.winTooSmall = function () {
     system.other.winTooSmall = true;
