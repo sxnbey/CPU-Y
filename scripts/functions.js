@@ -19,16 +19,16 @@ module.exports = (system) => {
   };
 
   system.functions.reload = function () {
-    if (system.lastCommand)
-      system.lastCommand.run(system, system.lastCommand.args);
+    if (process.stdout.columns < 47) return system.functions.winTooSmall();
+
+    if (system.other.lastCommand.run)
+      system.other.lastCommand.run(system, system.other.lastCommand.args);
     else system.functions.run();
+
+    if (!system.other.onMainPage) system.handlers.commandHandler(system, true);
   };
 
   system.functions.run = function () {
-    // Checks if the window is too small.
-
-    if (process.stdout.columns < 47) return system.functions.winTooSmall();
-
     system.modules.createUi(system);
   };
 
@@ -44,7 +44,9 @@ module.exports = (system) => {
     console.log("Please make the window wider!");
     console.log("\n");
     console.log(
-      "When the window is wide enough, you automatically return to where you were before."
+      "When the window is wide enough," +
+        "\n" +
+        "you automatically return to where you were before."
     );
     console.log("\n");
     console.log('For more information, type "help".');
@@ -55,6 +57,6 @@ module.exports = (system) => {
   system.functions.winReturn = function () {
     system.other.winTooSmall = false;
 
-    system.functions.run();
+    system.functions.reload();
   };
 };

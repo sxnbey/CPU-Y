@@ -7,8 +7,10 @@ const rl = readline.createInterface({
 
 module.exports = commandHandler;
 
-function commandHandler(system) {
+function commandHandler(system, promptOnly = false) {
   prompt();
+
+  if (promptOnly) return;
 
   rl.addListener("line", (msg) => {
     const args = msg.trim().split(" ");
@@ -17,20 +19,22 @@ function commandHandler(system) {
       (i) => i.config.name == inputCmd || i.config.aliases.includes(inputCmd)
     );
 
-    if (command) command.run(system, args);
-    else {
-      system.functions.cpuyBanner();
+    if (command) {
+      command.run(system, args);
 
+      if (!["exit"].includes(inputCmd)) {
+        system.other.lastCommand = command;
+        system.other.lastCommand.args = args;
+      }
+
+      system.other.onMainPage = false;
+    } else {
+      console.log("\n");
       console.log(
         `Command "${inputCmd}" couldn't be found.` +
           "\n" +
           'Type "help" for help.'
       );
-    }
-
-    if (!["exit", "reload"].includes(inputCmd)) {
-      system.other.lastCommand = command ? command : null;
-      system.other.lastCommand.args = args;
     }
 
     prompt();
