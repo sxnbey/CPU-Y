@@ -18,18 +18,27 @@ module.exports = (system) => {
                                                        `);
   };
 
+  // This functions reloads the window.
+
   system.functions.reload = function () {
+    console.log("wsg");
+    // Checks if the width is too small, because the window has to be reloaded after a window resize.
+
     if (process.stdout.columns < 47) return system.functions.winTooSmall();
+
+    // Runs the last command or returns back to the main page.
 
     if (system.other.lastCommand.run)
       system.other.lastCommand.run(system, system.other.lastCommand.args);
     else system.functions.run();
 
-    if (!system.other.onMainPage) system.handlers.commandHandler(system, true);
+    system.handlers.commandHandler(system, true);
   };
 
+  // Starts the program.
+
   system.functions.run = function () {
-    system.modules.createUi(system);
+    system.modules.createMainPage(system);
   };
 
   // The function to display the text when the window width is below 47.
@@ -38,7 +47,6 @@ module.exports = (system) => {
     system.other.winTooSmall = true;
 
     console.clear();
-
     console.log("The window is too small!");
     console.log("\n");
     console.log("Please make the window wider!");
@@ -52,7 +60,7 @@ module.exports = (system) => {
     console.log('For more information, type "help".');
   };
 
-  // The function to make you return to wherever you where before the window has become too small.
+  // The counterpart to the function above (makes you go back to where you were before).
 
   system.functions.winReturn = function () {
     system.other.winTooSmall = false;

@@ -26,8 +26,6 @@ function commandHandler(system, promptOnly = false) {
         system.other.lastCommand = command;
         system.other.lastCommand.args = args;
       }
-
-      system.other.onMainPage = false;
     } else {
       console.log("\n");
       console.log(

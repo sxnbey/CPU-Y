@@ -9,7 +9,6 @@ const system = {
     lastCommand: {},
     winTooSmall: false,
     startingUp: true,
-    onMainPage: true,
   },
 };
 const loader = require("./loader.js");
@@ -36,8 +35,6 @@ console.log("Please wait while CPU-Y is fetching your system information...");
 (async () => {
   await system.modules.createData(system);
 
-  system.other.startingUp = false;
-
   if (process.stdout.columns < 47) return system.functions.winTooSmall();
 
   // Runs the program.
@@ -45,7 +42,11 @@ console.log("Please wait while CPU-Y is fetching your system information...");
 })();
 
 process.stdout.addListener("resize", () => {
+  // Just so nothing gets messed up while CPU-Y is starting up.
+
   if (system.other.startingUp) return;
+
+  // A quick reload because text can look "distorted" after resizing.
 
   system.functions.reload();
 

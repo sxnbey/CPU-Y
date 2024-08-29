@@ -2,9 +2,7 @@
 *                                   DECLARATION, IM- & EXPORTS                                   *
 \************************************************************************************************/
 
-// Imports the module to respond to console inputs.
-
-module.exports = createUi;
+module.exports = createMainPage;
 
 /************************************************************************************************\
 *                                              MAIN                                              *
@@ -12,7 +10,7 @@ module.exports = createUi;
 
 // Creates the UI.
 
-function createUi(system) {
+function createMainPage(system) {
   try {
     system.functions.cpuyBanner();
 
@@ -24,7 +22,12 @@ function createUi(system) {
         "But if you already know how it works, ignore the sentence above and just type any command you need below."
     );
 
-    return system.handlers.commandHandler(system);
+    // To prevent a 2nd readline to be created.
+
+    if (system.other.startingUp) {
+      system.other.startingUp = false;
+      system.handlers.commandHandler(system);
+    }
 
     // console.log("-------------------------------------");
     // console.log("-----------------CPU-Y---------------");
