@@ -12,15 +12,11 @@ module.exports = createMainPage;
 
 function createMainPage(system) {
   try {
-    system.functions.cpuyBanner();
+    const home = system.commands.find((i) => i.config.name == "home");
 
-    console.log("Welcome to CPU-Y!");
-    console.log("\n");
-    console.log(
-      'If it\'s your first time using CPU-Y, type "help" for more information on how to use this program.' +
-        "\n" +
-        "But if you already know how it works, ignore the sentence above and just type any command you need below."
-    );
+    system.other.lastCommand = home;
+
+    home.run(system, []);
 
     // To prevent a 2nd readline to be created.
 

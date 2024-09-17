@@ -37,8 +37,9 @@ console.log("Please wait while CPU-Y is fetching your system information...");
 
   if (process.stdout.columns < 47) return system.functions.winTooSmall();
 
-  // Runs the CPU-Y.
-  system.functions.run();
+  // Runs CPU-Y.
+
+  system.modules.createMainPage(system);
 })();
 
 // This event is triggered when the size of the console window is changed.

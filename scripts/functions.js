@@ -27,15 +27,9 @@ module.exports = (system) => {
 
     if (system.other.lastCommand.run)
       system.other.lastCommand.run(system, system.other.lastCommand.args);
-    else system.functions.run();
+    else system.commands.find((i) => i.config.name == "home").run(system, []);
 
     system.handlers.commandHandler(system, true);
-  };
-
-  // Starts the CPU-Y.
-
-  system.functions.run = function () {
-    system.modules.createMainPage(system);
   };
 
   // The function to display the please-make-the-window-wider-text when the window width is below 47.
