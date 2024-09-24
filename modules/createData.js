@@ -56,7 +56,7 @@ async function createData(system) {
       cpu:
         `CPU: ${sysinf.cpu.manufacturer} ${sysinf.cpu.brand}` +
         "\n" +
-        `Sockel: ${sysinf.cpu.socket}` +
+        `Socket: ${sysinf.cpu.socket}` +
         "\n" +
         `Cores: ${sysinf.cpu.cores}` +
         "\n" +

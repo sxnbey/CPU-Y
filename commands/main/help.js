@@ -2,6 +2,7 @@ module.exports.config = {
   name: "help",
   aliases: [],
   desc: "A few important things you need to know before using CPU-Y.",
+  listed: true,
 };
 
 module.exports.run = (system, args) => {
