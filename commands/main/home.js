@@ -1,7 +1,7 @@
 module.exports.config = {
   name: "home",
   aliases: [],
-  desc: "The homescreen of CPU-Y.",
+  desc: "The home screen of CPU-Y.",
 };
 
 module.exports.run = (system, args) => {

@@ -11,9 +11,9 @@ const system = {
     startingUp: true,
   },
 };
-const loader = require("./loader.js");
+const loader = require("./modules/loader.js");
 
-require("./scripts/functions.js")(system);
+require("./modules/functions.js")(system);
 
 /************************************************************************************************\
 *                                              MAIN                                              *
