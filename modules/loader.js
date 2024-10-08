@@ -28,7 +28,7 @@ function loadAll(system) {
       fs.readdirSync(dirPath).forEach((i) => {
         // After iterating through the directory, it loads the file.
 
-        system[key][i.split(".")[0]] = require(dirPath + i);
+        system[key][i.split(".")[0]] = require("../" + dirPath + i);
       });
 
     console.log(`${key.charAt(0).toUpperCase() + key.slice(1)} loaded.`);
@@ -43,7 +43,7 @@ function loadCommands(arr, dirPath) {
 
     // If it's a file, it will be pushed into the commands array.
 
-    const command = require(dirPath + i);
+    const command = require("../" + dirPath + i);
 
     arr.push({
       config: command.config,
