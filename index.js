@@ -7,6 +7,7 @@ require("dotenv").config();
 const os = require("os");
 const system = {
   dev: process.env.dev?.split(",").includes(os.userInfo().username),
+  chalk: require("chalk"),
   functions: {},
   sysinf: {},
   other: {
@@ -32,10 +33,6 @@ system.functions.cpuyBanner();
 // Loads all modules, handlers and commands.
 
 loader(system);
-
-console.log(system.commands);
-
-return;
 
 console.log("\n");
 console.log("Please wait while CPU-Y is fetching your system information...");

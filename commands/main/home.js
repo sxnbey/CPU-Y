@@ -11,8 +11,9 @@ module.exports.run = (system, args) => {
   console.log("Welcome to CPU-Y!");
   console.log("\n");
   console.log(
-    'If it\'s your first time using CPU-Y, type "help" for more information on how to use this program.' +
-      "\n" +
-      "But if you already know how it works, ignore the sentence above and just type any command you need below."
+    'If it\'s your first time using CPU-Y, type "help" for more information on how to use this program.'
+  );
+  console.log(
+    "But if you already know how it works, ignore the sentence above and just type any command you need below."
   );
 };

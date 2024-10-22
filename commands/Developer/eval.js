@@ -6,5 +6,5 @@ module.exports.config = {
 };
 
 module.exports.run = (system, args) => {
-  console.log("huhu");
+  system.functions.cpuyBanner();
 };

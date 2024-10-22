@@ -2,8 +2,6 @@
 *                                   DECLARATION, IM- & EXPORTS                                   *
 \************************************************************************************************/
 
-const commandHandler = require("./commandHandler");
-
 // Exports the error handler.
 
 module.exports = errorHandler;
@@ -28,31 +26,38 @@ function errorHandler(system, layer, error, stack) {
 
   // The error message.
 
-  console.clear();
-  console.log("An error occurred while processing your request:");
-  console.log(`${errors.info.layers[layer]} - ${layer}x${error.code}`);
-  console.log(error.name);
+  system.functions.cpuyBanner();
+
+  console.log(
+    system.chalk.red("An error occurred while processing your request:")
+  );
+  console.log("\n");
+  console.log(`Error: ${layer}x${error.code} ${error.name}`);
   console.log("\n");
   console.log("Origin of the error:\n" + fileAndLine());
 
   if (error.severity == 3) {
     console.log("\n");
     console.log(
-      `This is a ${
+      `This is a ${system.chalk.red(
         errors.info.severity[error.severity]
-      } error. CPU-Y is shutting down now.`
+      )} error. CPU-Y is shutting down now.`
     );
 
     process.exit(0);
   } else {
     console.log("\n");
     console.log(
-      `This is a ${
-        errors.info.severity[error.severity]
-      } error. You can still use CPU-Y but some commands might not work.`
+      system.chalk.green(
+        `This is a ${
+          errors.info.severity[error.severity]
+        } error. You can still use CPU-Y but some commands might not work.`
+      )
     );
     console.log("\n");
-    console.log("You will return to the homescreen in 10 seconds.");
+    console.log(
+      system.chalk.green("You will return to the homescreen in 10 seconds.")
+    );
 
     (async () => {
       await system.functions.wait(10000);

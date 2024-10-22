@@ -31,7 +31,7 @@ function commandHandler(system, promptOnly = false) {
       (i) => i.config.name == inputCmd || i.config.aliases.includes(inputCmd)
     );
 
-    if (command) {
+    if (command && (system.dev || command.config.category != "Developer")) {
       command.run(system, args);
 
       if (!["exit"].includes(inputCmd)) {

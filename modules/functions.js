@@ -1,7 +1,8 @@
 module.exports = (system) => {
   system.functions.cpuyBanner = function () {
     console.clear();
-    console.log(`
+    console.log(
+      system.chalk.cyan(`
   ______   _______   __    __       __      __ 
  /      \\ |       \\ |  \\  |  \\     |  \\    /  \\
 |  $$$$$$\\| $$$$$$$\\| $$  | $$      \\$$\\  /  $$
@@ -13,7 +14,8 @@ module.exports = (system) => {
   \\$$$$$$  \\$$        \\$$$$$$           \\$$       
                                                    
 -----------------------------------------------
-                                                       `);
+                                                       `)
+    );
   };
 
   // This functions reloads the window.
@@ -63,5 +65,9 @@ module.exports = (system) => {
 
   system.functions.wait = function (ms) {
     return new Promise((res) => setTimeout(() => res(true), ms));
+  };
+
+  system.functions.log = function (text, color = "gray") {
+    console.log(system.chalk[color](text));
   };
 };
