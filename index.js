@@ -33,6 +33,10 @@ system.functions.cpuyBanner();
 
 loader(system);
 
+console.log(system.commands);
+
+return;
+
 console.log("\n");
 console.log("Please wait while CPU-Y is fetching your system information...");
 // Fetches the system information in an async function because I don't like then(). You'll never catch me using then(), that's a PROMISE!!!! AHAHHAHHAHahha

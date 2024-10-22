@@ -3,7 +3,6 @@ module.exports.config = {
   aliases: ["e"],
   desc: "Evaluates JavaScript-Code",
   listed: false,
-  category: "Dev",
 };
 
 module.exports.run = (system, args) => {

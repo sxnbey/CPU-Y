@@ -17,7 +17,6 @@ function loadAll(system) {
 
   dirs.forEach((dir) => {
     const key = dir;
-    const dirPath = `./${dir}/`;
 
     // The commands are stored in an array not in an object.
 
@@ -39,14 +38,22 @@ function loadCommands(arr, dirPath) {
   // Iterates through the directory and if there is a folder, it iterates through said folder.
 
   fs.readdirSync(dirPath).forEach((i) => {
-    if (!i.endsWith(".js")) return loadCommands(arr, `./${dirPath}/${i}/`);
+    if (!i.endsWith(".js")) return loadCommands(arr, `${dirPath}/${i}/`);
 
     // If it's a file, it will be pushed into the commands array.
 
     const command = require(`../${dirPath}${i}`);
+    const folder = dirPath
+      .split("/")
+      .slice(2)
+      .join("/")
+      .replace(/^\/+|\/+$/g, "");
 
     arr.push({
-      config: command.config,
+      config: {
+        ...command.config,
+        category: folder,
+      },
       run: command.run,
     });
   });

@@ -3,7 +3,6 @@ module.exports.config = {
   aliases: [],
   desc: "The home screen of CPU-Y.",
   listed: false,
-  category: "Main",
 };
 
 module.exports.run = (system, args) => {
