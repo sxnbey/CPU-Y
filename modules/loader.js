@@ -23,12 +23,12 @@ function loadAll(system) {
 
     system[key] = dir == "commands" ? [] : {};
 
-    if (dir == "commands") loadCommands(system[key], dirPath);
+    if (dir == "commands") loadCommands(system[key], `./${dir}/`);
     else
-      fs.readdirSync(dirPath).forEach((i) => {
+      fs.readdirSync(`./${dir}/`).forEach((i) => {
         // After iterating through the directory, it loads the file.
 
-        system[key][i.split(".")[0]] = require("../" + dirPath + i);
+        system[key][i.split(".")[0]] = require("../" + `./${dir}/` + i);
       });
 
     console.log(`${key.charAt(0).toUpperCase() + key.slice(1)} loaded.`);
@@ -39,11 +39,11 @@ function loadCommands(arr, dirPath) {
   // Iterates through the directory and if there is a folder, it iterates through said folder.
 
   fs.readdirSync(dirPath).forEach((i) => {
-    if (!i.endsWith(".js")) return loadCommands(arr, dirPath + i + "/");
+    if (!i.endsWith(".js")) return loadCommands(arr, `./${dirPath}/${i}/`);
 
     // If it's a file, it will be pushed into the commands array.
 
-    const command = require("../" + dirPath + i);
+    const command = require(`../${dirPath}${i}`);
 
     arr.push({
       config: command.config,

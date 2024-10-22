@@ -58,4 +58,10 @@ module.exports = (system) => {
 
     system.functions.reload();
   };
+
+  // This functions waits.
+
+  system.functions.wait = function (ms) {
+    return new Promise((res) => setTimeout(() => res(true), ms));
+  };
 };

@@ -2,13 +2,19 @@
 *                                   DECLARATION, IM- & EXPORTS                                   *
 \************************************************************************************************/
 
+require("dotenv").config();
+
+const os = require("os");
 const system = {
+  dev: process.env.dev?.split(",").includes(os.userInfo().username),
   functions: {},
   sysinf: {},
   other: {
     lastCommand: {},
     winTooSmall: false,
     startingUp: true,
+    errorOnStartup: false,
+    commandsBlockedByError: [],
   },
 };
 const loader = require("./modules/loader.js");
@@ -29,7 +35,6 @@ loader(system);
 
 console.log("\n");
 console.log("Please wait while CPU-Y is fetching your system information...");
-
 // Fetches the system information in an async function because I don't like then(). You'll never catch me using then(), that's a PROMISE!!!! AHAHHAHHAHahha
 
 (async () => {

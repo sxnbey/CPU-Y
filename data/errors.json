@@ -1,30 +1,40 @@
 {
-  "01": [
-    {
-      "code": "001",
-      "name": "ERR_RETR_SYSINF",
-      "layer": "DATA",
-      "severity": "CRITICAL",
-      "explanation": "System information could not be retrieved.",
-      "help": ["Reinstall Node.js module 'systeminformation'."]
-    },
-    {
-      "code": "002",
-      "name": "ERR_EVAL_SYSINF",
-      "layer": "DATA",
-      "severity": "CRITICAL",
-      "explanation": "System information could not be evaluated.",
-      "help": []
-    }
-  ],
-  "02": [
-    {
-      "code": "001",
-      "name": "ERR_RENDER_UI",
-      "layer": "UI",
-      "severity": "CRITICAL",
-      "explanation": "User interface could not be rendered.",
-      "help": []
-    }
-  ]
+  "errors": {
+    "01": [
+      {
+        "code": "001",
+        "name": "ERR_LOAD_MODULES",
+        "severity": "3",
+        "explanation": "Needed modules could not be loaded.",
+        "help": []
+      },
+      {
+        "code": "002",
+        "name": "ERR_RENDER_UI",
+        "severity": "3",
+        "explanation": "User interface could not be rendered.",
+        "help": []
+      }
+    ],
+    "02": [
+      {
+        "code": "001",
+        "name": "ERR_RETR_SYSINF",
+        "severity": "2",
+        "explanation": "System information could not be retrieved.",
+        "help": ["Reinstall Node.js module 'systeminformation'."]
+      },
+      {
+        "code": "002",
+        "name": "ERR_EVAL_SYSINF",
+        "severity": "2",
+        "explanation": "System information could not be evaluated.",
+        "help": []
+      }
+    ]
+  },
+  "info": {
+    "layers": { "01": "SYSTEM", "02": "DATA" },
+    "severity": { "1": "MINIMAL", "2": "MEDIUM", "3": "CRITICAL" }
+  }
 }

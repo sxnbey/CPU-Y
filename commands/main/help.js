@@ -3,6 +3,7 @@ module.exports.config = {
   aliases: [],
   desc: "A few important things you need to know before using CPU-Y.",
   listed: true,
+  category: "Main",
 };
 
 module.exports.run = (system, args) => {
@@ -30,5 +31,3 @@ module.exports.run = (system, args) => {
       "  {} => necessary - [] => optional"
   );
 };
-
-// ALL COMMANDS (lol 1?) ARE WORK IN PROGRESSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS

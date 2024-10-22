@@ -41,9 +41,11 @@ function commandHandler(system, promptOnly = false) {
     } else {
       console.log("\n");
       console.log(
-        `Command "${inputCmd}" couldn't be found.` +
-          "\n" +
-          'Type "help" for help.'
+        (system.other.commandsBlockedByError.includes(command)
+          ? `Command "${inputCmd}" couldn't be executed because of an error.`
+          : inputCmd.length
+          ? `Command "${inputCmd}" couldn't be found.`
+          : "Please enter a command.") + `\nType "help" for help.`
       );
     }
 

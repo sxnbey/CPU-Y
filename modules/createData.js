@@ -34,8 +34,10 @@ async function createData(system) {
       },
     };
     sysinf.cpu.load = (await sysin.currentLoad()).currentLoad;
+
+    // sysinf.nonExistentMethod();
   } catch (e) {
-    system.handlers.errorHandler("01", "001", e.stack.split("\n"));
+    system.handlers.errorHandler(system, "02", "001", e.stack.split("\n"));
   }
 
   // The finished system information.
@@ -169,6 +171,6 @@ async function createData(system) {
         `Speed: ${sysinf.network.speed} Mbit/s`,
     };
   } catch (e) {
-    system.handlers.errorHandler("01", "002", e.stack.split("\n"));
+    system.handlers.errorHandler(system, "02", "002", e.stack.split("\n"));
   }
 }

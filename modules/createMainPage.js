@@ -12,6 +12,8 @@ module.exports = createMainPage;
 
 function createMainPage(system) {
   try {
+    if (system.other.errorOnStartup) return;
+
     const home = system.commands.find((i) => i.config.name == "home");
 
     system.other.lastCommand = home;
@@ -73,6 +75,6 @@ function createMainPage(system) {
     // console.log("-------------------------------------");
     // console.log("-------------------------------------");
   } catch (e) {
-    system.handlers.errorHandler("02", "001", e.stack.split("\n"));
+    system.handlers.errorHandler(system, "01", "001", e.stack.split("\n"));
   }
 }

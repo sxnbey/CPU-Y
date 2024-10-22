@@ -3,6 +3,7 @@ module.exports.config = {
   aliases: [],
   desc: "The home screen of CPU-Y.",
   listed: false,
+  category: "Main",
 };
 
 module.exports.run = (system, args) => {
@@ -16,5 +17,3 @@ module.exports.run = (system, args) => {
       "But if you already know how it works, ignore the sentence above and just type any command you need below."
   );
 };
-
-// ALL COMMANDS (lol 1?) ARE WORK IN PROGRESSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
