@@ -26,19 +26,23 @@ function errorHandler(system, layer, error, stack) {
 
   // The error message.
 
+  // console.clear();
   system.functions.cpuyBanner();
-
-  console.log(
-    system.chalk.red("An error occurred while processing your request:")
+  system.functions.log(
+    `An ${system.chalk.red("ERROR")} occurred while processing your request:`
   );
   console.log("\n");
-  console.log(`Error: ${layer}x${error.code} ${error.name}`);
+  system.functions.log(`${error.name}`, ["red"]);
   console.log("\n");
-  console.log("Origin of the error:\n" + fileAndLine());
+  system.functions.log(
+    `Error code: ${system.chalk.red(`${layer}x${error.code}`)}`
+  );
+  system.functions.log(`Origin: ${fileAndLine()}`);
+  // If it's a critical error, CPU-Y shuts down.
 
   if (error.severity == 3) {
     console.log("\n");
-    console.log(
+    system.functions.log(
       `This is a ${system.chalk.red(
         errors.info.severity[error.severity]
       )} error. CPU-Y is shutting down now.`
@@ -47,20 +51,24 @@ function errorHandler(system, layer, error, stack) {
     process.exit(0);
   } else {
     console.log("\n");
-    console.log(
-      system.chalk.green(
-        `This is a ${
-          errors.info.severity[error.severity]
-        } error. You can still use CPU-Y but some commands might not work.`
-      )
+    system.functions.log(
+      `This is a ${system.chalk[error.severity == 2 ? "yellow" : "green"](
+        errors.info.severity[error.severity]
+      )} error. You can still use CPU-Y but some commands might not work.`
     );
-    console.log("\n");
-    console.log(
-      system.chalk.green("You will return to the homescreen in 10 seconds.")
+    // console.log("\n");
+    system.functions.log(
+      `For more information on the error, type "${system.chalk.cyan(
+        `error ${layer}x${error.code}`
+      )}"`
     );
+    // console.log("\n");
+    system.functions.log("You will return to the homescreen in 15 seconds.", [
+      "green",
+    ]);
 
     (async () => {
-      await system.functions.wait(10000);
+      await system.functions.wait(15000);
 
       system.other.errorOnStartup = false;
       system.modules.createMainPage(system);

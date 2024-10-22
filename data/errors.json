@@ -20,7 +20,7 @@
       {
         "code": "001",
         "name": "ERR_RETR_SYSINF",
-        "severity": "2",
+        "severity": "3",
         "explanation": "System information could not be retrieved.",
         "help": ["Reinstall Node.js module 'systeminformation'."]
       },

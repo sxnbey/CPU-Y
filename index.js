@@ -35,7 +35,10 @@ system.functions.cpuyBanner();
 loader(system);
 
 console.log("\n");
-console.log("Please wait while CPU-Y is fetching your system information...");
+system.functions.log(
+  "Please wait while CPU-Y is fetching your system information...",
+  ["yellow"]
+);
 // Fetches the system information in an async function because I don't like then(). You'll never catch me using then(), that's a PROMISE!!!! AHAHHAHHAHahha
 
 (async () => {

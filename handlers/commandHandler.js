@@ -40,7 +40,7 @@ function commandHandler(system, promptOnly = false) {
       }
     } else {
       console.log("\n");
-      console.log(
+      system.functions.log(
         (system.other.commandsBlockedByError.includes(command)
           ? `Command "${inputCmd}" couldn't be executed because of an error.`
           : inputCmd.length
@@ -55,7 +55,7 @@ function commandHandler(system, promptOnly = false) {
   // Triggers on CTRL + C.
 
   rl.addListener("close", () => {
-    console.log("Goodbye!");
+    system.functions.log("Goodbye!");
 
     process.exit(0);
   });

@@ -30,7 +30,10 @@ function loadAll(system) {
         system[key][i.split(".")[0]] = require("../" + `./${dir}/` + i);
       });
 
-    console.log(`${key.charAt(0).toUpperCase() + key.slice(1)} loaded.`);
+    system.functions.log(
+      `${key.charAt(0).toUpperCase() + key.slice(1)} loaded. [+]`,
+      ["green"]
+    );
   });
 }
 

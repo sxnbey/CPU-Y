@@ -8,12 +8,14 @@ module.exports.config = {
 module.exports.run = (system, args) => {
   system.functions.cpuyBanner();
 
-  console.log("Welcome to CPU-Y!");
+  system.functions.log("Welcome to CPU-Y!", ["green", "underline"]);
   console.log("\n");
-  console.log(
-    'If it\'s your first time using CPU-Y, type "help" for more information on how to use this program.'
+  system.functions.log(
+    `If it\`s your first time using CPU-Y, type "${system.chalk.cyan(
+      "help"
+    )}" for more information on how to use this program.`
   );
-  console.log(
+  system.functions.log(
     "But if you already know how it works, ignore the sentence above and just type any command you need below."
   );
 };

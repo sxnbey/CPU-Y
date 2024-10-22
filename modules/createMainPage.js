@@ -27,53 +27,53 @@ function createMainPage(system) {
       system.handlers.commandHandler(system);
     }
 
-    // console.log("-------------------------------------");
-    // console.log("-----------------CPU-Y---------------");
-    // console.log("-------------------------------------");
-    // console.log(data.system());
+    // system.functions.log("-------------------------------------");
+    // system.functions.log("-----------------CPU-Y---------------");
+    // system.functions.log("-------------------------------------");
+    // system.functions.log(data.system());
     // console.log("\n");
-    // console.log("-------------------------------------");
-    // console.log("---------------Network---------------");
-    // console.log("-------------------------------------");
+    // system.functions.log("-------------------------------------");
+    // system.functions.log("---------------Network---------------");
+    // system.functions.log("-------------------------------------");
     // console.log("\n");
-    // console.log(data.network());
+    // system.functions.log(data.network());
     // console.log("\n");
-    // console.log("-------------------------------------");
-    // console.log("-----------------CPU-----------------");
-    // console.log("-------------------------------------");
+    // system.functions.log("-------------------------------------");
+    // system.functions.log("-----------------CPU-----------------");
+    // system.functions.log("-------------------------------------");
     // console.log("\n");
-    // console.log(data.cpu());
+    // system.functions.log(data.cpu());
     // console.log("\n");
-    // console.log("-------------------------------------");
-    // console.log("-----------------RAM-----------------");
-    // console.log("-------------------------------------");
+    // system.functions.log("-------------------------------------");
+    // system.functions.log("-----------------RAM-----------------");
+    // system.functions.log("-------------------------------------");
     // console.log("\n");
-    // console.log(data.ram());
+    // system.functions.log(data.ram());
     // console.log("\n");
-    // console.log("-------------------------------------");
-    // console.log("---------------Graphics--------------");
-    // console.log("-------------------------------------");
+    // system.functions.log("-------------------------------------");
+    // system.functions.log("---------------Graphics--------------");
+    // system.functions.log("-------------------------------------");
     // console.log("\n");
-    // console.log(data.graphics());
+    // system.functions.log(data.graphics());
     // console.log("\n");
-    // console.log("-------------------------------------");
-    // console.log("---------------Display---------------");
-    // console.log("-------------------------------------");
+    // system.functions.log("-------------------------------------");
+    // system.functions.log("---------------Display---------------");
+    // system.functions.log("-------------------------------------");
     // console.log("\n");
-    // console.log(data.displays());
+    // system.functions.log(data.displays());
     // console.log("\n");
     // // If it's a desktop, this is not needed.
     // if (data.hasBattery) {
-    //   console.log("-------------------------------------");
-    //   console.log("-------------Battery-----------------");
-    //   console.log("-------------------------------------");
+    //   system.functions.log("-------------------------------------");
+    //   system.functions.log("-------------Battery-----------------");
+    //   system.functions.log("-------------------------------------");
     //   console.log("\n");
-    //   console.log(data.battery());
+    //   system.functions.log(data.battery());
     //   console.log("\n");
     // }
-    // console.log("-------------------------------------");
-    // console.log("-------------------------------------");
-    // console.log("-------------------------------------");
+    // system.functions.log("-------------------------------------");
+    // system.functions.log("-------------------------------------");
+    // system.functions.log("-------------------------------------");
   } catch (e) {
     system.handlers.errorHandler(system, "01", "001", e.stack.split("\n"));
   }

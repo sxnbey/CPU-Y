@@ -1,7 +1,7 @@
 module.exports = (system) => {
   system.functions.cpuyBanner = function () {
     console.clear();
-    console.log(
+    system.functions.log(
       system.chalk.cyan(`
   ______   _______   __    __       __      __ 
  /      \\ |       \\ |  \\  |  \\     |  \\    /  \\
@@ -40,17 +40,17 @@ module.exports = (system) => {
     system.other.winTooSmall = true;
 
     console.clear();
-    console.log("The window is too small!");
+    system.functions.log("The window is too small!", ["red"]);
     console.log("\n");
-    console.log("Please make the window wider!");
+    system.functions.log("Please make the window wider!", ["red"]);
     console.log("\n");
-    console.log(
+    system.functions.log(
       "When the window is wide enough," +
         "\n" +
         "you automatically return to where you were before."
     );
     console.log("\n");
-    console.log('For more information, type "help".');
+    system.functions.log('For more information, type "help".');
   };
 
   // The counterpart to the function above (makes you go back to where you were before).
@@ -67,7 +67,13 @@ module.exports = (system) => {
     return new Promise((res) => setTimeout(() => res(true), ms));
   };
 
-  system.functions.log = function (text, color = "gray") {
-    console.log(system.chalk[color](text));
+  // My logging functions with chalk.
+
+  system.functions.log = function (text, styles = ["gray"]) {
+    styles.forEach((i) => {
+      text = system.chalk[i](text);
+    });
+
+    console.log(text);
   };
 };
