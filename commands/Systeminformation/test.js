@@ -1,7 +1,7 @@
 module.exports.config = {
-  name: "help",
+  name: "test",
   aliases: [],
-  desc: "A few important things you need to know before using CPU-Y.",
+  desc: "test",
   listed: true,
 };
 

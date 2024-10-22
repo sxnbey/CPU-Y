@@ -21,7 +21,6 @@ function errorHandler(system, layer, error, stack) {
 
   error = errors.errors[layer].find((i) => i.code == error);
 
-  system.other.commandsBlockedByError.push(system.other.lastCommand);
   system.other.errorOnStartup = true;
 
   // The error message.
@@ -50,19 +49,30 @@ function errorHandler(system, layer, error, stack) {
 
     process.exit(0);
   } else {
+    console.log(system.other.commandsBlockedByError);
+
+    if (error.severity == 2)
+      errors.errors["02"].forEach((i) =>
+        system.other.commandsBlockedByError.push(
+          system.commands.filter(
+            (i) => i.config.category == "Systeminformation"
+          )
+        )
+      );
+
+    console.log(system.other.commandsBlockedByError);
+
     console.log("\n");
     system.functions.log(
       `This is a ${system.chalk[error.severity == 2 ? "yellow" : "green"](
         errors.info.severity[error.severity]
       )} error. You can still use CPU-Y but some commands might not work.`
     );
-    // console.log("\n");
     system.functions.log(
       `For more information on the error, type "${system.chalk.cyan(
         `error ${layer}x${error.code}`
       )}"`
     );
-    // console.log("\n");
     system.functions.log("You will return to the homescreen in 15 seconds.", [
       "green",
     ]);

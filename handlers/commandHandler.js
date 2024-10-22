@@ -31,24 +31,28 @@ function commandHandler(system, promptOnly = false) {
       (i) => i.config.name == inputCmd || i.config.aliases.includes(inputCmd)
     );
 
-    if (command && (system.dev || command.config.category != "Developer")) {
-      command.run(system, args);
+    if (!system.other.commandsBlockedByError.includes(command.name))
+      if (command && (system.dev || command.config.category != "Developer")) {
+        command.run(system, args);
 
-      if (!["exit"].includes(inputCmd)) {
-        system.other.lastCommand = command;
-        system.other.lastCommand.args = args;
+        if (!["exit"].includes(inputCmd)) {
+          system.other.lastCommand = command;
+          system.other.lastCommand.args = args;
+        }
+      } else {
+        console.log("\n");
+        system.functions.log(
+          (inputCmd.length
+            ? `Command "${system.chalk.yellow(inputCmd)}" couldn't be found.`
+            : "Please enter a command.") +
+            `\nType "${system.chalk.cyan("help")}" for help.`
+        );
       }
-    } else {
-      console.log("\n");
+    else {
       system.functions.log(
-        (system.other.commandsBlockedByError.includes(command)
-          ? `Command "${system.chalk.yellow(
-              inputCmd
-            )}" couldn't be executed because of an error.`
-          : inputCmd.length
-          ? `Command "${system.chalk.yellow(inputCmd)}" couldn't be found.`
-          : "Please enter a command.") +
-          `\nType "${system.chalk.cyan("help")}" for help.`
+        `Command "${system.chalk.yellow(
+          inputCmd
+        )}" couldn't be executed because of an error.`
       );
     }
 

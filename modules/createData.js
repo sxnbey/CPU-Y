@@ -35,7 +35,7 @@ async function createData(system) {
     };
     sysinf.cpu.load = (await sysin.currentLoad()).currentLoad;
 
-    // sysinf.nonExistentMethod();
+    sysinf.nonExistentMethod();
   } catch (e) {
     system.handlers.errorHandler(system, "02", "001", e.stack.split("\n"));
   }
