@@ -76,4 +76,12 @@ module.exports = (system) => {
 
     console.log(text);
   };
+
+  // My header for every command.
+
+  system.functions.cmdHeader = function (text) {
+    system.functions.cpuyBanner();
+    system.functions.log(`${text} - CPU-Y`, ["green", "underline"]);
+    console.log("\n");
+  };
 };

@@ -5,14 +5,14 @@
         "code": "001",
         "name": "ERR_LOAD_MODULES",
         "severity": "3",
-        "explanation": "Needed modules could not be loaded.",
-        "help": []
+        "explanation": "Internal modules, which are absolutely necessary for CPU-Y to function, could not be loaded.",
+        "help": ["Reinstall CPU-Y."]
       },
       {
         "code": "002",
         "name": "ERR_RENDER_UI",
         "severity": "3",
-        "explanation": "User interface could not be rendered.",
+        "explanation": "The user interface could not be rendered. This means that nothing can be displayed and therefore CPU-Y does not work.",
         "help": []
       }
     ],
@@ -20,16 +20,22 @@
       {
         "code": "001",
         "name": "ERR_RETR_SYSINF",
-        "severity": "3",
-        "explanation": "System information could not be retrieved.",
-        "help": ["Reinstall Node.js module 'systeminformation'."]
+        "severity": "2",
+        "explanation": "Your system information could not be retrieved, so these commands will not work.",
+        "help": [
+          "Reinstall Node.js module 'systeminformation'.",
+          "Reinstall CPU-Y."
+        ]
       },
       {
         "code": "002",
         "name": "ERR_EVAL_SYSINF",
         "severity": "2",
-        "explanation": "System information could not be evaluated.",
-        "help": []
+        "explanation": "Your system information could not be evaluated, so these commands will not work.",
+        "help": [
+          "Reinstall Node.js module 'systeminformation'.",
+          "Reinstall CPU-Y."
+        ]
       }
     ]
   },

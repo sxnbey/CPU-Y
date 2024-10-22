@@ -2,14 +2,11 @@ module.exports.config = {
   name: "home",
   aliases: [],
   desc: "The home screen of CPU-Y.",
-  listed: false,
+  listed: true,
 };
 
 module.exports.run = (system, args) => {
-  system.functions.cpuyBanner();
-
-  system.functions.log("Welcome to CPU-Y!", ["green", "underline"]);
-  console.log("\n");
+  system.functions.cmdHeader("Welcome!");
   system.functions.log(
     `If it\`s your first time using CPU-Y, type "${system.chalk.cyan(
       "help"

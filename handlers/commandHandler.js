@@ -42,10 +42,13 @@ function commandHandler(system, promptOnly = false) {
       console.log("\n");
       system.functions.log(
         (system.other.commandsBlockedByError.includes(command)
-          ? `Command "${inputCmd}" couldn't be executed because of an error.`
+          ? `Command "${system.chalk.yellow(
+              inputCmd
+            )}" couldn't be executed because of an error.`
           : inputCmd.length
-          ? `Command "${inputCmd}" couldn't be found.`
-          : "Please enter a command.") + `\nType "help" for help.`
+          ? `Command "${system.chalk.yellow(inputCmd)}" couldn't be found.`
+          : "Please enter a command.") +
+          `\nType "${system.chalk.cyan("help")}" for help.`
       );
     }
 
@@ -55,7 +58,7 @@ function commandHandler(system, promptOnly = false) {
   // Triggers on CTRL + C.
 
   rl.addListener("close", () => {
-    system.functions.log("Goodbye!");
+    system.functions.log("Goodbye!", ["green", "underline"]);
 
     process.exit(0);
   });
