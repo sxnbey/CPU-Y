@@ -18,7 +18,7 @@ module.exports.run = async (system, args) => {
 
   system.functions.log("Reloading...", ["yellow"]);
 
-  await system.functions.wait(2500);
+  await system.functions.wait(1500);
 
   system.modules.createMainPage(system);
 

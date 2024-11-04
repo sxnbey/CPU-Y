@@ -30,9 +30,13 @@ function loadAll(system) {
     fs.readdirSync(`./${dir}/`).forEach((i) => {
       count++;
 
+      // Deletes the cache of the file.
+
+      delete require.cache[require.resolve(`../${dir}${i}`)];
+
       // After iterating through the directory, it loads the file.
 
-      system[key][i.split(".")[0]] = require("../" + `./${dir}/` + i);
+      system[key][i.split(".")[0]] = require(`../${dir}${i}`);
     });
 
     loadLog(system, key.charAt(0).toUpperCase() + key.slice(1), count);
