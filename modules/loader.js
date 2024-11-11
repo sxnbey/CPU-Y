@@ -15,15 +15,16 @@ function loadAll(system) {
 
   const dirs = ["modules", "handlers"];
 
+  // The commands are stored in an array not in an object.
   system["commands"] = [];
 
   loadCommands(system, system["commands"], `./${"commands"}/`);
 
+  loadLog(system, "Commands", system.commands.length);
+
   dirs.forEach((dir) => {
     const key = dir;
     let count = 0;
-
-    // The commands are stored in an array not in an object.
 
     system[key] = {};
 
@@ -32,16 +33,15 @@ function loadAll(system) {
 
       // Deletes the cache of the file.
 
-      delete require.cache[require.resolve(`../${dir}${i}`)];
+      delete require.cache[require.resolve(`../${dir}/${i}`)];
 
       // After iterating through the directory, it loads the file.
 
-      system[key][i.split(".")[0]] = require(`../${dir}${i}`);
+      system[key][i.split(".")[0]] = require(`../${dir}/${i}`);
     });
 
     loadLog(system, key.charAt(0).toUpperCase() + key.slice(1), count);
   });
-  loadLog(system, "Commands", system.commands.length);
 }
 
 // The function that logs everything that has been loaded.

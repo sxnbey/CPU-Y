@@ -15,7 +15,7 @@ const system = {
     winTooSmall: false,
     startingUp: true,
     errorOnStartup: false,
-    commandsBlockedByError: [],
+    catsBlockedByError: [],
   },
 };
 const loader = require("./modules/loader.js");

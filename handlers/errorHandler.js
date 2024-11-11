@@ -25,7 +25,6 @@ function errorHandler(system, layer, error, stack) {
 
   // The error message.
 
-  // console.clear();
   system.functions.cpuyBanner();
   system.functions.log(
     `An ${system.chalk.red("ERROR")} occurred while processing your request:`
@@ -49,18 +48,10 @@ function errorHandler(system, layer, error, stack) {
 
     process.exit(0);
   } else {
-    console.log(system.other.commandsBlockedByError);
-
     if (error.severity == 2)
-      errors.errors["02"].forEach((i) =>
-        system.other.commandsBlockedByError.push(
-          system.commands.filter(
-            (i) => i.config.category == "Systeminformation"
-          )
-        )
+      errors.info.layers[layer].blockedCats.forEach((i) =>
+        system.other.catsBlockedByError.push(i)
       );
-
-    console.log(system.other.commandsBlockedByError);
 
     console.log("\n");
     system.functions.log(

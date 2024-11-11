@@ -7,8 +7,6 @@ module.exports.config = {
 
 module.exports.run = (system, args) => {
   system.functions.cmdHeader("Hello and thank you for using CPU-Y!");
-
-  console.log("\n");
   system.functions.log(
     "To get you started, there are a few things you need to know first:"
   );

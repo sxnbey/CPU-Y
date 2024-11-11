@@ -40,7 +40,10 @@
     ]
   },
   "info": {
-    "layers": { "01": "SYSTEM", "02": "DATA" },
+    "layers": {
+      "01": { "name": "SYSTEM", "blockedCats": [] },
+      "02": { "name": "DATA", "blockedCats": ["Systeminformation"] }
+    },
     "severity": { "1": "MINIMAL", "2": "MEDIUM", "3": "CRITICAL" }
   }
 }
