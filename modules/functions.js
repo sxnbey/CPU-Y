@@ -67,7 +67,7 @@ module.exports = (system) => {
     return new Promise((res) => setTimeout(() => res(true), ms));
   };
 
-  // My logging functions with chalk.
+  // My logging function with chalk.
 
   system.functions.log = function (text, styles = ["gray"]) {
     styles.forEach((i) => {
@@ -83,5 +83,13 @@ module.exports = (system) => {
     system.functions.cpuyBanner();
     system.functions.log(`${text} - CPU-Y`, ["green", "underline"]);
     console.log("\n");
+  };
+
+  // RNG function.
+
+  system.functions.rng = function (min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
   };
 };

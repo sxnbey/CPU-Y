@@ -6,6 +6,8 @@ module.exports.config = {
 };
 
 module.exports.run = async (system, args) => {
+  let rngLoadingTimer = system.functions.rng(200, 1500);
+
   system.functions.cmdHeader("Reload");
 
   system.modules = {};
@@ -14,13 +16,16 @@ module.exports.run = async (system, args) => {
 
   require("../../modules/loader.js")(system);
 
-  console.log("\n");
+  console.log();
 
-  system.functions.log("Reloading...", ["yellow"]);
+  system.functions.log(
+    [
+      `RNG loading timer: ${system.chalk.cyan(`${rngLoadingTimer}ms`)}`,
+      system.chalk.yellow("Reloading..."),
+    ].join("\n\n")
+  );
 
-  // It's too fast and doesn't feel right.
-
-  await system.functions.wait(1500);
+  await system.functions.wait(rngLoadingTimer);
 
   system.modules.createMainPage(system);
 

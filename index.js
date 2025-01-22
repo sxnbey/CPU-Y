@@ -11,6 +11,7 @@ const system = {
   functions: {},
   sysinf: {},
   other: {
+    startWithoutSysinf: true,
     lastCommand: {},
     winTooSmall: false,
     startingUp: true,
@@ -42,7 +43,7 @@ system.functions.log(
 // Fetches the system information in an async function because I don't like then(). You'll never catch me using then(), that's a PROMISE!!!! AHAHHAHHAHahha
 
 (async () => {
-  await system.modules.createData(system);
+  if (!system.other.startWithoutSysinf) await system.modules.createData(system);
 
   if (process.stdout.columns < 47) return system.functions.winTooSmall();
 

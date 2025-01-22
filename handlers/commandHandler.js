@@ -39,13 +39,9 @@ function commandHandler(system, promptOnly = false) {
       (system.dev || command.config.category != "Developer") &&
       !system.other.catsBlockedByError.includes(command.config.category)
     ) {
-      try {
-        command.run(system, args);
-      } catch (e) {
-        // error catch (soon)
-      }
+      command.run(system, args);
 
-      if (!["exit"].includes(inputCmd)) {
+      if (!["bye"].includes(inputCmd)) {
         system.other.lastCommand = command;
         system.other.lastCommand.args = args;
       }
@@ -59,7 +55,7 @@ function commandHandler(system, promptOnly = false) {
               command.config.name
             )}" couldn't be executed because of an error.`
           : `Command "${system.chalk.yellow(inputCmd)}" couldn't be found.`) +
-          `\nType "${system.chalk.cyan("help")}" for help.`
+          `\nType "${system.chalk.cyan("commands")}" for a list of commands.`
       );
     }
 

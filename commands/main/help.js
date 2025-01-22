@@ -12,18 +12,19 @@ module.exports.run = (system, args) => {
   );
   console.log("\n");
   system.functions.log(
-    "- Keep this window at least 47 characters (the width of the CPU-Y banner) wide." +
-      "\n" +
-      "  But it's recommended to always keep it as wide as the visible text for CPU-Y to work as intended." +
-      "\n" +
-      '- All commands can be viewed with "commands".' +
-      "\n" +
-      '- To properly close CPU-Y, use CTRL + C or type "exit".' +
-      "\n" +
-      "- Commands have to be used like this:" +
-      "\n" +
-      "  {COMMAND} [ARGUMENTS]" +
-      "\n" +
-      "  {} => necessary - [] => optional"
+    [
+      `- Keep this window at least ${system.chalk.yellow(
+        "47"
+      )} characters (the width of the CPU-Y banner) wide.`,
+      "  But it's recommended to always keep it as wide as the visible text for CPU-Y to work as intended.",
+      `- All commands can be viewed with "${system.chalk.cyan("commands")}".`,
+      `- To properly close CPU-Y, use CTRL + C or type "${system.chalk.cyan(
+        "bye"
+      )}".`,
+      "- Commands have to be used like this:",
+      `  > ${system.chalk.cyan("COMMAND")} ${system.chalk.blue("ARGUMENTS")}`,
+      "       ^        ^",
+      "   necessary optional",
+    ].join("\n")
   );
 };
