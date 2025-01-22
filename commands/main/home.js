@@ -8,7 +8,7 @@ module.exports.config = {
 module.exports.run = (system, args) => {
   system.functions.cmdHeader("Welcome!");
   system.functions.log(
-    `If it\`s your first time using CPU-Y, type "${system.chalk.cyan(
+    `If it\'s your first time using CPU-Y, type "${system.chalk.cyan(
       "help"
     )}" for more information on how to use this program.`
   );

@@ -6,14 +6,14 @@
         "name": "ERR_LOAD_MODULES",
         "severity": "3",
         "explanation": "Internal modules, which are absolutely necessary for CPU-Y to function, could not be loaded.",
-        "help": ["Reinstall CPU-Y."]
+        "help": ["Reinstall CPU-Y.", "Restart CPU-Y."]
       },
       {
         "code": "002",
         "name": "ERR_RENDER_UI",
         "severity": "3",
         "explanation": "The user interface could not be rendered. This means that nothing can be displayed and therefore CPU-Y does not work.",
-        "help": []
+        "help": ["Reinstall CPU-Y.", "Restart CPU-Y."]
       }
     ],
     "02": [
@@ -24,7 +24,8 @@
         "explanation": "Your system information could not be retrieved, so these commands will not work.",
         "help": [
           "Reinstall Node.js module 'systeminformation'.",
-          "Reinstall CPU-Y."
+          "Reinstall CPU-Y.",
+          "Restart CPU-Y."
         ]
       },
       {
@@ -34,15 +35,29 @@
         "explanation": "Your system information could not be evaluated, so these commands will not work.",
         "help": [
           "Reinstall Node.js module 'systeminformation'.",
-          "Reinstall CPU-Y."
+          "Reinstall CPU-Y.",
+          "Restart CPU-Y."
         ]
+      }
+    ],
+    "03": [
+      {
+        "code": "001",
+        "name": "ERR_RUN_CMD",
+        "severity": "2",
+        "explanation": "And error occured while trying to run a command.",
+        "help": ["Reinstall CPU-Y.", "Restart CPU-Y."]
       }
     ]
   },
   "info": {
     "layers": {
       "01": { "name": "SYSTEM", "blockedCats": [] },
-      "02": { "name": "DATA", "blockedCats": ["Systeminformation"] }
+      "02": {
+        "name": "DATA",
+        "blockedCats": ["Systeminformation"],
+        "03": { "name": "COMMANDS", "blockedCats": [] }
+      }
     },
     "severity": { "1": "MINIMAL", "2": "MEDIUM", "3": "CRITICAL" }
   }

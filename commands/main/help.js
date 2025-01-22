@@ -1,12 +1,12 @@
 module.exports.config = {
   name: "help",
-  aliases: [],
+  aliases: ["h"],
   desc: "A few important things you need to know before using CPU-Y.",
   listed: true,
 };
 
 module.exports.run = (system, args) => {
-  system.functions.cmdHeader("Hello and thank you for using CPU-Y!");
+  system.functions.cmdHeader("Hello and thank you for using me!");
   system.functions.log(
     "To get you started, there are a few things you need to know first:"
   );

@@ -16,9 +16,9 @@ function loadAll(system) {
   const dirs = ["modules", "handlers"];
 
   // The commands are stored in an array not in an object.
-  system["commands"] = [];
+  system.commands = [];
 
-  loadCommands(system, system["commands"], `./${"commands"}/`);
+  loadCommands(system, system.commands, "./commands/");
 
   loadLog(system, "Commands", system.commands.length);
 
@@ -59,7 +59,7 @@ function loadCommands(system, arr, dirPath) {
 
   fs.readdirSync(dirPath).forEach((i) => {
     if (!i.endsWith(".js"))
-      return loadCommands(system, arr, `${dirPath}/${i}/`, true);
+      return loadCommands(system, arr, `${dirPath}/${i}/`);
 
     // Deletes the cache of the file.
 

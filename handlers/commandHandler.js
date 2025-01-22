@@ -39,7 +39,11 @@ function commandHandler(system, promptOnly = false) {
       (system.dev || command.config.category != "Developer") &&
       !system.other.catsBlockedByError.includes(command.config.category)
     ) {
-      command.run(system, args);
+      try {
+        command.run(system, args);
+      } catch (e) {
+        // error catch (soon)
+      }
 
       if (!["exit"].includes(inputCmd)) {
         system.other.lastCommand = command;
@@ -50,7 +54,7 @@ function commandHandler(system, promptOnly = false) {
       system.functions.log(
         (!inputCmd.length
           ? "Please enter a command."
-          : system.other.catsBlockedByError.includes(command.config.category)
+          : system.other.catsBlockedByError.includes(command?.config.category)
           ? `Command "${system.chalk.yellow(
               command.config.name
             )}" couldn't be executed because of an error.`

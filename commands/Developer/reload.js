@@ -18,6 +18,8 @@ module.exports.run = async (system, args) => {
 
   system.functions.log("Reloading...", ["yellow"]);
 
+  // It's too fast and doesn't feel right.
+
   await system.functions.wait(1500);
 
   system.modules.createMainPage(system);

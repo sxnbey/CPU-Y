@@ -8,6 +8,8 @@ module.exports.config = {
 module.exports.run = (system, args) => {
   system.functions.cmdHeader("Evaluate JavaScript code");
 
+  ufha;
+
   if (!args.length)
     return system.functions.log(
       "Please enter JavaScript code to be evaluated!",

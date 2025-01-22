@@ -1,5 +1,5 @@
 module.exports.config = {
-  name: "exit",
+  name: "bye",
   aliases: [],
   desc: "Exits CPU-Y.",
   listed: true,
