@@ -20,7 +20,6 @@ function commandHandler(system) {
 
     if (command && (system.dev || command.config.category != "Developer")) {
       await command.run(system, args);
-      system.functions.prompt();
 
       // Is this check really necessary here? We will never know, because I rather write this comment than test it.
       if (!["exit"].includes(inputCmd)) {
@@ -35,7 +34,6 @@ function commandHandler(system) {
           : "Please enter a command.") +
           `\nType "${system.chalk.cyan("help")}" for help.`,
       );
-      system.functions.prompt();
     }
   });
 

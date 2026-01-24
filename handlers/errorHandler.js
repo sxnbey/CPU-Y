@@ -17,7 +17,7 @@ function errorHandler(system, layer, error, stack) {
 
   system.other.errorOnStartup = true;
 
-  system.functions.cpuyBanner();
+  system.functions.banner();
   system.functions.log(
     `An ${system.chalk.red("ERROR")} occurred while processing your request:`,
   );

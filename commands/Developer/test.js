@@ -10,7 +10,7 @@ module.exports.config = {
 module.exports.run = async (system, args) => {
   return;
 
-  system.functions.cpuyBanner();
+  system.functions.banner();
 
   console.log("hier:" + system.apikey);
   const API_TOKEN = system.apikey;

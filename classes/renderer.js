@@ -21,19 +21,17 @@ module.exports = (system) => {
 
     buildRenderedString() {
       const { title, lines, footer } = this.system.toRender;
-      const output = [];
-
-      title ? output.push(title, "") : null;
-
-      lines.length
-        ? output.push(...lines)
-        : output.push(
-            "du hund du hast nix zum einzeigen angegeben was mit dir",
-          );
-
-      footer ? output.push("", footer) : null;
-
-      return output.join("\n");
+      return [
+        this.system.functions.banner(),
+        "",
+        title || "<!No title to display!>",
+        "",
+        "",
+        ...(lines.length ? lines : ["<!No lines to display!>"]),
+        "",
+        "",
+        footer ? this.system.chalk.grey(footer) : "<!No footer to display!>",
+      ].join("\n");
     }
 
     render(forced = false) {
@@ -45,10 +43,11 @@ module.exports = (system) => {
 
       this.lastRender = output;
 
-      // Clears the console.
+      // "\x1Bc" apparently clears the console.
 
-      process.stdout.write("\x1Bc");
-      process.stdout.write(output);
+      process.stdout.write("\x1Bc" + output);
+
+      this.system.functions.prompt();
     }
   };
 };
