@@ -25,41 +25,33 @@ function commandHandler(system, promptOnly = false) {
 
   if (promptOnly) return;
 
-  // Triggers whenever a line has been entered in the console.
-
-  system.rl.addListener("line", (msg) => {
+  rl.addListener("line", async (msg) => {
     const args = msg.trim().split(" ");
     const inputCmd = args.shift();
     const command = system.commands.find(
-      (i) => i.config.name == inputCmd || i.config.aliases.includes(inputCmd)
+      (i) => i.config.name == inputCmd || i.config.aliases.includes(inputCmd),
     );
 
-    if (
-      command &&
-      (system.dev || command.config.category != "Developer") &&
-      !system.other.catsBlockedByError.includes(command.config.category)
-    ) {
-      command.run(system, args);
+    // Runs the command if it exists and if the user is allowed to use it. If he's not, he will be gaslit into thinking the command doesn't exist.
 
-      if (!["bye"].includes(inputCmd)) {
+    if (command && (system.dev || command.config.category != "Developer")) {
+      await command.run(system, args);
+      prompt();
+
+      if (!["exit"].includes(inputCmd)) {
         system.other.lastCommand = command;
         system.other.lastCommand.args = args;
       }
     } else {
       console.log("\n");
       system.functions.log(
-        (!inputCmd.length
-          ? "Please enter a command."
-          : system.other.catsBlockedByError.includes(command?.config.category)
-          ? `Command "${system.chalk.yellow(
-              command.config.name
-            )}" couldn't be executed because of an error.`
-          : `Command "${system.chalk.yellow(inputCmd)}" couldn't be found.`) +
-          `\nType "${system.chalk.cyan("commands")}" for a list of commands.`
+        (inputCmd.length
+          ? `Command "${system.chalk.yellow(inputCmd)}" couldn't be found.`
+          : "Please enter a command.") +
+          `\nType "${system.chalk.cyan("help")}" for help.`,
       );
+      prompt();
     }
-
-    prompt();
   });
 
   // Triggers on CTRL + C.

@@ -22,12 +22,12 @@ module.exports.run = async (system, args) => {
     [
       `RNG loading timer: ${system.chalk.cyan(`${rngLoadingTimer}ms`)}`,
       system.chalk.yellow("Reloading..."),
-    ].join("\n\n")
+    ].join("\n\n"),
   );
+
+  console.log("\n");
 
   await system.functions.wait(rngLoadingTimer);
 
-  system.modules.createMainPage(system);
-
-  system.functions.reload();
+  system.functions.log("Reloaded all modules and commands.", ["green"]);
 };

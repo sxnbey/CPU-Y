@@ -1,3 +1,5 @@
+const fetch = require("node-fetch");
+
 module.exports.config = {
   name: "test",
   aliases: [],
@@ -5,28 +7,41 @@ module.exports.config = {
   listed: true,
 };
 
-module.exports.run = (system, args) => {
+module.exports.run = async (system, args) => {
+  return;
+
   system.functions.cpuyBanner();
 
-  system.functions.log("Hello and thank you for using CPU-Y!");
-  console.log("\n");
-  system.functions.log(
-    "To get you started, there are a few things you need to know first:"
-  );
-  console.log("\n");
-  system.functions.log(
-    "- Keep this window at least 47 characters (the width of the CPU-Y banner) wide." +
-      "\n" +
-      "  But it's recommended to always keep it as wide as the visible text for CPU-Y to work as intended." +
-      "\n" +
-      '- All commands can be viewed with "commands".' +
-      "\n" +
-      '- To properly close CPU-Y, use CTRL + C or type "exit".' +
-      "\n" +
-      "- Commands have to be used like this:" +
-      "\n" +
-      "  {COMMAND} [ARGUMENTS]" +
-      "\n" +
-      "  {} => necessary - [] => optional"
-  );
+  console.log("hier:" + system.apikey);
+  const API_TOKEN = system.apikey;
+  const PLAYER_TAG = "#QU9LPQQV";
+
+  const url = `https://api.clashroyale.com/v1/players/${encodeURIComponent(
+    PLAYER_TAG,
+  )}`;
+
+  const res = await fetch(url, {
+    headers: {
+      Authorization: `Bearer ${API_TOKEN}`,
+    },
+  });
+
+  if (!res.ok) {
+    console.error("API Fehler:", res.status, await res.text());
+    process.exit(1);
+  }
+
+  const data = await res.json();
+
+  const crAccount = {
+    name: data.name,
+    tag: data.tag,
+    clan: data.clan,
+    role: data.role,
+    wins: data.wins,
+    losses: data.losses,
+    winrate: (data.wins / (data.wins + data.losses)) * 100,
+  };
+
+  console.log(crAccount);
 };

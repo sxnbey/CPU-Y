@@ -7,65 +7,41 @@ require("dotenv").config();
 const os = require("os");
 const system = {
   dev: process.env.dev?.split(",").includes(os.userInfo().username),
+  apikey: process.env.apikey,
+  toRender: { title: "hey", lines: ["du", "geiler", "sexmann"], footer: "sex" },
   chalk: require("chalk"),
   functions: {},
   sysinf: {},
   other: {
     startWithoutSysinf: true,
     lastCommand: {},
-    winTooSmall: false,
-    startingUp: true,
     errorOnStartup: false,
     catsBlockedByError: [],
   },
 };
-const loader = require("./modules/loader.js");
 
 require("./modules/functions.js")(system);
+require("./modules/loader.js")(system);
 
-/************************************************************************************************\
-*                                              MAIN                                              *
-\************************************************************************************************/
+const renderling = require("./classes/renderer.js")(system);
 
-// Creates the banner.
+const Renderer = new renderling(200);
+// Renderer.start();
 
-system.functions.cpuyBanner();
+// /************************************************************************************************\
+// *                                              MAIN                                              *
+// \************************************************************************************************/
 
-// Loads all modules, handlers and commands.
+// return;
 
-loader(system);
+const home = system.commands.find((i) => i.config.name == "home");
 
-console.log("\n");
-system.functions.log(
-  "Please wait while CPU-Y is fetching your system information...",
-  ["yellow"]
-);
-// Fetches the system information in an async function because I don't like then(). You'll never catch me using then(), that's a PROMISE!!!! AHAHHAHHAHahha
+system.other.lastCommand = home;
 
-(async () => {
-  if (!system.other.startWithoutSysinf) await system.modules.createData(system);
+home.run(system, []);
 
-  if (process.stdout.columns < 47) return system.functions.winTooSmall();
+system.handlers.commandHandler(system);
 
-  // Runs CPU-Y.
+// Renderling renders again on window resize.
 
-  system.modules.createMainPage(system);
-})();
-
-// This event is triggered when the size of the console window is changed.
-
-process.stdout.addListener("resize", () => {
-  // Just so nothing gets messed up while CPU-Y is starting up.
-
-  if (system.other.startingUp) return;
-
-  // A quick reload because text can look "distorted" after resizing.
-
-  system.functions.reload();
-
-  if (process.stdout.columns < 47 && !system.other.winTooSmall)
-    system.functions.winTooSmall();
-
-  if (process.stdout.columns >= 47 && system.other.winTooSmall)
-    system.functions.winReturn();
-});
+process.stdout.addListener("resize", () => Renderer.render(true));

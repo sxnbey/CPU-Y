@@ -12,6 +12,8 @@ module.exports = errorHandler;
 
 // This function handles all error.
 
+//! FULL REWORK SOON
+
 function errorHandler(system, layer, error, stack) {
   // Import the errors.
 
@@ -27,13 +29,13 @@ function errorHandler(system, layer, error, stack) {
 
   system.functions.cpuyBanner();
   system.functions.log(
-    `An ${system.chalk.red("ERROR")} occurred while processing your request:`
+    `An ${system.chalk.red("ERROR")} occurred while processing your request:`,
   );
   console.log("\n");
   system.functions.log(`${error.name}`, ["red"]);
   console.log("\n");
   system.functions.log(
-    `Error code: ${system.chalk.red(`${layer}x${error.code}`)}`
+    `Error code: ${system.chalk.red(`${layer}x${error.code}`)}`,
   );
   system.functions.log(`Origin: ${fileAndLine()}`);
   // If it's a critical error, CPU-Y shuts down.
@@ -42,27 +44,33 @@ function errorHandler(system, layer, error, stack) {
     console.log("\n");
     system.functions.log(
       `This is a ${system.chalk.red(
-        errors.info.severity[error.severity]
-      )} error. CPU-Y is shutting down now.`
+        errors.info.severity[error.severity],
+      )} error. CPU-Y is shutting down now.`,
     );
 
     process.exit(0);
   } else {
     if (error.severity == 2)
-      errors.info.layers[layer].blockedCats.forEach((i) =>
-        system.other.catsBlockedByError.push(i)
+      errors.errors["02"].forEach((i) =>
+        system.other.commandsBlockedByError.push(
+          system.commands.filter(
+            (i) => i.config.category == "Systeminformation",
+          ),
+        ),
       );
+
+    console.log(system.other.commandsBlockedByError);
 
     console.log("\n");
     system.functions.log(
       `This is a ${system.chalk[error.severity == 2 ? "yellow" : "green"](
-        errors.info.severity[error.severity]
-      )} error. You can still use CPU-Y but some commands might not work.`
+        errors.info.severity[error.severity],
+      )} error. You can still use CPU-Y but some commands might not work.`,
     );
     system.functions.log(
       `For more information on the error, type "${system.chalk.cyan(
-        `error ${layer}x${error.code}`
-      )}"`
+        `error ${layer}x${error.code}`,
+      )}"`,
     );
     system.functions.log("You will return to the homescreen in 15 seconds.", [
       "green",
