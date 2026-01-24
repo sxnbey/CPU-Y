@@ -8,24 +8,8 @@ module.exports = commandHandler;
 *                                              MAIN                                              *
 \************************************************************************************************/
 
-function commandHandler(system, promptOnly = false) {
-  // Imports readline and creates a readline interface so I can interact with responses in the console.
-
-  const readline = require("readline");
-
-  system.rl =
-    system.rl ??
-    readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
-      prompt: "> ",
-    });
-
-  prompt();
-
-  if (promptOnly) return;
-
-  rl.addListener("line", async (msg) => {
+function commandHandler(system) {
+  system.rl.addListener("line", async (msg) => {
     const args = msg.trim().split(" ");
     const inputCmd = args.shift();
     const command = system.commands.find(
@@ -36,8 +20,9 @@ function commandHandler(system, promptOnly = false) {
 
     if (command && (system.dev || command.config.category != "Developer")) {
       await command.run(system, args);
-      prompt();
+      system.functions.prompt();
 
+      // Is this check really necessary here? We will never know, because I rather write this comment than test it.
       if (!["exit"].includes(inputCmd)) {
         system.other.lastCommand = command;
         system.other.lastCommand.args = args;
@@ -50,7 +35,7 @@ function commandHandler(system, promptOnly = false) {
           : "Please enter a command.") +
           `\nType "${system.chalk.cyan("help")}" for help.`,
       );
-      prompt();
+      system.functions.prompt();
     }
   });
 
@@ -61,11 +46,4 @@ function commandHandler(system, promptOnly = false) {
 
     process.exit(0);
   });
-
-  // This function creates the "> " in the console.
-
-  function prompt() {
-    console.log("\n");
-    system.rl.prompt();
-  }
 }

@@ -9,11 +9,13 @@ module.exports = (system) => {
 
     start() {
       if (this.timer) return;
+
       this.timer = setInterval(() => this.render(), this.interval);
     }
 
     stop() {
       clearInterval(this.timer);
+
       this.timer = null;
     }
 
@@ -23,7 +25,11 @@ module.exports = (system) => {
 
       title ? output.push(title, "") : null;
 
-      lines.length ? output.push(...lines) : null;
+      lines.length
+        ? output.push(...lines)
+        : output.push(
+            "du hund du hast nix zum einzeigen angegeben was mit dir",
+          );
 
       footer ? output.push("", footer) : null;
 

@@ -25,8 +25,8 @@ module.exports = (system) => {
     return new Promise((res) => setTimeout(() => res(true), ms));
   };
 
-  // My logging functions with chalk.
-  //! SOON GONE
+  // My logging function with chalk.
+  //! SOON GONE OR IMPLEMENTED DIFFERENTLY
 
   system.functions.log = function (text, styles = ["gray"]) {
     styles.forEach((i) => {
@@ -37,7 +37,7 @@ module.exports = (system) => {
   };
 
   // My header for every command.
-  //! SOON GONE
+  //! SOON GONE OR IMPLEMENTED DIFFERENTLY
 
   system.functions.cmdHeader = function (text) {
     system.functions.cpuyBanner();
@@ -51,5 +51,12 @@ module.exports = (system) => {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
+  };
+
+  // This function creates the "> " in the console.
+
+  system.functions.prompt = function () {
+    console.log("\n");
+    system.rl.prompt();
   };
 };

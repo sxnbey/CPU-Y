@@ -11,11 +11,8 @@ module.exports = loadAll;
 \************************************************************************************************/
 
 function loadAll(system) {
-  // The directories in which the files to be loaded are located.
-
   const dirs = ["modules", "handlers"];
 
-  // The commands are stored in an array not in an object.
   system.commands = [];
 
   loadCommands(system, system.commands, "./commands/");
@@ -31,7 +28,7 @@ function loadAll(system) {
     fs.readdirSync(`./${dir}/`).forEach((i) => {
       count++;
 
-      // Deletes the cache of the file.
+      // Deletes the cache of the file (Very important for hot-reloading).
 
       delete require.cache[require.resolve(`../${dir}/${i}`)];
 
@@ -48,7 +45,7 @@ function loadAll(system) {
 
 function loadLog(system, text, count) {
   system.functions.log(
-    `${system.chalk.green(count)} ${text} loaded. ${system.chalk.green("[+]")}`
+    `${system.chalk.green(count)} ${text} loaded. ${system.chalk.green("[+]")}`,
   );
 }
 
@@ -61,7 +58,7 @@ function loadCommands(system, arr, dirPath) {
     if (!i.endsWith(".js"))
       return loadCommands(system, arr, `${dirPath}/${i}/`);
 
-    // Deletes the cache of the file.
+    // Deletes the cache of the file (Very important for hot-reloading).
 
     delete require.cache[require.resolve(`../${dirPath}${i}`)];
 

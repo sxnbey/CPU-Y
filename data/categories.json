@@ -1,7 +1,0 @@
-{
-  "categories": {
-    "developer": "Commands that can only be used by the developer.",
-    "main": "The most important commands.",
-    "systeminformation": "These commands show you your system information."
-  }
-}

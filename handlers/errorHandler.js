@@ -2,30 +2,20 @@
 *                                   DECLARATION, IM- & EXPORTS                                   *
 \************************************************************************************************/
 
-// Exports the error handler.
-
 module.exports = errorHandler;
 
 /************************************************************************************************\
 *                                              MAIN                                              *
 \************************************************************************************************/
 
-// This function handles all error.
-
-//! FULL REWORK SOON
+//! SOON GONE OR IMPLEMENTED DIFFERENTLY
 
 function errorHandler(system, layer, error, stack) {
-  // Import the errors.
-
   const errors = require("../data/errors.json");
-
-  // Searches the error in the imported object.
 
   error = errors.errors[layer].find((i) => i.code == error);
 
   system.other.errorOnStartup = true;
-
-  // The error message.
 
   system.functions.cpuyBanner();
   system.functions.log(
