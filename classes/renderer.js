@@ -1,22 +1,10 @@
 module.exports = (system) => {
   return class Renderer {
-    constructor(interval = 200) {
+    constructor() {
       this.system = system;
-      this.interval = interval;
-      this.timer = null;
       this.lastRender = "";
-    }
 
-    start() {
-      if (this.timer) return;
-
-      this.timer = setInterval(() => this.render(), this.interval);
-    }
-
-    stop() {
-      clearInterval(this.timer);
-
-      this.timer = null;
+      this.system.toRender.on("changed", () => this.render());
     }
 
     buildRenderedString() {

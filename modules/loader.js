@@ -12,12 +12,15 @@ module.exports = loadAll;
 
 function loadAll(system) {
   const dirs = ["modules", "handlers"];
+  const commandDirs = ["commands", "subcommands"];
 
-  system.commands = [];
+  commandDirs.forEach((dir) => {
+    system[dir] = [];
 
-  loadCommands(system, system.commands, "./commands/");
+    loadCommands(system, system[dir], `./${dir}/`);
 
-  loadLog(system, "Commands", system.commands.length);
+    loadLog(system, dir, system[dir].length);
+  });
 
   dirs.forEach((dir) => {
     const key = dir;
@@ -28,7 +31,7 @@ function loadAll(system) {
     fs.readdirSync(`./${dir}/`).forEach((i) => {
       count++;
 
-      // Deletes the cache of the file (Very important for hot-reloading).
+      // Deletes the cache of the file (for hot reloading).
 
       delete require.cache[require.resolve(`../${dir}/${i}`)];
 
@@ -42,10 +45,11 @@ function loadAll(system) {
 }
 
 // The function that logs everything that has been loaded.
+//! SOON GONE OR IMPLEMENTED DIFFERENTLY
 
 function loadLog(system, text, count) {
   system.functions.log(
-    `${system.chalk.green(count)} ${text} loaded. ${system.chalk.green("[+]")}`,
+    `${system.chalk.green(count)} ${text.charAt(0).toUpperCase()} loaded. ${system.chalk.green("[+]")}`,
   );
 }
 

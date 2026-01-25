@@ -21,10 +21,10 @@ system.rl = readline.createInterface({
   output: process.stdout,
   prompt: "> ",
 });
-const Renderer = require("./classes/renderer.js")(system);
-const renderling = new Renderer(200);
 const RenderState = require("./classes/renderstate.js");
 system.toRender = new RenderState();
+const Renderer = require("./classes/renderer.js")(system);
+const renderling = new Renderer();
 
 require("./modules/functions.js")(system);
 require("./modules/loader.js")(system);
@@ -34,8 +34,6 @@ require("./modules/loader.js")(system);
 \************************************************************************************************/
 
 //! SOON LIL RENDERLING GONNA DO HIS WOOOOORK
-
-renderling.start();
 
 // return;
 

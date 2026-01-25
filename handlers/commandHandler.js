@@ -10,7 +10,7 @@ module.exports = commandHandler;
 
 function commandHandler(system) {
   system.rl.addListener("line", async (msg) => {
-    const args = msg.trim().split(" ");
+    const args = msg.trim().split(/\s+/);
     const inputCmd = args.shift();
     const command = system.commands.find(
       (i) => i.config.name == inputCmd || i.config.aliases.includes(inputCmd),
