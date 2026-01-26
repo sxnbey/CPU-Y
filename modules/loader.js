@@ -3,6 +3,9 @@
 \************************************************************************************************/
 
 const fs = require("fs");
+const dirs = ["modules", "handlers"];
+const commandDirs = ["commands", "subcommands"];
+const blacklist = ["loader.js"];
 
 module.exports = loadAll;
 
@@ -11,9 +14,6 @@ module.exports = loadAll;
 \************************************************************************************************/
 
 function loadAll(system) {
-  const dirs = ["modules", "handlers"];
-  const commandDirs = ["commands", "subcommands"];
-
   commandDirs.forEach((dir) => {
     system[dir] = [];
 
@@ -23,24 +23,29 @@ function loadAll(system) {
   });
 
   dirs.forEach((dir) => {
-    const key = dir;
     let count = 0;
 
-    system[key] = {};
+    system[dir] = {};
 
     fs.readdirSync(`./${dir}/`).forEach((i) => {
+      if (blacklist.includes(i)) return;
+
       count++;
 
       // Deletes the cache of the file (for hot reloading).
 
       delete require.cache[require.resolve(`../${dir}/${i}`)];
 
-      // After iterating through the directory, it loads the file.
+      // After iterating through the directory, it runs the file and saves it.
 
-      system[key][i.split(".")[0]] = require(`../${dir}/${i}`);
+      const file = require(`../${dir}/${i}`);
+
+      file(system);
+
+      system[dir][i.split(".")[0]] = file;
     });
 
-    loadLog(system, key.charAt(0).toUpperCase() + key.slice(1), count);
+    loadLog(system, dir.charAt(0).toUpperCase() + dir.slice(1), count);
   });
 }
 
@@ -56,16 +61,12 @@ function loadLog(system, text, count) {
   );
 }
 
-// This right here will load all commands.
-
 function loadCommands(system, arr, dirPath) {
   // Iterates through the directory and if there is a folder, it iterates through said folder.
 
   fs.readdirSync(dirPath).forEach((i) => {
     if (!i.endsWith(".js"))
       return loadCommands(system, arr, `${dirPath}/${i}/`);
-
-    // Deletes the cache of the file (Very important for hot-reloading).
 
     delete require.cache[require.resolve(`../${dirPath}${i}`)];
 

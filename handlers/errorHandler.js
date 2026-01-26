@@ -11,6 +11,8 @@ module.exports = errorHandler;
 //! SOON GONE OR IMPLEMENTED DIFFERENTLY
 
 function errorHandler(system, layer, error, stack) {
+  return;
+
   const errors = require("../data/errors.json");
 
   error = errors.errors[layer].find((i) => i.code == error);

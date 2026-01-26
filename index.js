@@ -34,7 +34,6 @@ system.toRender = new RenderState();
 const Renderer = require("./classes/renderer.js")(system);
 const renderling = new Renderer();
 
-require("./modules/functions.js")(system);
 require("./modules/loader.js")(system);
 
 /************************************************************************************************\
@@ -49,7 +48,3 @@ renderling.render();
 // Shows the boot log if in dev mode.
 
 // if (system.dev) system.other.bootLog.forEach((i) => system.toRender.addLine(i));
-
-// Renderling renders again on window resize.
-
-process.stdout.addListener("resize", () => renderling.render(true));

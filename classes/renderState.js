@@ -17,6 +17,7 @@ module.exports = class RenderState extends EventEmitter {
     this.body =
       "hallo du mann o i j lj h p j p j2j l2jl l2j lkj kl2j l l2jlk".split(" ");
     this.footer = ["CPU-Y - Footer-Platzhaltertext, der maximal tuff ist"];
+    this.input = [];
   }
 
   setHeader(title) {
@@ -47,10 +48,29 @@ module.exports = class RenderState extends EventEmitter {
     return this;
   }
 
+  setInput(input) {
+    this.input = input;
+    this.emit("changed");
+
+    return this;
+  }
+
+  addInput(letter) {
+    this.input.push(letter);
+    this.emit("changed");
+
+    return this;
+  }
+
+  getInput() {
+    return this.input.join("");
+  }
+
   clear() {
-    this.header = "";
+    this.header = [];
     this.lines = [];
-    this.footer = "";
+    this.footer = [];
+    this.input = [];
 
     return this;
   }
