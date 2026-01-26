@@ -1,5 +1,5 @@
 {
-  "name": "cpu-y",
+  "name": "testumgebung",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -10,9 +10,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "chalk": "^4.1.2",
-    "dotenv": "^16.4.7",
-    "node-fetch": "^2.7.0",
     "terminal-kit": "^3.1.2"
   }
 }

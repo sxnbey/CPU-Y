@@ -6,6 +6,7 @@ require("dotenv").config();
 
 const readline = require("readline");
 const os = require("os");
+
 const system = {
   dev: process.env.dev?.split(",").includes(os.userInfo().username),
   apikey: process.env.apikey,
@@ -14,6 +15,7 @@ const system = {
   functions: {},
   other: {
     lastCommand: {},
+    bootLog: ["", "Boot log:", ""],
   },
 };
 system.rl = readline.createInterface({
@@ -21,6 +23,7 @@ system.rl = readline.createInterface({
   output: process.stdout,
   prompt: "> ",
 });
+
 const RenderState = require("./classes/renderstate.js");
 system.toRender = new RenderState();
 const Renderer = require("./classes/renderer.js")(system);
@@ -33,12 +36,12 @@ require("./modules/loader.js")(system);
 *                                              MAIN                                              *
 \************************************************************************************************/
 
-//! SOON LIL RENDERLING GONNA DO HIS WOOOOORK
-
-// return;
-
 system.handlers.commandHandler(system);
 system.rl.emit("line", "home");
+
+// Shows the boot log if in dev mode.
+
+if (system.dev) system.other.bootLog.forEach((i) => system.toRender.addLine(i));
 
 // Renderling renders again on window resize.
 

@@ -21,9 +21,10 @@ function commandHandler(system) {
     if (command && (system.dev || command.config.category != "Developer")) {
       await command.run(system, args);
 
-      // Is this check really necessary here? We will never know, because I rather write this comment than test it.
+      //? Still necessary? Soon check
+
       if (!["exit"].includes(inputCmd)) {
-        system.other.lastCommand = command;
+        system.other.lastCommand.name = command.name;
         system.other.lastCommand.args = args;
       }
     } else {

@@ -11,12 +11,15 @@ module.exports = (system) => {
       const { title, lines, footer } = this.system.toRender;
       return [
         this.system.functions.banner(),
+        "-----------------------------------------------",
         "",
         title || "<!No title to display!>",
         "",
+        "-----------------------------------------------",
         "",
         ...(lines.length ? lines : ["<!No lines to display!>"]),
         "",
+        "-----------------------------------------------",
         "",
         footer ? this.system.chalk.grey(footer) : "<!No footer to display!>",
       ].join("\n");

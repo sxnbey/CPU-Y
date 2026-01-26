@@ -44,12 +44,15 @@ function loadAll(system) {
   });
 }
 
-// The function that logs everything that has been loaded.
-//! SOON GONE OR IMPLEMENTED DIFFERENTLY
-
 function loadLog(system, text, count) {
-  system.functions.log(
-    `${system.chalk.green(count)} ${text.charAt(0).toUpperCase()} loaded. ${system.chalk.green("[+]")}`,
+  let label = text.charAt(0).toUpperCase() + text.slice(1);
+
+  if (count == 1) label = label.slice(0, -1);
+
+  system.other.bootLog.push(
+    `${system.chalk.green(count)} ${
+      label
+    } loaded. ${system.chalk.green("[+]")}`,
   );
 }
 
