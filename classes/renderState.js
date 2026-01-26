@@ -4,27 +4,37 @@ module.exports = class RenderState extends EventEmitter {
   constructor() {
     super();
 
-    this.title = "";
-    this.lines = [];
-    this.footer = "";
+    this.banner = `  ______   _______   __    __       __      __ 
+ /      \\ |       \\ |  \\  |  \\     |  \\    /  \\
+|  $$$$$$\\| $$$$$$$\\| $$  | $$      \\$$\\  /  $$
+| $$   \\$$| $$__/ $$| $$  | $$ ______\\$$\\/  $$ 
+| $$      | $$    $$| $$  | $$|      \\$$  $$  
+| $$   __ | $$$$$$$ | $$  | $$ \\$$$$$$ \\$$$$   
+| $$__/  \\| $$      | $$__/ $$         | $$    
+ \\$$    $$| $$       \\$$    $$         | $$    
+  \\$$$$$$  \\$$        \\$$$$$$           \\$$`;
+    this.header = ["CPU-Y - Header-Platzhaltertext, der maximal tuff ist"];
+    this.body =
+      "hallo du mann o i j lj h p j p j2j l2jl l2j lkj kl2j l l2jlk".split(" ");
+    this.footer = ["CPU-Y - Footer-Platzhaltertext, der maximal tuff ist"];
   }
 
-  setTitle(title) {
-    this.title = title;
+  setHeader(title) {
+    this.header = title;
     this.emit("changed");
 
     return this;
   }
 
-  setLines(lines) {
-    this.lines = lines;
+  setBody(lines) {
+    this.body = lines;
     this.emit("changed");
 
     return this;
   }
 
-  addLine(line) {
-    this.lines.push(line);
+  addBodyLine(line) {
+    this.body.push(line);
     this.emit("changed");
 
     return this;
@@ -38,7 +48,7 @@ module.exports = class RenderState extends EventEmitter {
   }
 
   clear() {
-    this.title = "";
+    this.header = "";
     this.lines = [];
     this.footer = "";
 

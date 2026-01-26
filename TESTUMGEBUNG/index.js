@@ -1,4 +1,4 @@
-const terminalkit = require("terminal-kit");
+const terminalkit = require("this.terminal-kit");
 const term = terminalkit.terminal;
 const ScreenBuffer = terminalkit.ScreenBuffer;
 
@@ -12,7 +12,6 @@ term.on("key", (name) => {
 term.clear();
 term.grabInput();
 term.grabInput({ mouse: "button" });
-
 term.fullscreen(true);
 
 const banner = `  ______   _______   __    __       __      __ 
@@ -24,179 +23,208 @@ const banner = `  ______   _______   __    __       __      __
 | $$__/  \\| $$      | $$__/ $$         | $$    
  \\$$    $$| $$       \\$$    $$         | $$    
   \\$$$$$$  \\$$        \\$$$$$$           \\$$`;
-// let bodyLines =
+// let this.system.renderState.body =
 //   "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.".split(
 //     " ",
 //   );
-let bodyLines =
-  "hallo du mann o i j lj h p j p j2j l2jl l2j lkj kl2j l l2jlk".split(" ");
-let scrollIndex = 0;
-let visibleLines;
+let body = "hallo du mann o i j lj h p j p j2j l2jl l2j lkj kl2j l l2jlk".split(
+  " ",
+);
 
-let bannerH;
-let headerH;
-let footerH;
-let bodyH;
+class Renderer {
+  constructor() {
+    this.system = {
+      toRender: {},
+      renderState: {
+        header: ["CPU-Y - Header-Platzhaltertext, der maximal tuff ist"],
+        body: body,
+        footer: ["CPU-Y - Footer-Platzhaltertext, der maximal tuff ist"],
+      },
+    };
 
-let layout = {};
+    this.term = term;
 
-function render() {
-  let renderState = {
-    header: ["CPU-Y - Header-Platzhaltertext, der maximal tuff ist"],
-    body: bodyLines,
-    footer: ["CPU-Y - Footer-Platzhaltertext, der maximal tuff ist"],
-  };
+    this.lastRender = {};
 
-  //* Calculate layout
+    this.banner = this.banner;
+    this.bannerHeight = null;
+    this.headerHeight = null;
+    this.bodyHeight = null;
+    this.footerHeight = null;
 
-  bannerH = banner.split("\n").length;
-  headerH = renderState.header.length;
-  footerH = renderState.footer.length;
+    this.scrollIndex = 0;
+    this.visibleLines = [];
 
-  const sectionGap = 1;
-  const reserved =
-    bannerH +
-    headerH +
-    footerH +
-    sectionGap * 3 + // header gap, body gap, footer gap
-    3; // the ">" (le prompt + some padding)
+    this.layout = {};
 
-  bodyH = Math.max(0, term.height - reserved);
-
-  let y = bannerH;
-
-  layout.header = {
-    centered: false,
-    height: headerH,
-    y: y + sectionGap,
-  };
-
-  y += layout.header.height + sectionGap;
-
-  layout.body = {
-    centered: true,
-    height: bodyH,
-    y: y + sectionGap,
-    paddingOffset: 0,
-  };
-
-  y += layout.body.height + sectionGap;
-
-  layout.footer = {
-    centered: false,
-    height: footerH,
-    y: y + sectionGap,
-  };
-
-  calculatePaddingOffset();
-
-  // Because of the structure it was possible that the body overwrites the footer, so I have to make sure the body doesn't draw outside his teretorry.
-
-  //? Why not render body earlier? Soon check
-
-  layout.body = {
-    ...layout.body,
-    start: layout.body.y + layout.body.paddingOffset,
-    end: layout.body.y + layout.body.height,
-  };
-
-  // Calculates currently possible scroll & changes scrollIndex if needed.
-
-  const maxScroll = Math.max(0, bodyLines.length - bodyH);
-  scrollIndex = Math.max(0, Math.min(scrollIndex, maxScroll));
-
-  visibleLines = bodyLines.slice(scrollIndex, scrollIndex + bodyH);
-
-  // Renderling starts rendering process.
-
-  const sb = new ScreenBuffer({
-    dst: term,
-  });
-
-  // Clear everything
-  //* Only changed soon!
-
-  for (let y = 0; y < term.height; y++) {
-    sb.put({ x: 1, y }, " ".repeat(term.width));
+    // this.system.toRender.on("changed", () => this.render());
   }
 
-  // Banner
+  render() {
+    //* Calculate layout
 
-  banner.split("\n").forEach((line, index) => {
-    sb.put({ x: 1, y: index }, line.padEnd(term.width, " "));
-  });
+    this.bannerHeight = this.banner.split("\n").length;
+    this.headerHeight = this.system.renderState.header.length;
+    this.footerHeight = this.system.renderState.footer.length;
 
-  // Header & Footer
+    const sectionGap = 1;
+    const reserved =
+      this.bannerHeight +
+      this.headerHeight +
+      this.footerHeight +
+      sectionGap * 3 + // header gap, body gap, footer gap
+      3; // the ">" (le prompt + some padding)
 
-  ["header", "footer"].forEach((section) =>
-    renderState[section].forEach((line, index) =>
-      sb.put(
-        {
-          x: 1,
-          y: layout[section].y + index,
-        },
-        line.padEnd(term.width, " "),
+    this.bodyHeight = Math.max(0, this.term.height - reserved);
+
+    let y = this.bannerHeight;
+
+    this.layout.header = {
+      centered: false,
+      height: this.headerHeight,
+      y: y + sectionGap,
+    };
+
+    y += this.layout.header.height + sectionGap;
+
+    this.layout.body = {
+      centered: true,
+      height: this.bodyHeight,
+      y: y + sectionGap,
+      paddingOffset: 0,
+    };
+
+    y += this.layout.body.height + sectionGap;
+
+    this.layout.footer = {
+      centered: false,
+      height: this.footerHeight,
+      y: y + sectionGap,
+    };
+
+    this.calculatePaddingOffset();
+
+    // Because of the structure it was possible that the body overwrites the footer, so I have to make sure the body doesn't draw outside his teretorry.
+
+    //? Why not render body earlier? Soon check
+
+    this.layout.body.start =
+      this.layout.body.y + this.layout.body.paddingOffset;
+
+    this.layout.body.end = this.layout.body.y + this.layout.body.height;
+
+    // this.layout.body = {
+    //   ...this.layout.body,
+    //   start: this.layout.body.y + this.layout.body.paddingOffset,
+    //   end: this.layout.body.y + this.layout.body.height,
+    // };
+
+    // Calculates currently possible scroll & changes scrollIndex if needed.
+
+    const maxScroll = Math.max(
+      0,
+      this.system.renderState.body.length - this.bodyHeight,
+    );
+    this.scrollIndex = Math.max(0, Math.min(this.scrollIndex, maxScroll));
+
+    this.visibleLines = this.system.renderState.body.slice(
+      this.scrollIndex,
+      this.scrollIndex + this.bodyHeight,
+    );
+
+    // Renderling starts rendering process.
+
+    const sb = new ScreenBuffer({
+      dst: this.term,
+    });
+
+    // Clear everything
+    //* Only changed soon!
+
+    for (let y = 0; y < this.term.height; y++) {
+      sb.put({ x: 0, y }, " ".repeat(this.term.width));
+    }
+
+    // this.banner
+
+    this.banner.split("\n").forEach((line, index) => {
+      sb.put({ x: 1, y: index }, line.padEnd(this.term.width, " "));
+    });
+
+    // Header & Footer
+
+    ["header", "footer"].forEach((section) =>
+      this.system.renderState[section].forEach((line, index) =>
+        sb.put(
+          {
+            x: 1,
+            y: this.layout[section].y + index,
+          },
+          line.padEnd(this.term.width, " "),
+        ),
       ),
-    ),
-  );
+    );
 
-  // Body
+    // Body
 
-  for (let y = 0; y < bodyH; y++) {
-    const posY = layout.body.start + y;
+    for (let y = 0; y < this.bodyHeight; y++) {
+      const posY = this.layout.body.start + y;
 
-    if (posY >= layout.body.end) break;
+      if (posY >= this.layout.body.end) break;
 
-    const line = visibleLines[y] || " ".padEnd(term.width, " ");
+      const line = this.visibleLines[y] || " ".padEnd(this.term.width, " ");
 
-    sb.put({ x: 1, y: posY }, line.padEnd(term.width, " "));
+      sb.put({ x: 1, y: posY }, line.padEnd(this.term.width, " "));
+    }
+
+    // Le prompt
+
+    sb.put({ x: 2, y: this.term.height - 2 }, ">".padEnd(this.term.width, " "));
+
+    // THe canvas shall be filled now
+
+    sb.draw();
+
+    // After drawing, the cursor will be moved out of the window. Hiding and restoring the cursor did NOT work (as I intended at least).
+
+    //? Other way maybe? Check soon
+
+    this.term.moveTo(5, this.term.height - 1);
   }
 
-  // Le prompt
-
-  sb.put({ x: 2, y: term.height - 2 }, ">".padEnd(term.width, " "));
-
-  // THe canvas shall be filled now
-
-  sb.draw();
-
-  // After drawing, the cursor will be moved out of the window. Hiding and restoring the cursor did NOT work (as I intended at least).
-
-  //? Other way maybe? Check soon
-
-  term.moveTo(5, term.height - 1);
-
-  function calculatePaddingOffset() {
-    Object.entries(layout).forEach(([section, config]) => {
+  calculatePaddingOffset() {
+    Object.entries(this.layout).forEach(([section, config]) => {
       if (!config.centered) return;
 
-      const extraLines = config.height - renderState[section].length;
+      const extraLines =
+        config.height - this.system.renderState[section].length;
 
-      if (extraLines > 1) {
-        layout[section].paddingOffset = Math.floor(extraLines / 2);
-      }
+      if (extraLines > 1)
+        this.layout[section].paddingOffset = Math.floor(extraLines / 2);
     });
   }
 }
 
-term.on("mouse", (name, data) => {
-  if (data.y <= layout.body.y || data.y >= term.height - (footerH + 2)) return;
+// term.on("mouse", (name, data) => {
+//   if (
+//     data.y <= this.layout.body.y ||
+//     data.y >= this.term.height - (this.footerHeight + 2)
+//   )
+//     return;
 
-  if (name == "MOUSE_WHEEL_UP") {
-    scrollIndex = Math.max(0, scrollIndex - 3);
-    render();
-  }
+//   if (name == "MOUSE_WHEEL_UP") {
+//     this.scrollIndex = Math.max(0, this.scrollIndex - 3);
+//     render();
+//   }
 
-  if (name == "MOUSE_WHEEL_DOWN") {
-    scrollIndex = Math.min(
-      Math.max(0, bodyLines.length - bodyH),
-      scrollIndex + 3,
-    );
+//   if (name == "MOUSE_WHEEL_DOWN") {
+//     this.scrollIndex = Math.min(
+//       Math.max(0, this.system.renderState.body.length - this.bodyHeight),
+//       this.scrollIndex + 3,
+//     );
 
-    render();
-  }
-});
-
-render();
+//     render();
+//   }
+// });
 
 term.on("resize", () => render());

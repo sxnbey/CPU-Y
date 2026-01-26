@@ -6,10 +6,15 @@ require("dotenv").config();
 
 const readline = require("readline");
 const os = require("os");
+const terminalkit = require("terminal-kit");
+const term = terminalkit.terminal;
+const ScreenBuffer = terminalkit.ScreenBuffer;
 
 const system = {
   dev: process.env.dev?.split(",").includes(os.userInfo().username),
   apikey: process.env.apikey,
+  term: term,
+  screenBuffer: ScreenBuffer,
   chalk: require("chalk"),
   rl: null,
   functions: {},
@@ -36,12 +41,14 @@ require("./modules/loader.js")(system);
 *                                              MAIN                                              *
 \************************************************************************************************/
 
-system.handlers.commandHandler(system);
-system.rl.emit("line", "home");
+renderling.render();
+
+// system.handlers.commandHandler(system);
+// system.rl.emit("line", "home");
 
 // Shows the boot log if in dev mode.
 
-if (system.dev) system.other.bootLog.forEach((i) => system.toRender.addLine(i));
+// if (system.dev) system.other.bootLog.forEach((i) => system.toRender.addLine(i));
 
 // Renderling renders again on window resize.
 
