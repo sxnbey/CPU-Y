@@ -5,7 +5,7 @@ const blacklist = ["loader.js"];
 
 module.exports = loadAll;
 
-//! WIP WORKING ON CORE
+//! WIP
 
 class Loader {
   constructor(system) {

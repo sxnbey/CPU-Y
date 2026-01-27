@@ -78,11 +78,11 @@ module.exports = class System {
     let directory = startDirectory;
 
     while (!fs.existsSync(this.path.join(directory, "package.json"))) {
-      const ownPath = this.path.dirname(directory);
+      const parentDirectory = this.path.dirname(directory);
 
-      if (ownPath == directory) throw new Error("Root not found");
+      if (parentDirectory == directory) throw new Error("Root not found");
 
-      directory = ownPath;
+      directory = parentDirectory;
     }
 
     return directory;

@@ -1,4 +1,4 @@
 module.exports = (system) => {
-  //! WIP WORKING ON CORE
+  //! WIP WORKING ON LOADER
   system.term.on("key", {});
 };
