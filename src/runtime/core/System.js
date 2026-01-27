@@ -1,72 +1,113 @@
 require("dotenv").config();
 
 const os = require("os");
+const path = require("path");
+const fs = require("fs");
 const terminalkit = require("terminal-kit");
 const term = terminalkit.terminal;
 const ScreenBuffer = terminalkit.ScreenBuffer;
 
+const RenderState = require("./RenderState.js");
+
 module.exports = class System {
   constructor(options = {}) {
     this.config = {
-      commandDirectory: "commands",
-      subcommandDirectory: "subcommands",
-      toLoad: ["handlers", "modules"],
+      commandsPath: "",
+      subcommandsPath: "",
+      pathsToLoad: ["../handlers", "../modules"],
       ...options,
     };
 
     this.dev = process.env.dev?.split(",").includes(os.userInfo().username);
 
+    this.path = path;
+    this.fs = fs;
     this.term = term;
     this.ScreenBuffer = ScreenBuffer;
+
+    this.renderer = null;
+    this.toRender = new RenderState();
 
     this.functions = {};
     this.lastCommand = {};
     this.bootLog = [];
   }
 
-  setCommandDirectory(directory) {
-    this.config.commandDirectory = directory;
+  setCommandsPath(path) {
+    this.config.commandsPath = path;
 
     return this;
   }
 
-  setSubcommandDirectory(directory) {
-    this.config.subcommandDirectory = directory;
+  setSubcommandsPath(path) {
+    this.config.subcommandsPath = path;
 
     return this;
   }
 
-  setCustomLoad(pathArray) {
-    this.config.customLoad = pathArray;
+  setCustomPaths(pathArray) {
+    this.config.customPaths = pathArray;
 
     return this;
   }
 
-  addCustomLoad(path) {
-    if (!this.config.customLoad) this.config.customLoad = [];
+  addCustomPath(path) {
+    if (!this.config.customPaths) this.config.customPaths = [];
 
-    this.config.customLoad.push(path);
+    this.config.customPaths.push(path);
 
     return this;
   }
 
-  // const system = {
-  //   dev: process.env.dev?.split(",").includes(os.userInfo().username),
-  //   apikey: process.env.apikey,
-  //   term: term,
-  //   screenBuffer: ScreenBuffer,
-  //   chalk: require("chalk"),
-  //   functions: {},
-  //   other: {
-  //     lastCommand: {},
-  //     bootLog: ["", "Boot log:", ""],
-  //   },
-  // };
+  createSystemEntry(name, value) {
+    this.system[name] = value;
 
-  // const RenderState = require("./runtime/core/renderState.js");
-  // system.toRender = new RenderState();
-  // const Renderer = require("./runtime/core/renderer.js")(system);
-  // const renderling = new Renderer();
+    return this;
+  }
 
-  // require("./runtime/modules/loader.js")(system);
+  createAllCommandPaths() {
+    const rootDirectory = this.findRootDirectory(__dirname);
+
+    ["commands", "subcommands"].forEach(
+      (folder) =>
+        (this.config[folder + "Path"] = this.path.join(rootDirectory, folder)),
+    );
+  }
+
+  findRootDirectory(startDirectory) {
+    let directory = startDirectory;
+
+    while (!fs.existsSync(this.path.join(directory, "package.json"))) {
+      const ownPath = this.path.dirname(directory);
+
+      if (ownPath == directory) throw new Error("Root not found");
+
+      directory = ownPath;
+    }
+
+    return directory;
+  }
+
+  start() {
+    this.createAllCommandPaths();
+
+    return console.log(this.config);
+
+    this.term.on("key", (name) => {
+      if (name === "CTRL_C") {
+        term.processExit(0);
+        term.fullscreen(false);
+      }
+    });
+
+    this.term.clear();
+    this.term.grabInput();
+    this.term.grabInput({ mouse: "button" });
+    this.term.fullscreen(true);
+
+    const Renderer = require("./Renderer.js");
+
+    this.renderer = new Renderer(this);
+    this.renderer.render();
+  }
 };

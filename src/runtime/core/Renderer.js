@@ -3,7 +3,7 @@ module.exports = class Renderer {
     this.system = system;
     this.term = system.term;
 
-    this.screenBuffer = system.screenBuffer;
+    this.ScreenBuffer = system.ScreenBuffer;
     this.toRender = system.toRender;
     this.lastRender = {};
     this.layout = {};
@@ -21,7 +21,7 @@ module.exports = class Renderer {
   }
 
   render() {
-    const sb = new this.screenBuffer({
+    const sb = new this.ScreenBuffer({
       dst: this.term,
     });
 
@@ -121,7 +121,7 @@ module.exports = class Renderer {
     //* Only changed soon!
 
     for (let y = 0; y < this.term.height; y++) {
-      sb.put({ x: 0, y }, " ".padEnd(this.term.width, ""));
+      sb.put({ x: 1, y }, " ".padEnd(this.term.width, ""));
     }
   }
 

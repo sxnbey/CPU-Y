@@ -10,14 +10,54 @@ module.exports = loadAll;
 class Loader {
   constructor(system) {
     this.system = system;
-    this.fs = fs;
+    this.fs = system.fs;
 
-    this.directories = dirs;
-    this.blacklist = blacklist;
+    this.commandsPath = system.config.commandsPath;
+    this.subcommandsPath = system.config.subcommandsPath;
+    this.pathsToLoad = system.config.pathsToLoad;
+    this.customPaths = system.config.customPaths || null;
+    this.allPaths = [];
+    this.blacklist = system.blacklist;
+  }
+
+  start() {
+    this.createAllPaths();
+  }
+
+  loadModulesAndHandler() {
+    this.pathsToLoad.forEach((path) => {
+      const folderName = path.split("/")[1];
+
+      this.system.createSystemEntry(folderName, file);
+
+      this.fs.readdirSync(path).forEach((file) => {
+        if (this.blacklist.includes(file)) return;
+
+        file = require(file);
+
+        if (typeof file == "function") {
+        }
+      });
+    });
+  }
+
+  loadAndRunFunctions(file) {
+    file(this.system);
+  }
+
+  createAllPaths() {
+    this.allPaths = [
+      this.commandsPath,
+      this.subcommandsPath,
+      ...this.pathsToLoad,
+    ];
+
+    if (this.customPaths)
+      this.customPaths.forEach((path) => this.allPaths.push(path));
   }
 
   loadRecursive() {
-    this.directories.forEach((directory) => {});
+    this.allPaths.forEach((directory) => {});
   }
 }
 
