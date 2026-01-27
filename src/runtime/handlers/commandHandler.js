@@ -1,4 +1,6 @@
 module.exports = (system) => {
+  return;
+
   system.rl.addListener("line", async (msg) => {
     const args = msg.trim().split(/\s+/);
     const inputCmd = args.shift();

@@ -1,17 +1,25 @@
-/************************************************************************************************\
-*                                   DECLARATION, IM- & EXPORTS                                   *
-\************************************************************************************************/
-
 const fs = require("fs");
-const dirs = ["modules", "handlers"];
-const commandDirs = ["commands", "subcommands"];
+const dirs = ["modules", "handlers", "commands", "subcommands"];
+// const commandDirs = ["commands", "subcommands"];
 const blacklist = ["loader.js"];
 
 module.exports = loadAll;
 
-/************************************************************************************************\
-*                                              MAIN                                              *
-\************************************************************************************************/
+//! WIP WORKING ON CORE
+
+class Loader {
+  constructor(system) {
+    this.system = system;
+    this.fs = fs;
+
+    this.directories = dirs;
+    this.blacklist = blacklist;
+  }
+
+  loadRecursive() {
+    this.directories.forEach((directory) => {});
+  }
+}
 
 function loadAll(system) {
   commandDirs.forEach((dir) => {

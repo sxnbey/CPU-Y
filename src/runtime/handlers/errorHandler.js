@@ -13,7 +13,7 @@ module.exports = errorHandler;
 function errorHandler(system, layer, error, stack) {
   return;
 
-  const errors = require("../data/errors.json");
+  const errors = require("../../../data/errors.json");
 
   error = errors.errors[layer].find((i) => i.code == error);
 

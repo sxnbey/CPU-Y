@@ -4,7 +4,6 @@
 
 require("dotenv").config();
 
-const readline = require("readline");
 const os = require("os");
 const terminalkit = require("terminal-kit");
 const term = terminalkit.terminal;
@@ -16,25 +15,19 @@ const system = {
   term: term,
   screenBuffer: ScreenBuffer,
   chalk: require("chalk"),
-  rl: null,
   functions: {},
   other: {
     lastCommand: {},
     bootLog: ["", "Boot log:", ""],
   },
 };
-system.rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-  prompt: "> ",
-});
 
-const RenderState = require("./classes/renderstate.js");
+const RenderState = require("./runtime/core/renderState.js");
 system.toRender = new RenderState();
-const Renderer = require("./classes/renderer.js")(system);
+const Renderer = require("./runtime/core/renderer.js")(system);
 const renderling = new Renderer();
 
-require("./modules/loader.js")(system);
+require("./runtime/modules/loader.js")(system);
 
 /************************************************************************************************\
 *                                              MAIN                                              *
@@ -42,7 +35,6 @@ require("./modules/loader.js")(system);
 
 renderling.render();
 
-// system.handlers.commandHandler(system);
 // system.rl.emit("line", "home");
 
 // Shows the boot log if in dev mode.
