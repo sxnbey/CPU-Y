@@ -34,24 +34,36 @@ module.exports = class System {
   }
 
   setCommandsPath(path) {
+    if (typeof path != "string")
+      throw new TypeError(`Expected string got ${typeof path} instead`);
+
     this.config.commandsPath = path;
 
     return this;
   }
 
   setSubcommandsPath(path) {
+    if (typeof path != "string")
+      throw new TypeError(`Expected string got ${typeof path} instead`);
+
     this.config.subcommandsPath = path;
 
     return this;
   }
 
   setCustomPaths(pathArray) {
+    if (!Array.isArray(pathArray))
+      throw new TypeError(`Expected array got ${typeof pathArray} instead`);
+
     this.config.customPaths = pathArray;
 
     return this;
   }
 
   addCustomPath(path) {
+    if (typeof path != "string")
+      throw new TypeError(`Expected string got ${typeof path} instead`);
+
     if (!this.config.customPaths) this.config.customPaths = [];
 
     this.config.customPaths.push(path);
@@ -59,10 +71,25 @@ module.exports = class System {
     return this;
   }
 
-  createSystemEntry(name, value) {
-    this.system[name] = value;
+  changeSystemEntry(name, value = {}) {
+    if (typeof value != "object")
+      throw new TypeError(`Expected object got ${typeof value} instead`);
+
+    this[name] = value;
 
     return this;
+  }
+
+  addToSystemEntry(name, key, value) {
+    if (!this[name]) this[name] = {};
+
+    this[name][key] = value;
+
+    return this;
+  }
+
+  getSystemEntry(name) {
+    return this[name];
   }
 
   createAllCommandPaths() {
@@ -90,6 +117,8 @@ module.exports = class System {
 
   start() {
     this.createAllCommandPaths();
+
+    this.setCustomPaths([]);
 
     return console.log(this.config);
 

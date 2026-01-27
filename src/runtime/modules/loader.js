@@ -10,7 +10,6 @@ module.exports = loadAll;
 class Loader {
   constructor(system) {
     this.system = system;
-    this.fs = system.fs;
 
     this.commandsPath = system.config.commandsPath;
     this.subcommandsPath = system.config.subcommandsPath;
@@ -26,14 +25,18 @@ class Loader {
 
   loadModulesAndHandler() {
     this.pathsToLoad.forEach((path) => {
-      const folderName = path.split("/")[1];
+      const folderName = this.system.path.split("/")[1];
 
-      this.system.createSystemEntry(folderName, file);
+      this.system.changeSystemEntry(folderName, {});
 
-      this.fs.readdirSync(path).forEach((file) => {
+      this.system.fs.readdirSync(path).forEach((file) => {
         if (this.blacklist.includes(file)) return;
 
-        file = require(file);
+        const fileName = file.split(".js")[0];
+
+        file = require(this.system.path.join(path, file));
+
+        this.system.addToSystemEntry(folderName, fileName, file);
 
         if (typeof file == "function") {
         }
@@ -41,8 +44,8 @@ class Loader {
     });
   }
 
-  loadAndRunFunctions(file) {
-    file(this.system);
+  loadAndRunFunction(file) {
+    file(this.system)();
   }
 
   createAllPaths() {
