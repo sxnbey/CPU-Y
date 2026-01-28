@@ -1,3 +1,7 @@
+/**
+ * @typedef {import("../core/System.js")} System
+ */
+
 const fs = require("fs");
 const dirs = ["modules", "handlers", "commands", "subcommands"];
 // const commandDirs = ["commands", "subcommands"];
@@ -7,25 +11,41 @@ module.exports = loadAll;
 
 //! WIP
 
+/**
+ * Loader is responsible for loading:
+ * - Commands
+ * - Modules
+ * - Handler
+ *
+ * @class Loader
+ */
+
 class Loader {
+  /**
+   * @param {System} system
+   */
+
   constructor(system) {
     this.system = system;
 
     this.commandsPath = system.config.commandsPath;
     this.subcommandsPath = system.config.subcommandsPath;
+
     this.pathsToLoad = system.config.pathsToLoad;
-    this.customPaths = system.config.customPaths || null;
+    this.customPaths = system.config.customPaths ?? null;
+
     this.allPaths = [];
-    this.blacklist = system.blacklist;
+
+    this.blacklist = system.config.loadBlacklist;
   }
 
   start() {
     this.createAllPaths();
   }
 
-  loadModulesAndHandler() {
+  load() {
     this.pathsToLoad.forEach((path) => {
-      const folderName = this.system.path.split("/")[1];
+      const folderName = this.system.path.basename(path);
 
       this.system.changeSystemEntry(folderName, {});
 
@@ -36,16 +56,28 @@ class Loader {
 
         file = require(this.system.path.join(path, file));
 
-        this.system.addToSystemEntry(folderName, fileName, file);
-
-        if (typeof file == "function") {
+        switch (file.type) {
+          case "function":
+            this.loadAndRunFunction(fileName, file);
+            break;
+          case "command":
+            this.loadCommand(fileName, file);
+            break;
+          case "class":
+            this.loadClass(fileName, file);
         }
       });
     });
   }
 
-  loadAndRunFunction(file) {
-    file(this.system)();
+  loadAndRunFunction(functionName, func) {
+    this.system.changeSystemEntry(functionName, func);
+
+    func.execute(this.system);
+  }
+
+  loadClass(className, classFile) {
+    this.system.changeSystemEntry(className, classFile.class);
   }
 
   createAllPaths() {
@@ -59,9 +91,7 @@ class Loader {
       this.customPaths.forEach((path) => this.allPaths.push(path));
   }
 
-  loadRecursive() {
-    this.allPaths.forEach((directory) => {});
-  }
+  loadRecursive() {}
 }
 
 function loadAll(system) {

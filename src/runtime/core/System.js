@@ -9,12 +9,25 @@ const ScreenBuffer = terminalkit.ScreenBuffer;
 
 const RenderState = require("./RenderState.js");
 
+/**
+ * Core system runtime.
+ *
+ * Initializes:
+ * - rendering
+ * - file loading
+ * - input handling
+ * - and more :3
+ *
+ * @class System
+ */
+
 module.exports = class System {
   constructor(options = {}) {
     this.config = {
       commandsPath: "",
       subcommandsPath: "",
       pathsToLoad: ["../handlers", "../modules"],
+      loadBlacklist: ["loader.js"],
       ...options,
     };
 
@@ -118,7 +131,7 @@ module.exports = class System {
   start() {
     this.createAllCommandPaths();
 
-    this.setCustomPaths([]);
+    this.setCustomPaths("");
 
     return console.log(this.config);
 
