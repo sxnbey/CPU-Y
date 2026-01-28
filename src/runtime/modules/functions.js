@@ -1,4 +1,6 @@
-module.exports = (system) => {
+module.exports = { type: "function", execute: execute };
+
+function execute(system) {
   system.functions.banner = function () {
     return system.chalk.cyan(`
   ______   _______   __    __       __      __ 
@@ -52,4 +54,4 @@ module.exports = (system) => {
     console.log("\n");
     system.rl.prompt();
   };
-};
+}

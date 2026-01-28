@@ -7,6 +7,7 @@ const terminalkit = require("terminal-kit");
 const term = terminalkit.terminal;
 const ScreenBuffer = terminalkit.ScreenBuffer;
 
+const Renderer = require("./Renderer.js");
 const RenderState = require("./RenderState.js");
 const Loader = require("../modules/Loader.js");
 
@@ -38,9 +39,9 @@ module.exports = class System {
     this.fs = fs;
     this.term = term;
     this.ScreenBuffer = ScreenBuffer;
-    this.Loader = Loader;
 
-    this.renderer = null;
+    this.Loader = Loader;
+    this.Renderer = Renderer;
     this.toRender = new RenderState();
 
     this.functions = {};
@@ -107,35 +108,46 @@ module.exports = class System {
     return this[name];
   }
 
-  createAllPaths() {
-    const rootDirectory = this.findRootDirectory(__dirname);
-
-    ["commands", "subcommands"].forEach(
-      (folder) =>
-        (this.config[folder + "Path"] = this.path.join(rootDirectory, folder)),
-    );
+  getConfigEntry(name) {
+    return this.config[name];
   }
 
-  findRootDirectory(startDirectory) {
-    let directory = startDirectory;
+  scanDirectoryRecursive(path, files = []) {
+    this.fs.readdirSync(path, { withFileTypes: true }).forEach((entry) => {
+      const fullPath = this.path.join(path, entry.name);
 
-    while (!fs.existsSync(this.path.join(directory, "package.json"))) {
-      const parentDirectory = this.path.dirname(directory);
+      if (entry.isDirectory()) this.scanDirectoryRecursive(fullPath, files);
+      else if (entry.isFile() && entry.name.endsWith(".js"))
+        files.push(fullPath);
+    });
 
-      if (parentDirectory == directory) throw new Error("Root not found");
+    return files;
+  }
 
-      directory = parentDirectory;
-    }
+  createAllPaths() {
+    const projectRoot = process.cwd();
+    const frameworkRoot = this.path.resolve(__dirname, "..");
 
-    return directory;
+    this.config.commandsPath = this.path.join(projectRoot, "commands");
+    this.config.subcommandsPath = this.path.join(projectRoot, "subcommands");
+
+    this.config.pathsToLoad = [
+      this.path.join(frameworkRoot, "handlers"),
+      this.path.join(frameworkRoot, "modules"),
+      this.config.commandsPath,
+      this.config.subcommandsPath,
+    ];
+
+    if (this.config.customPaths)
+      this.config.pathsToLoad.push(...this.config.customPaths);
   }
 
   start() {
-    this.createAllCommandPaths();
+    this.createAllPaths();
 
     new this.Loader(this).start();
 
-    return console.log(this.config);
+    console.log(this.functions);
 
     this.term.on("key", (name) => {
       if (name === "CTRL_C") {
@@ -144,14 +156,12 @@ module.exports = class System {
       }
     });
 
-    this.term.clear();
-    this.term.grabInput();
-    this.term.grabInput({ mouse: "button" });
-    this.term.fullscreen(true);
+    // this.term.clear();
+    // this.term.grabInput();
+    // this.term.grabInput({ mouse: "button" });
+    // this.term.fullscreen(true);
 
-    const Renderer = require("./Renderer.js");
-
-    this.renderer = new Renderer(this);
-    this.renderer.render();
+    // this.Renderer = new this.Renderer(this);
+    // this.Renderer.render();
   }
 };

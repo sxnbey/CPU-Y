@@ -19,31 +19,17 @@ module.exports = class Loader {
   constructor(system) {
     this.system = system;
 
-    this.commandsPath = system.config.commandsPath;
-    this.subcommandsPath = system.config.subcommandsPath;
+    this.commandsPath = system.getConfigEntry("commandsPath");
+    this.subcommandsPath = system.getConfigEntry("subcommandsPath");
 
-    this.pathsToLoad = system.config.pathsToLoad;
-    this.customPaths = system.config.customPaths ?? null;
+    this.pathsToLoad = system.getConfigEntry("pathsToLoad");
+    this.customPaths = system.getConfigEntry("customPaths") ?? null;
 
-    this.allPaths = [];
-
-    this.blacklist = system.config.loadBlacklist;
+    this.blacklist = system.getConfigEntry("loadBlacklist");
   }
 
   start() {
-    this.createAllPaths();
     this.load();
-  }
-
-  createAllPaths() {
-    this.allPaths = [
-      this.commandsPath,
-      this.subcommandsPath,
-      ...this.pathsToLoad,
-    ];
-
-    if (this.customPaths)
-      this.customPaths.forEach((path) => this.allPaths.push(path));
   }
 
   load() {
@@ -52,7 +38,7 @@ module.exports = class Loader {
 
       this.system.changeSystemEntry(folderName, {});
 
-      const files = this.loadRecursive(path);
+      const files = this.system.scanDirectoryRecursive(path);
 
       files.forEach((filePath) => {
         const fileName = this.system.path.basename(filePath, ".js");
@@ -65,42 +51,28 @@ module.exports = class Loader {
 
         switch (file.type) {
           case "function":
-            this.loadAndRunFunction(fileName, file);
+            this.loadAndRunFunction(fileName, folderName, file);
             break;
           case "command":
-            this.loadCommand(fileName, file);
+            this.loadCommand(fileName, folderName, file);
             break;
           case "class":
-            this.loadClass(fileName, file);
+            this.loadClass(fileName, folderName, file);
         }
       });
     });
   }
 
-  loadRecursive(path, files = []) {
-    this.system.fs
-      .readdirSync(path, { withFileTypes: true })
-      .forEach((entry) => {
-        const fullPath = this.system.path.join(path, entry.name);
-
-        if (entry.isDirectory()) this.loadRecursive(fullPath, files);
-        else if (entry.isFile() && entry.name.endsWith(".js"))
-          files.push(fullPath);
-      });
-
-    return files;
-  }
-
-  loadAndRunFunction(functionName, func) {
-    this.system.changeSystemEntry(functionName, func);
+  loadAndRunFunction(functionName, category, func) {
+    this.system.addToSystemEntry(category, functionName, func);
 
     func.execute(this.system);
   }
 
   loadCommand(commandName, command) {}
 
-  loadClass(className, classFile) {
-    this.system.changeSystemEntry(className, classFile.class);
+  loadClass(className, category, classFile) {
+    this.system.addToSystemEntry(category, className, classFile.class);
   }
 };
 
