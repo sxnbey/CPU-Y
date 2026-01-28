@@ -8,6 +8,7 @@ const term = terminalkit.terminal;
 const ScreenBuffer = terminalkit.ScreenBuffer;
 
 const RenderState = require("./RenderState.js");
+const Loader = require("../modules/Loader.js");
 
 /**
  * Core system runtime.
@@ -26,8 +27,8 @@ module.exports = class System {
     this.config = {
       commandsPath: "",
       subcommandsPath: "",
-      pathsToLoad: ["../handlers", "../modules"],
-      loadBlacklist: ["loader.js"],
+      pathsToLoad: [],
+      loadBlacklist: ["Loader.js"],
       ...options,
     };
 
@@ -37,6 +38,7 @@ module.exports = class System {
     this.fs = fs;
     this.term = term;
     this.ScreenBuffer = ScreenBuffer;
+    this.Loader = Loader;
 
     this.renderer = null;
     this.toRender = new RenderState();
@@ -105,7 +107,7 @@ module.exports = class System {
     return this[name];
   }
 
-  createAllCommandPaths() {
+  createAllPaths() {
     const rootDirectory = this.findRootDirectory(__dirname);
 
     ["commands", "subcommands"].forEach(
@@ -131,7 +133,7 @@ module.exports = class System {
   start() {
     this.createAllCommandPaths();
 
-    this.setCustomPaths("");
+    new this.Loader(this).start();
 
     return console.log(this.config);
 

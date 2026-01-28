@@ -2,15 +2,6 @@
  * @typedef {import("../core/System.js")} System
  */
 
-const fs = require("fs");
-const dirs = ["modules", "handlers", "commands", "subcommands"];
-// const commandDirs = ["commands", "subcommands"];
-const blacklist = ["loader.js"];
-
-module.exports = loadAll;
-
-//! WIP
-
 /**
  * Loader is responsible for loading:
  * - Commands
@@ -20,7 +11,7 @@ module.exports = loadAll;
  * @class Loader
  */
 
-class Loader {
+module.exports = class Loader {
   /**
    * @param {System} system
    */
@@ -41,6 +32,18 @@ class Loader {
 
   start() {
     this.createAllPaths();
+    this.load();
+  }
+
+  createAllPaths() {
+    this.allPaths = [
+      this.commandsPath,
+      this.subcommandsPath,
+      ...this.pathsToLoad,
+    ];
+
+    if (this.customPaths)
+      this.customPaths.forEach((path) => this.allPaths.push(path));
   }
 
   load() {
@@ -49,12 +52,16 @@ class Loader {
 
       this.system.changeSystemEntry(folderName, {});
 
-      this.system.fs.readdirSync(path).forEach((file) => {
-        if (this.blacklist.includes(file)) return;
+      const files = this.loadRecursive(path);
 
-        const fileName = file.split(".js")[0];
+      files.forEach((filePath) => {
+        const fileName = this.system.path.basename(filePath, ".js");
 
-        file = require(this.system.path.join(path, file));
+        if (this.blacklist.includes(fileName)) return;
+
+        delete require.cache[require.resolve(filePath)];
+
+        const file = require(filePath);
 
         switch (file.type) {
           case "function":
@@ -70,102 +77,41 @@ class Loader {
     });
   }
 
+  loadRecursive(path, files = []) {
+    this.system.fs
+      .readdirSync(path, { withFileTypes: true })
+      .forEach((entry) => {
+        const fullPath = this.system.path.join(path, entry.name);
+
+        if (entry.isDirectory()) this.loadRecursive(fullPath, files);
+        else if (entry.isFile() && entry.name.endsWith(".js"))
+          files.push(fullPath);
+      });
+
+    return files;
+  }
+
   loadAndRunFunction(functionName, func) {
     this.system.changeSystemEntry(functionName, func);
 
     func.execute(this.system);
   }
 
+  loadCommand(commandName, command) {}
+
   loadClass(className, classFile) {
     this.system.changeSystemEntry(className, classFile.class);
   }
+};
 
-  createAllPaths() {
-    this.allPaths = [
-      this.commandsPath,
-      this.subcommandsPath,
-      ...this.pathsToLoad,
-    ];
+// function loadLog(system, text, count) {
+//   let label = text.charAt(0).toUpperCase() + text.slice(1);
 
-    if (this.customPaths)
-      this.customPaths.forEach((path) => this.allPaths.push(path));
-  }
+//   if (count == 1) label = label.slice(0, -1);
 
-  loadRecursive() {}
-}
-
-function loadAll(system) {
-  commandDirs.forEach((dir) => {
-    system[dir] = [];
-
-    loadCommands(system, system[dir], `./${dir}/`);
-
-    loadLog(system, dir, system[dir].length);
-  });
-
-  dirs.forEach((dir) => {
-    let count = 0;
-
-    system[dir] = {};
-
-    fs.readdirSync(`./${dir}/`).forEach((i) => {
-      if (blacklist.includes(i)) return;
-
-      count++;
-
-      // Deletes the cache of the file (for hot reloading).
-
-      delete require.cache[require.resolve(`../${dir}/${i}`)];
-
-      // After iterating through the directory, it runs the file and saves it.
-
-      const file = require(`../${dir}/${i}`);
-
-      file(system);
-
-      system[dir][i.split(".")[0]] = file;
-    });
-
-    loadLog(system, dir.charAt(0).toUpperCase() + dir.slice(1), count);
-  });
-}
-
-function loadLog(system, text, count) {
-  let label = text.charAt(0).toUpperCase() + text.slice(1);
-
-  if (count == 1) label = label.slice(0, -1);
-
-  system.other.bootLog.push(
-    `${system.chalk.green(count)} ${
-      label
-    } loaded. ${system.chalk.green("[+]")}`,
-  );
-}
-
-function loadCommands(system, arr, dirPath) {
-  // Iterates through the directory and if there is a folder, it iterates through said folder.
-
-  fs.readdirSync(dirPath).forEach((i) => {
-    if (!i.endsWith(".js"))
-      return loadCommands(system, arr, `${dirPath}/${i}/`);
-
-    delete require.cache[require.resolve(`../${dirPath}${i}`)];
-
-    // If it's a file, it will be pushed into the commands array.
-
-    const command = require(`../${dirPath}${i}`);
-    const folder = dirPath
-      .split("/")
-      .slice(2)
-      .join("/")
-      .replace(/^\/+|\/+$/g, "");
-
-    arr.push({
-      config: {
-        ...command.config,
-        category: folder,
-      },
-      run: command.run,
-    });
-  });
-}
+//   system.other.bootLog.push(
+//     `${system.chalk.green(count)} ${
+//       label
+//     } loaded. ${system.chalk.green("[+]")}`,
+//   );
+// }
