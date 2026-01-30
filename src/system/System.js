@@ -59,82 +59,6 @@ module.exports = class System {
 
   //! Error checks will be better soon with own error handler and stuff
 
-  registerRuntimeFunction({ name, value, options = {} }) {
-    const { persistent = false, execute = false } = options;
-
-    // if (typeof name != "string")
-    //   throw new TypeError(`Expected string got ${typeof name} instead`);
-
-    // if (typeof value != "function")
-    //   throw new TypeError(`Expected function got ${typeof value} instead`);
-
-    if (value.category && typeof value.category == "string")
-      this.addToSystemEntry({
-        name: value.category,
-        key: name,
-        value: value.export,
-      });
-    else this.changeSystemEntry(name, value.export);
-
-    if (!options) options = { persistent: false, execute: false };
-
-    this.persistentCheck({
-      source: "runtime",
-      type: "function",
-      name: name,
-      value: value.export,
-      options,
-    });
-
-    if (execute) value.export.call(this);
-
-    return this;
-  }
-
-  registerClass({ name, value, options = {} }) {
-    const { persistent = false, instantiate = false } = options;
-
-    // if (typeof name != "string")
-    //   throw new TypeError(`Expected string got ${typeof name} instead`);
-
-    // if (typeof value != "function")
-    //   throw new TypeError(`Expected function got ${typeof value} instead`);
-
-    const instance = instantiate ? new value.export(this) : value.export;
-
-    if (instance.category && typeof instance.category == "string")
-      this.addToSystemEntry({
-        name: instance.category,
-        key: name,
-        value: instance,
-      });
-    else this.changeSystemEntry(name, instance);
-
-    this.persistentCheck({
-      source: "runtime",
-      type: "class",
-      name: name,
-      value: value.export,
-      options,
-    });
-
-    return this;
-  }
-
-  persistentCheck(value) {
-    return;
-
-    // ID gen and check soon cuz not every value has a category
-
-    const exists = this.survivesHotReload.some(
-      (i) => i.name == value.name && i.category == value.category,
-    );
-
-    if (!exists) this.survivesHotReload.push(value);
-
-    return exists;
-  }
-
   // addUtil(name, func, survivesHotreload = false) {
   //   this.addToSystemEntry(name, "functions", func);
 
@@ -150,24 +74,6 @@ module.exports = class System {
   //   },
   //   run: command.run,
   // });
-
-  addCommand() {}
-
-  getSystemEntry(name) {
-    return this[name];
-  }
-
-  scanDirectoryRecursive(path, files = []) {
-    this.fs.readdirSync(path, { withFileTypes: true }).forEach((entry) => {
-      const fullPath = this.path.join(path, entry.name);
-
-      if (entry.isDirectory()) this.scanDirectoryRecursive(fullPath, files);
-      else if (entry.isFile() && entry.name.endsWith(".js"))
-        files.push(fullPath);
-    });
-
-    return files;
-  }
 
   createAllPaths() {
     const projectRoot = process.cwd();
