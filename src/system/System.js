@@ -7,9 +7,9 @@ const terminalkit = require("terminal-kit");
 const term = terminalkit.terminal;
 const ScreenBuffer = terminalkit.ScreenBuffer;
 
-const Renderer = require("./Renderer.js");
-const RenderState = require("./RenderState.js");
-const Loader = require("../modules/Loader.js");
+const Renderer = require("../runtime/core/Renderer.js");
+const RenderState = require("../runtime/core/RenderState.js");
+const Loader = require("../runtime/modules/Loader.js");
 
 /**
  * Core system runtime.
@@ -58,128 +58,6 @@ module.exports = class System {
   }
 
   //! Error checks will be better soon with own error handler and stuff
-
-  setCommandsPath(path) {
-    if (typeof path != "string")
-      throw new TypeError(`Expected string got ${typeof path} instead`);
-
-    this.config.commandsPath = path;
-
-    return this;
-  }
-
-  setSubcommandsPath(path) {
-    if (typeof path != "string")
-      throw new TypeError(`Expected string got ${typeof path} instead`);
-
-    this.config.subcommandsPath = path;
-
-    return this;
-  }
-
-  setCustomPaths(pathArray) {
-    if (!Array.isArray(pathArray))
-      throw new TypeError(`Expected array got ${typeof pathArray} instead`);
-
-    this.config.customPaths = pathArray;
-
-    return this;
-  }
-
-  addCustomPath(path) {
-    if (typeof path != "string")
-      throw new TypeError(`Expected string got ${typeof path} instead`);
-
-    if (!this.config.customPaths) this.config.customPaths = [];
-
-    this.config.customPaths.push(path);
-
-    return this;
-  }
-
-  changeSystemEntry(name, value = {}) {
-    if (typeof name != "string")
-      throw new TypeError(`Expected string got ${typeof name} instead`);
-
-    if (typeof value != "object")
-      throw new TypeError(`Expected object got ${typeof value} instead`);
-
-    this[name] = value;
-
-    return this;
-  }
-
-  addToSystemEntry({ name, key, value }) {
-    if (typeof name != "string")
-      throw new TypeError(`Expected string got ${typeof name} instead`);
-
-    if (typeof key != "string")
-      throw new TypeError(`Expected string got ${typeof key} instead`);
-
-    // if (typeof value != "object")
-    //   throw new TypeError(`Expected object got ${typeof value} instead`);
-
-    if (!this[name]) this[name] = {};
-
-    this[name][key] = value;
-
-    return this;
-  }
-
-  pushToSystemArray(name, value) {
-    this[name].push(value);
-
-    return this;
-  }
-
-  registerModule({ moduleName, module, options = {} }) {
-    const {
-      persistent = false,
-      execute = false,
-      instantiate = false,
-    } = options;
-
-    // For error check in each function
-
-    moduleName = moduleName || null;
-    module = module || null;
-
-    const types = {
-      function: () =>
-        this.registerRuntimeFunction({
-          name: moduleName,
-          value: module,
-          options: { persistent, execute },
-        }),
-      class: () =>
-        this.registerClass({
-          name: moduleName,
-          value: module,
-          options: { persistent, instantiate },
-        }),
-      command: () =>
-        this.registerCommand({
-          value: module,
-          options: { persistent },
-        }),
-      util: () =>
-        this.registerUtil({
-          name: moduleName,
-          value: module,
-          options: { persistent },
-        }),
-    };
-
-    if (!types[module.type])
-      throw new TypeError(
-        'No file type - module.type "string" needed (function, class, command, util)\n' +
-          module.filePath || "",
-      );
-
-    types[module.type]();
-
-    return this;
-  }
 
   registerRuntimeFunction({ name, value, options = {} }) {
     const { persistent = false, execute = false } = options;
@@ -277,10 +155,6 @@ module.exports = class System {
 
   getSystemEntry(name) {
     return this[name];
-  }
-
-  getConfigEntry(name) {
-    return this.config[name];
   }
 
   scanDirectoryRecursive(path, files = []) {
