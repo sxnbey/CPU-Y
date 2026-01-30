@@ -35,44 +35,51 @@ module.exports = class Loader {
   load() {
     this.pathsToLoad.forEach((path) => {
       const folderName = this.system.path.basename(path);
-
-      this.system.changeSystemEntry(folderName, {});
-
       const files = this.system.scanDirectoryRecursive(path);
+
+      let didLoadSomething = false;
 
       files.forEach((filePath) => {
         const fileName = this.system.path.basename(filePath, ".js");
-
-        if (this.blacklist.includes(fileName)) return;
 
         delete require.cache[require.resolve(filePath)];
 
         const file = require(filePath);
 
+        if (this.blacklist.includes(fileName)) return;
+
+        if (!file.type)
+          throw new TypeError(
+            'No file type - module.type "string" needed (function, class, command)\n' +
+              filePath,
+          );
+
+        if (file.dontLoad) return;
+
+        if (!didLoadSomething) {
+          this.system.changeSystemEntry(folderName, {});
+
+          didLoadSomething = true;
+        }
+
         switch (file.type) {
           case "function":
-            this.loadAndRunFunction(fileName, folderName, file);
+            this.system.addModule(fileName, folderName, file);
             break;
           case "command":
-            this.loadCommand(fileName, folderName, file);
+            this.loadCommand(file);
             break;
           case "class":
             this.loadClass(fileName, folderName, file);
+            break;
+          default:
+            throw new TypeError(
+              'Unknown file type - module.type "string" needed (function, class, command)\n' +
+                filePath,
+            );
         }
       });
     });
-  }
-
-  loadAndRunFunction(functionName, category, func) {
-    this.system.addToSystemEntry(category, functionName, func);
-
-    func.execute(this.system);
-  }
-
-  loadCommand(commandName, command) {}
-
-  loadClass(className, category, classFile) {
-    this.system.addToSystemEntry(category, className, classFile.class);
   }
 };
 

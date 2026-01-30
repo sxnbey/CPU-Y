@@ -1,6 +1,6 @@
-module.exports = { type: "function", execute: execute };
+module.exports = { type: "function", func: blabla, dontLoad: true };
 
-function execute(system) {
+function blabla(system) {
   system.functions.banner = function () {
     return system.chalk.cyan(`
   ______   _______   __    __       __      __ 

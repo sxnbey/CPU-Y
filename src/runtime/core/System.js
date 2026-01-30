@@ -29,6 +29,7 @@ module.exports = class System {
       commandsPath: "",
       subcommandsPath: "",
       pathsToLoad: [],
+      customPaths: [],
       loadBlacklist: ["Loader.js"],
       ...options,
     };
@@ -44,10 +45,19 @@ module.exports = class System {
     this.Renderer = Renderer;
     this.toRender = new RenderState();
 
-    this.functions = {};
+    this.commands = null;
+    this.subCommands = null;
+    this.handlers = {};
+    this.modules = {};
+    this.utils = {};
+
+    this.survivesHotReload = [];
+
     this.lastCommand = {};
     this.bootLog = [];
   }
+
+  //! Error checks will be better soon with own error handler and stuff
 
   setCommandsPath(path) {
     if (typeof path != "string")
@@ -88,6 +98,9 @@ module.exports = class System {
   }
 
   changeSystemEntry(name, value = {}) {
+    if (typeof name != "string")
+      throw new TypeError(`Expected string got ${typeof name} instead`);
+
     if (typeof value != "object")
       throw new TypeError(`Expected object got ${typeof value} instead`);
 
@@ -96,13 +109,166 @@ module.exports = class System {
     return this;
   }
 
-  addToSystemEntry(name, key, value) {
+  addToSystemEntry({ name, key, value }) {
+    if (typeof name != "string")
+      throw new TypeError(`Expected string got ${typeof name} instead`);
+
+    if (typeof key != "string")
+      throw new TypeError(`Expected string got ${typeof key} instead`);
+
+    if (typeof value != "object")
+      throw new TypeError(`Expected object got ${typeof value} instead`);
+
     if (!this[name]) this[name] = {};
 
     this[name][key] = value;
 
     return this;
   }
+
+  registerModule({
+    moduleName,
+    module,
+    options: { persistent = false, execute = false, instantiate = false },
+  }) {
+    const category = module.category || null;
+
+    // For error check in each function
+
+    moduleName = moduleName || null;
+    module = module || null;
+
+    const types = {
+      function: () =>
+        this.registerRuntimeFunction({
+          name: moduleName,
+          category: category,
+          value: module,
+          options: { persistent, execute },
+        }),
+      class: () =>
+        this.registerClass({
+          name: moduleName,
+          category: module.category,
+          value: module,
+          options: { persistent, instantiate },
+        }),
+      command: () =>
+        this.registerCommand({
+          category: module.config?.category,
+          value: module,
+          options: { persistent },
+        }),
+      util: () =>
+        this.registerUtil({
+          name: moduleName,
+          value: module,
+          options: { persistent },
+        }),
+    };
+
+    if (!types[module.type])
+      throw new TypeError(
+        'No file type - module.type "string" needed (function, class, command, util)\n' +
+          module.filePath || "",
+      );
+
+    types[module.type]();
+
+    return this;
+  }
+
+  registerRuntimeFunction({
+    name,
+    value,
+    options: { persistent = false, execute = false },
+  }) {
+    if (typeof name != "string")
+      throw new TypeError(`Expected string got ${typeof name} instead`);
+
+    if (typeof value != "function")
+      throw new TypeError(`Expected function got ${typeof value} instead`);
+
+    if (value.category && typeof value.category == "string")
+      this.addToSystemEntry({ name: value.category, key: name, value });
+    else this.changeSystemEntry(name, value);
+
+    this.persistentCheck({
+      source: "runtime",
+      type: "function",
+      name: name,
+      category: value.category || null,
+      value,
+      options,
+    });
+
+    if (execute) value.call(this);
+
+    return this;
+  }
+
+  registerClass({
+    name,
+    value,
+    options: { persistent = false, instantiate = false },
+  }) {
+    if (typeof name != "string")
+      throw new TypeError(`Expected string got ${typeof name} instead`);
+
+    if (typeof value != "function")
+      throw new TypeError(`Expected function got ${typeof value} instead`);
+
+    const instance = instantiate ? new value(this) : value;
+
+    if (instance.category && typeof instance.category == "string")
+      this.addToSystemEntry({
+        name: instance.category,
+        key: name,
+        value: instance,
+      });
+    else this.changeSystemEntry(name, instance);
+
+    this.persistentCheck({
+      source: "runtime",
+      type: "class",
+      name: name,
+      category: value.category || null,
+      value,
+      options,
+    });
+
+    return this;
+  }
+
+  persistentCheck(value) {
+    // ID gen and check soon cuz not every value has a category
+
+    const exists = this.survivesHotReload.some(
+      (i) => i.name == value.name && i.category == value.category,
+    );
+
+    if (!exists) this.survivesHotReload.push(value);
+
+    return exists;
+  }
+
+  // addUtil(name, func, survivesHotreload = false) {
+  //   this.addToSystemEntry(name, "functions", func);
+
+  //   if (survivesHotreload)
+
+  //   return this;
+  // }
+
+  // arr.push({
+  //   config: {
+  //     ...command.config,
+  //     category: folder,
+  //   },
+  //   run: command.run,
+  // });
+
+  addCommand() {}
 
   getSystemEntry(name) {
     return this[name];
@@ -138,7 +304,7 @@ module.exports = class System {
       this.config.subcommandsPath,
     ];
 
-    if (this.config.customPaths)
+    if (this.config.customPaths.length)
       this.config.pathsToLoad.push(...this.config.customPaths);
   }
 
