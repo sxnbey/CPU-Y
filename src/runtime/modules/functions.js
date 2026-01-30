@@ -1,6 +1,6 @@
 module.exports = {
   type: "function",
-  value: () => {
+  export: () => {
     console.log("hi");
   },
   options: { execute: true },

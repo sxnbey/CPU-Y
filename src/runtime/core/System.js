@@ -7,8 +7,8 @@ const terminalkit = require("terminal-kit");
 const term = terminalkit.terminal;
 const ScreenBuffer = terminalkit.ScreenBuffer;
 
-// const Renderer = require("./Renderer.js");
-// const RenderState = require("./RenderState.js");
+const Renderer = require("./Renderer.js");
+const RenderState = require("./RenderState.js");
 const Loader = require("../modules/Loader.js");
 
 /**
@@ -42,8 +42,8 @@ module.exports = class System {
     this.ScreenBuffer = ScreenBuffer;
 
     this.Loader = Loader;
-    // this.Renderer = Renderer;
-    // this.toRender = new RenderState();
+    this.Renderer = Renderer;
+    this.toRender = new RenderState();
 
     this.commands = null;
     this.subCommands = null;
@@ -126,6 +126,12 @@ module.exports = class System {
     return this;
   }
 
+  pushToSystemArray(name, value) {
+    this[name].push(value);
+
+    return this;
+  }
+
   registerModule({ moduleName, module, options = {} }) {
     const {
       persistent = false,
@@ -188,9 +194,9 @@ module.exports = class System {
       this.addToSystemEntry({
         name: value.category,
         key: name,
-        value: value.value,
+        value: value.export,
       });
-    else this.changeSystemEntry(name, value);
+    else this.changeSystemEntry(name, value.export);
 
     if (!options) options = { persistent: false, execute: false };
 
@@ -198,11 +204,11 @@ module.exports = class System {
       source: "runtime",
       type: "function",
       name: name,
-      value: value.value,
+      value: value.export,
       options,
     });
 
-    if (execute) value.value.call(this);
+    if (execute) value.export.call(this);
 
     return this;
   }
@@ -216,7 +222,7 @@ module.exports = class System {
     // if (typeof value != "function")
     //   throw new TypeError(`Expected function got ${typeof value} instead`);
 
-    const instance = instantiate ? new value.value(this) : value.value;
+    const instance = instantiate ? new value.export(this) : value.export;
 
     if (instance.category && typeof instance.category == "string")
       this.addToSystemEntry({
@@ -230,7 +236,7 @@ module.exports = class System {
       source: "runtime",
       type: "class",
       name: name,
-      value: value.value,
+      value: value.export,
       options,
     });
 

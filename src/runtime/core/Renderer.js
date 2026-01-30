@@ -1,4 +1,4 @@
-class Renderer {
+module.exports = class Renderer {
   constructor(system) {
     this.system = system;
     this.term = system.term;
@@ -158,10 +158,4 @@ class Renderer {
   }
 
   drawInput(sb) {}
-}
-
-module.exports = {
-  type: "class",
-  value: Renderer,
-  options: { instantiate: true },
 };

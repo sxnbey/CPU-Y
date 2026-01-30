@@ -40,6 +40,9 @@ module.exports = class Loader {
       let file;
 
       files.forEach((filePath) => {
+        // "runtime" as source means it's protected from reload (persistent)
+        // and not a path but an object instead
+
         if (path.source != "runtime") {
           const fileName = this.system.path.basename(filePath, ".js");
 
@@ -53,7 +56,7 @@ module.exports = class Loader {
 
           if (!file.type)
             throw new TypeError(
-              'No file type - module.type "string" needed (function, class, command)\n' +
+              'No file type - module.type "string" needed (function, class, command, util)\n' +
                 filePath,
             );
 
@@ -61,6 +64,9 @@ module.exports = class Loader {
           file.category = file.category ?? folderName;
           file.options = file.options ?? null;
           file.filePath = filePath;
+
+          if (file.options.persistent)
+            this.system.pushToSystemArray("survivesReload", file);
         } else file = path;
 
         this.system.registerModule({
