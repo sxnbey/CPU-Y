@@ -1,4 +1,6 @@
-module.exports = (system) => {
+module.exports = { dontLoad: true };
+
+exports = (system) => {
   return;
 
   system.rl.addListener("line", async (msg) => {

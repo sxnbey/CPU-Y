@@ -1,11 +1,5 @@
 const EventEmitter = require("events");
 
-module.exports = {
-  type: "class",
-  value: RenderState,
-  instantiate: true,
-};
-
 class RenderState extends EventEmitter {
   constructor() {
     super();
@@ -81,3 +75,9 @@ class RenderState extends EventEmitter {
     return this;
   }
 }
+
+module.exports = {
+  type: "class",
+  value: RenderState,
+  options: { instantiate: true },
+};

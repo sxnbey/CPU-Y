@@ -37,47 +37,37 @@ module.exports = class Loader {
       const folderName = this.system.path.basename(path);
       const files = this.system.scanDirectoryRecursive(path);
 
-      let didLoadSomething = false;
+      let file;
 
       files.forEach((filePath) => {
-        const fileName = this.system.path.basename(filePath, ".js");
+        if (path.source != "runtime") {
+          const fileName = this.system.path.basename(filePath, ".js");
 
-        delete require.cache[require.resolve(filePath)];
+          delete require.cache[require.resolve(filePath)];
 
-        const file = require(filePath);
+          file = require(filePath);
 
-        if (this.blacklist.includes(fileName)) return;
+          if (this.blacklist.includes(fileName)) return;
 
-        if (!file.type)
-          throw new TypeError(
-            'No file type - module.type "string" needed (function, class, command)\n' +
-              filePath,
-          );
+          if (file.dontLoad) return;
 
-        if (file.dontLoad) return;
-
-        if (!didLoadSomething) {
-          this.system.changeSystemEntry(folderName, {});
-
-          didLoadSomething = true;
-        }
-
-        switch (file.type) {
-          case "function":
-            this.system.addModule(fileName, folderName, file);
-            break;
-          case "command":
-            this.loadCommand(file);
-            break;
-          case "class":
-            this.loadClass(fileName, folderName, file);
-            break;
-          default:
+          if (!file.type)
             throw new TypeError(
-              'Unknown file type - module.type "string" needed (function, class, command)\n' +
+              'No file type - module.type "string" needed (function, class, command)\n' +
                 filePath,
             );
-        }
+
+          file.name = file.name ?? fileName;
+          file.category = file.category ?? folderName;
+          file.options = file.options ?? null;
+          file.filePath = filePath;
+        } else file = path;
+
+        this.system.registerModule({
+          moduleName: file.name,
+          module: file,
+          options: file.options,
+        });
       });
     });
   }

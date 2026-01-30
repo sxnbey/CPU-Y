@@ -1,3 +1,5 @@
+module.exports = { dontLoad: true };
+
 module.exports.config = {
   name: "clash",
   aliases: [],

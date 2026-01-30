@@ -7,8 +7,8 @@ const terminalkit = require("terminal-kit");
 const term = terminalkit.terminal;
 const ScreenBuffer = terminalkit.ScreenBuffer;
 
-const Renderer = require("./Renderer.js");
-const RenderState = require("./RenderState.js");
+// const Renderer = require("./Renderer.js");
+// const RenderState = require("./RenderState.js");
 const Loader = require("../modules/Loader.js");
 
 /**
@@ -30,7 +30,7 @@ module.exports = class System {
       subcommandsPath: "",
       pathsToLoad: [],
       customPaths: [],
-      loadBlacklist: ["Loader.js"],
+      loadBlacklist: ["Loader"],
       ...options,
     };
 
@@ -42,8 +42,8 @@ module.exports = class System {
     this.ScreenBuffer = ScreenBuffer;
 
     this.Loader = Loader;
-    this.Renderer = Renderer;
-    this.toRender = new RenderState();
+    // this.Renderer = Renderer;
+    // this.toRender = new RenderState();
 
     this.commands = null;
     this.subCommands = null;
@@ -116,8 +116,8 @@ module.exports = class System {
     if (typeof key != "string")
       throw new TypeError(`Expected string got ${typeof key} instead`);
 
-    if (typeof value != "object")
-      throw new TypeError(`Expected object got ${typeof value} instead`);
+    // if (typeof value != "object")
+    //   throw new TypeError(`Expected object got ${typeof value} instead`);
 
     if (!this[name]) this[name] = {};
 
@@ -126,12 +126,12 @@ module.exports = class System {
     return this;
   }
 
-  registerModule({
-    moduleName,
-    module,
-    options: { persistent = false, execute = false, instantiate = false },
-  }) {
-    const category = module.category || null;
+  registerModule({ moduleName, module, options = {} }) {
+    const {
+      persistent = false,
+      execute = false,
+      instantiate = false,
+    } = options;
 
     // For error check in each function
 
@@ -142,20 +142,17 @@ module.exports = class System {
       function: () =>
         this.registerRuntimeFunction({
           name: moduleName,
-          category: category,
           value: module,
           options: { persistent, execute },
         }),
       class: () =>
         this.registerClass({
           name: moduleName,
-          category: module.category,
           value: module,
           options: { persistent, instantiate },
         }),
       command: () =>
         this.registerCommand({
-          category: module.config?.category,
           value: module,
           options: { persistent },
         }),
@@ -178,47 +175,48 @@ module.exports = class System {
     return this;
   }
 
-  registerRuntimeFunction({
-    name,
-    value,
-    options: { persistent = false, execute = false },
-  }) {
-    if (typeof name != "string")
-      throw new TypeError(`Expected string got ${typeof name} instead`);
+  registerRuntimeFunction({ name, value, options = {} }) {
+    const { persistent = false, execute = false } = options;
 
-    if (typeof value != "function")
-      throw new TypeError(`Expected function got ${typeof value} instead`);
+    // if (typeof name != "string")
+    //   throw new TypeError(`Expected string got ${typeof name} instead`);
+
+    // if (typeof value != "function")
+    //   throw new TypeError(`Expected function got ${typeof value} instead`);
 
     if (value.category && typeof value.category == "string")
-      this.addToSystemEntry({ name: value.category, key: name, value });
+      this.addToSystemEntry({
+        name: value.category,
+        key: name,
+        value: value.value,
+      });
     else this.changeSystemEntry(name, value);
+
+    if (!options) options = { persistent: false, execute: false };
 
     this.persistentCheck({
       source: "runtime",
       type: "function",
       name: name,
-      category: value.category || null,
-      value,
+      value: value.value,
       options,
     });
 
-    if (execute) value.call(this);
+    if (execute) value.value.call(this);
 
     return this;
   }
 
-  registerClass({
-    name,
-    value,
-    options: { persistent = false, instantiate = false },
-  }) {
-    if (typeof name != "string")
-      throw new TypeError(`Expected string got ${typeof name} instead`);
+  registerClass({ name, value, options = {} }) {
+    const { persistent = false, instantiate = false } = options;
 
-    if (typeof value != "function")
-      throw new TypeError(`Expected function got ${typeof value} instead`);
+    // if (typeof name != "string")
+    //   throw new TypeError(`Expected string got ${typeof name} instead`);
 
-    const instance = instantiate ? new value(this) : value;
+    // if (typeof value != "function")
+    //   throw new TypeError(`Expected function got ${typeof value} instead`);
+
+    const instance = instantiate ? new value.value(this) : value.value;
 
     if (instance.category && typeof instance.category == "string")
       this.addToSystemEntry({
@@ -232,8 +230,7 @@ module.exports = class System {
       source: "runtime",
       type: "class",
       name: name,
-      category: value.category || null,
-      value,
+      value: value.value,
       options,
     });
 
@@ -241,6 +238,8 @@ module.exports = class System {
   }
 
   persistentCheck(value) {
+    return;
+
     // ID gen and check soon cuz not every value has a category
 
     const exists = this.survivesHotReload.some(
@@ -313,7 +312,7 @@ module.exports = class System {
 
     new this.Loader(this).start();
 
-    console.log(this.functions);
+    console.log(this.modules.functions);
 
     this.term.on("key", (name) => {
       if (name === "CTRL_C") {

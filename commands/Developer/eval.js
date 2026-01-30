@@ -1,3 +1,5 @@
+module.exports = { dontLoad: true };
+
 module.exports.config = {
   name: "eval",
   aliases: ["e"],
@@ -11,9 +13,9 @@ module.exports.run = (system, args) => {
   if (!args.length)
     return system.functions.log(
       `Please enter JavaScript code to be evaluated behind "${system.chalk.cyan(
-        this.config.name
+        this.config.name,
       )}"!`,
-      ["yellow"]
+      ["yellow"],
     );
 
   system.functions.log(
@@ -21,7 +23,7 @@ module.exports.run = (system, args) => {
       `Code to be evaluated:`,
       system.chalk.yellow(args.join(" ")),
       "Evaluation:\n",
-    ].join("\n\n")
+    ].join("\n\n"),
   );
 
   try {

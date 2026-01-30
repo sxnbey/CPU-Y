@@ -1,3 +1,5 @@
+module.exports = { dontLoad: true };
+
 const fetch = require("node-fetch");
 
 module.exports.config = {

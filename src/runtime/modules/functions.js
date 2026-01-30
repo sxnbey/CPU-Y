@@ -1,4 +1,10 @@
-module.exports = { type: "function", func: blabla, dontLoad: true };
+module.exports = {
+  type: "function",
+  value: () => {
+    console.log("hi");
+  },
+  options: { execute: true },
+};
 
 function blabla(system) {
   system.functions.banner = function () {

@@ -1,3 +1,5 @@
+module.exports = { dontLoad: true };
+
 module.exports.config = {
   name: "commands",
   aliases: ["cmds"],
@@ -10,8 +12,8 @@ module.exports.run = (system, args) => {
 
   system.functions.log(
     `To get more information on a command, type the name of it behind "${system.chalk.cyan(
-      "commands"
-    )}".\n`
+      "commands",
+    )}".\n`,
   );
 
   const toSort = system.commands.filter((i) => i.config.listed);
@@ -28,7 +30,7 @@ module.exports.run = (system, args) => {
       [
         `${cat.charAt(0).toUpperCase() + cat.slice(1)}:`,
         `- ${cmds.join("\n- ")}`,
-      ].join("\n")
+      ].join("\n"),
     )
     .join("\n\n");
 
