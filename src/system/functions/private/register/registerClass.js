@@ -7,10 +7,10 @@ module.exports = function _registerClass({ name, value, options = {} }) {
   // if (typeof value != "function")
   //   throw new TypeError(`Expected function got ${typeof value} instead`);
 
-  const instance = instantiate ? new value.export(this) : value.export;
+  const instance = instantiate ? new value.value(this) : value.value;
 
   if (instance.category && typeof instance.category == "string")
-    this.addToSystemEntry({
+    this._addToSystemEntry({
       name: instance.category,
       key: name,
       value: instance,
@@ -21,7 +21,7 @@ module.exports = function _registerClass({ name, value, options = {} }) {
     source: "runtime",
     type: "class",
     name: name,
-    value: value.export,
+    value: value.value,
     options,
   });
 

@@ -1,35 +1,21 @@
-module.exports = function _registerRuntimeFunction({
-  name,
-  value,
-  options = {},
-}) {
-  const { persistent = false, execute = false } = options;
-
-  // if (typeof name != "string")
-  //   throw new TypeError(`Expected string got ${typeof name} instead`);
-
-  // if (typeof value != "function")
-  //   throw new TypeError(`Expected function got ${typeof value} instead`);
-
-  if (value.category && typeof value.category == "string")
-    this.addToSystemEntry({
-      name: value.category,
-      key: name,
-      value: value.export,
+module.exports = function _registerRuntimeFunction(module) {
+  if (module.category && typeof module.category == "string")
+    this._addToSystemEntry({
+      name: module.category,
+      key: module.name,
+      value: module.value,
     });
-  else this._changeSystemEntry(name, value.export);
+  else this._changeSystemEntry(module.name, module.value);
 
-  if (!options) options = { persistent: false, execute: false };
+  // this._persistentCheck({
+  //   source: "runtime",
+  //   type: "function",
+  //   name: name,
+  //   module: module.value,
+  //   options,
+  // });
 
-  this._persistentCheck({
-    source: "runtime",
-    type: "function",
-    name: name,
-    value: value.export,
-    options,
-  });
-
-  if (execute) value.export.call(this);
+  if (module.options.execute) module.value.call(this);
 
   return this;
 };

@@ -1,6 +1,6 @@
 module.exports = {
   type: "function",
-  export: sample,
+  value: sample,
   dontLoad: true,
   options: { persistent: true, execute: true },
 };

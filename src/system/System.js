@@ -11,6 +11,9 @@ const Renderer = require("../runtime/core/Renderer.js");
 const RenderState = require("../runtime/core/RenderState.js");
 const Loader = require("../runtime/modules/Loader.js");
 
+const privateAPI = require("./functions/private/index.js");
+const publicAPI = require("./functions/public/index.js");
+
 /**
  * Core system runtime.
  *
@@ -41,6 +44,9 @@ module.exports = class System {
     this.term = term;
     this.ScreenBuffer = ScreenBuffer;
 
+    this._bindFunctions(privateAPI);
+    this._bindFunctions(publicAPI);
+
     this.Loader = Loader;
     this.Renderer = Renderer;
     this.toRender = new RenderState();
@@ -59,25 +65,14 @@ module.exports = class System {
 
   //! Error checks will be better soon with own error handler and stuff
 
-  // addUtil(name, func, survivesHotreload = false) {
-  //   this.addToSystemEntry(name, "functions", func);
-
-  //   if (survivesHotreload)
-
-  //   return this;
-  // }
-
-  // arr.push({
-  //   config: {
-  //     ...command.config,
-  //     category: folder,
-  //   },
-  //   run: command.run,
-  // });
+  _bindFunctions(functions) {
+    for (const [name, func] of Object.entries(functions))
+      this[name] = func.bind(this);
+  }
 
   createAllPaths() {
     const projectRoot = process.cwd();
-    const frameworkRoot = this.path.resolve(__dirname, "..");
+    const frameworkRoot = this.path.resolve(__dirname, "../runtime/");
 
     this.config.commandsPath = this.path.join(projectRoot, "commands");
     this.config.subcommandsPath = this.path.join(projectRoot, "subcommands");
@@ -98,7 +93,7 @@ module.exports = class System {
 
     new this.Loader(this).start();
 
-    console.log(this.modules.functions);
+    console.log(this.modules);
 
     this.term.on("key", (name) => {
       if (name === "CTRL_C") {

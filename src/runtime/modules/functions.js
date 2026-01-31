@@ -1,9 +1,9 @@
 module.exports = {
   type: "function",
-  export: () => {
+  value: () => {
     console.log("hi");
   },
-  options: { execute: true },
+  options: { execute: false },
 };
 
 function blabla(system) {

@@ -1,4 +1,4 @@
-class BaseModule {
+module.exports = class BaseModule {
   constructor(system, file) {
     this.system = system;
 
@@ -12,4 +12,4 @@ class BaseModule {
     this.filePath = file.path || null;
     this.id = null;
   }
-}
+};

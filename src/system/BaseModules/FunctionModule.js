@@ -1,18 +1,16 @@
-const BaseModule = require("./BaseModule");
+const BaseModule = require("./BaseModule.js");
 
 module.exports = class FunctionModule extends BaseModule {
   constructor(system, file) {
     super(system, file);
+
+    this.options = {
+      persistent: file.options.persistent ?? false,
+      execute: file.options.execute ?? false,
+    };
   }
 
   register() {
-    this.system._registerRuntimeFunction({
-      name: this.name,
-      value: this.value,
-      options: {
-        persistent: this.options.persistent || false,
-        execute: this.options.execute || false,
-      },
-    });
+    this.system._registerRuntimeFunction(this);
   }
 };

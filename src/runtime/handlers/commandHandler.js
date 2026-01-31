@@ -1,6 +1,6 @@
 module.exports = { dontLoad: true };
 
-exports = (system) => {
+sfff = (system) => {
   return;
 
   system.rl.addListener("line", async (msg) => {

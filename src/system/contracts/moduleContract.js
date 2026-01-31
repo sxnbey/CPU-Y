@@ -11,11 +11,16 @@ function validate(module) {
   if (!module || typeof module != "object")
     throw new TypeError("Module must be an object");
 
-  for (const key of this.required) {
+  for (const key of required) {
     if (!(key in module))
       throw new TypeError(`Module is missing required field: ${key}`);
   }
 
   if (typeof module.type != "string")
     throw new TypeError("module.type must be a string");
+
+  if (typeof module.name != "string")
+    throw new TypeError("module.name must be a string");
+
+  return true;
 }

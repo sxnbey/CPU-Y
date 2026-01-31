@@ -1,44 +1,16 @@
-module.exports = function registerModule({ moduleName, module, options = {} }) {
-  const { persistent = false, execute = false, instantiate = false } = options;
+const { validate } = require("../../../contracts/moduleContract.js");
 
-  // For error check in each function
+const FunctionModule = require("../../../BaseModules/FunctionModule.js");
 
-  moduleName = moduleName || null;
-  module = module || null;
+module.exports = function registerModule(module) {
+  console.log("triggered");
 
-  const types = {
-    function: () =>
-      this._registerRuntimeFunction({
-        name: moduleName,
-        value: module,
-        options: { persistent, execute },
-      }),
-    class: () =>
-      this._registerClass({
-        name: moduleName,
-        value: module,
-        options: { persistent, instantiate },
-      }),
-    command: () =>
-      this._registerCommand({
-        value: module,
-        options: { persistent },
-      }),
-    util: () =>
-      this._registerUtil({
-        name: moduleName,
-        value: module,
-        options: { persistent },
-      }),
-  };
+  validate(module);
 
-  if (!types[module.type])
-    throw new TypeError(
-      'No file type - module.type "string" needed (function, class, command, util)\n' +
-        module.filePath || "",
-    );
-
-  types[module.type]();
+  switch (module.type) {
+    case "function":
+      new FunctionModule(this, module).register();
+  }
 
   return this;
 };

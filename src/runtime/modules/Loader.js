@@ -2,6 +2,8 @@
  * @typedef {import("../core/System.js")} System
  */
 
+const { validate } = require("../../system/contracts/moduleContract.js");
+
 /**
  * Loader is responsible for loading:
  * - Commands
@@ -34,7 +36,6 @@ module.exports = class Loader {
 
   load() {
     this.pathsToLoad.forEach((path) => {
-      const folderName = this.system.path.basename(path);
       const files = this.system._scanDirectoryRecursive(path);
 
       let file;
@@ -46,34 +47,21 @@ module.exports = class Loader {
         if (path.source != "runtime") {
           const fileName = this.system.path.basename(filePath, ".js");
 
+          if (this.blacklist.includes(fileName)) return;
+
           delete require.cache[require.resolve(filePath)];
 
           file = require(filePath);
 
-          if (this.blacklist.includes(fileName)) return;
-
           if (file.dontLoad) return;
 
-          if (!file.type)
-            throw new TypeError(
-              'No file type - module.type "string" needed (function, class, command, util)\n' +
-                filePath,
-            );
+          file.name ??= fileName;
+          file.category ??= this.system.path.basename(path);
 
-          file.name = file.name ?? fileName;
-          file.category = file.category ?? folderName;
-          file.options = file.options ?? null;
-          file.filePath = filePath;
-
-          if (file.options.persistent)
-            this.system.pushToSystemArray("survivesReload", file);
+          validate(file);
         } else file = path;
 
-        this.system.registerModule({
-          moduleName: file.name,
-          module: file,
-          options: file.options,
-        });
+        this.system.registerModule(file);
       });
     });
   }
