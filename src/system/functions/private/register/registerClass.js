@@ -1,4 +1,4 @@
-module.exports = function registerClass({ name, value, options = {} }) {
+module.exports = function _registerClass({ name, value, options = {} }) {
   const { persistent = false, instantiate = false } = options;
 
   // if (typeof name != "string")
@@ -15,9 +15,9 @@ module.exports = function registerClass({ name, value, options = {} }) {
       key: name,
       value: instance,
     });
-  else this.changeSystemEntry(name, instance);
+  else this._changeSystemEntry(name, instance);
 
-  this.persistentCheck({
+  this._persistentCheck({
     source: "runtime",
     type: "class",
     name: name,

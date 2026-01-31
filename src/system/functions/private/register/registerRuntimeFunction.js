@@ -1,4 +1,4 @@
-module.exports = function registerRuntimeFunction({
+module.exports = function _registerRuntimeFunction({
   name,
   value,
   options = {},
@@ -17,11 +17,11 @@ module.exports = function registerRuntimeFunction({
       key: name,
       value: value.export,
     });
-  else this.changeSystemEntry(name, value.export);
+  else this._changeSystemEntry(name, value.export);
 
   if (!options) options = { persistent: false, execute: false };
 
-  this.persistentCheck({
+  this._persistentCheck({
     source: "runtime",
     type: "function",
     name: name,

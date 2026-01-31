@@ -8,24 +8,24 @@ module.exports = function registerModule({ moduleName, module, options = {} }) {
 
   const types = {
     function: () =>
-      this.registerRuntimeFunction({
+      this._registerRuntimeFunction({
         name: moduleName,
         value: module,
         options: { persistent, execute },
       }),
     class: () =>
-      this.registerClass({
+      this._registerClass({
         name: moduleName,
         value: module,
         options: { persistent, instantiate },
       }),
     command: () =>
-      this.registerCommand({
+      this._registerCommand({
         value: module,
         options: { persistent },
       }),
     util: () =>
-      this.registerUtil({
+      this._registerUtil({
         name: moduleName,
         value: module,
         options: { persistent },

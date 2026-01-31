@@ -1,3 +1,3 @@
-const persistentCheck = require("./persistentCheck.js");
+const _persistentCheck = require("./persistentCheck.js");
 
-module.exports = { persistentCheck };
+module.exports = { _persistentCheck };
