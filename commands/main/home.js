@@ -8,7 +8,7 @@ module.exports.config = {
 };
 
 module.exports.run = (system, args) => {
-  system.toRender.setLines([
+  system.RenderState.setLines([
     `If it\'s your first time using CPU-Y, type "${system.chalk.cyan(
       "help",
     )}" for more information on how to use this tool.`,

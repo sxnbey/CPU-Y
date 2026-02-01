@@ -1,8 +1,8 @@
 /**
- * @typedef {import("../core/System.js")} System
+ * @typedef {import("../System.js")} System
  */
 
-const { validate } = require("../../system/contracts/moduleContract.js");
+const { validate } = require("../contracts/moduleContract.js");
 
 /**
  * Loader is responsible for loading:
@@ -32,6 +32,8 @@ module.exports = class Loader {
 
   start() {
     this.load();
+
+    return this;
   }
 
   load() {
@@ -42,21 +44,26 @@ module.exports = class Loader {
 
       files.forEach((filePath) => {
         // "runtime" as source means it's protected from reload (persistent)
-        // and not a path but an object instead
+        // and not a path but an object instead.
 
         if (path.source != "runtime") {
           const fileName = this.system.path.basename(filePath, ".js");
 
           if (this.blacklist.includes(fileName)) return;
 
+          // So I don't kill running instances with deleting the cache.
+
+          const tempFile = require(filePath);
+
+          if (tempFile.dontLoad) return;
+
           delete require.cache[require.resolve(filePath)];
 
           file = require(filePath);
 
-          if (file.dontLoad) return;
-
           file.name ??= fileName;
           file.category ??= this.system.path.basename(path);
+          file.path = filePath;
 
           validate(file);
         } else file = path;

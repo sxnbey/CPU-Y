@@ -9,11 +9,13 @@ module.exports = {
 
 function validate(module) {
   if (!module || typeof module != "object")
-    throw new TypeError("Module must be an object");
+    throw new TypeError(`Module must be an object\n${module.path}`);
 
   for (const key of required) {
     if (!(key in module))
-      throw new TypeError(`Module is missing required field: ${key}`);
+      throw new TypeError(
+        `Module is missing required field: ${key}\n${module.path}`,
+      );
   }
 
   if (typeof module.type != "string")

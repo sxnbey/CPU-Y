@@ -1,10 +1,13 @@
 const EventEmitter = require("events");
 
-module.exports = class RenderState extends EventEmitter {
-  constructor() {
-    super();
+module.exports = {
+  dontLoad: true,
+  type: "class",
+  value: class RenderState extends EventEmitter {
+    constructor() {
+      super();
 
-    this.banner = `  ______   _______   __    __       __      __ 
+      this.banner = `  ______   _______   __    __       __      __ 
  /      \\ |       \\ |  \\  |  \\     |  \\    /  \\
 |  $$$$$$\\| $$$$$$$\\| $$  | $$      \\$$\\  /  $$
 | $$   \\$$| $$__/ $$| $$  | $$ ______\\$$\\/  $$ 
@@ -13,65 +16,68 @@ module.exports = class RenderState extends EventEmitter {
 | $$__/  \\| $$      | $$__/ $$         | $$    
  \\$$    $$| $$       \\$$    $$         | $$    
   \\$$$$$$  \\$$        \\$$$$$$           \\$$`;
-    this.header = ["CPU-Y - Header-Platzhaltertext, der maximal tuff ist"];
-    this.body =
-      "hallo du mann o i j lj h p j p j2j l2jl l2j lkj kl2j l l2jlk".split(" ");
-    this.footer = ["CPU-Y - Footer-Platzhaltertext, der maximal tuff ist"];
-    this.input = [];
-  }
+      this.header = ["CPU-Y - Header-Platzhaltertext, der maximal tuff ist"];
+      this.body =
+        "hallo du mann o i j lj h p j p j2j l2jl l2j lkj kl2j l l2jlk".split(
+          " ",
+        );
+      this.footer = ["CPU-Y - Footer-Platzhaltertext, der maximal tuff ist"];
+      this.input = [];
+    }
 
-  setHeader(title) {
-    this.header = title;
-    this.emit("changed");
+    setHeader(title) {
+      this.header = title;
+      this.emit("changed");
 
-    return this;
-  }
+      return this;
+    }
 
-  setBody(lines) {
-    this.body = lines;
-    this.emit("changed");
+    setBody(lines) {
+      this.body = lines;
+      this.emit("changed");
 
-    return this;
-  }
+      return this;
+    }
 
-  addBodyLine(line) {
-    this.body.push(line);
-    this.emit("changed");
+    addBodyLine(line) {
+      this.body.push(line);
+      this.emit("changed");
 
-    return this;
-  }
+      return this;
+    }
 
-  setFooter(footer) {
-    this.footer = footer;
-    this.emit("changed");
+    setFooter(footer) {
+      this.footer = footer;
+      this.emit("changed");
 
-    return this;
-  }
+      return this;
+    }
 
-  setInput(input) {
-    this.input = input;
-    this.emit("changed");
+    setInput(input) {
+      this.input = input;
+      this.emit("changed");
 
-    return this;
-  }
+      return this;
+    }
 
-  addInput(letter) {
-    this.input.push(letter);
-    this.emit("changed");
+    addInput(letter) {
+      this.input.push(letter);
+      this.emit("changed");
 
-    return this;
-  }
+      return this;
+    }
 
-  getInput() {
-    return this.input.join("");
-  }
+    getInput() {
+      return this.input.join("");
+    }
 
-  clear() {
-    this.header = [];
-    this.lines = [];
-    this.footer = [];
-    this.input = [];
+    clear() {
+      this.header = [];
+      this.lines = [];
+      this.footer = [];
+      this.input = [];
 
-    return this;
-  }
+      return this;
+    }
+  },
 };

@@ -4,12 +4,13 @@ const os = require("os");
 const path = require("path");
 const fs = require("fs");
 const terminalkit = require("terminal-kit");
-const term = terminalkit.terminal;
-const ScreenBuffer = terminalkit.ScreenBuffer;
 
-const Renderer = require("../runtime/core/Renderer.js");
-const RenderState = require("../runtime/core/RenderState.js");
-const Loader = require("../runtime/modules/Loader.js");
+const term = terminalkit.terminal;
+
+const Loader = require("./Loader/Loader.js");
+
+const RenderState = require("../runtime/core/RenderState.js").value;
+const Renderer = require("../runtime/core/Renderer.js").value;
 
 const privateAPI = require("./functions/private/index.js");
 const publicAPI = require("./functions/public/index.js");
@@ -33,7 +34,7 @@ module.exports = class System {
       subcommandsPath: "",
       pathsToLoad: [],
       customPaths: [],
-      loadBlacklist: ["Loader"],
+      loadBlacklist: [],
       ...options,
     };
 
@@ -42,20 +43,23 @@ module.exports = class System {
     this.path = path;
     this.fs = fs;
     this.term = term;
-    this.ScreenBuffer = ScreenBuffer;
 
     this._bindFunctions(privateAPI);
     this._bindFunctions(publicAPI);
 
     this.Loader = Loader;
     this.Renderer = Renderer;
-    this.toRender = new RenderState();
+    this.RenderState = RenderState;
 
-    this.commands = null;
-    this.subCommands = null;
+    this.commands = [];
+    this.subcommands = [];
+    this.core = {};
     this.handlers = {};
     this.modules = {};
     this.utils = {};
+
+    this.allRegisteredModules = [];
+    this.allModuleIds = [];
 
     this.survivesHotReload = [];
 
@@ -70,7 +74,7 @@ module.exports = class System {
       this[name] = func.bind(this);
   }
 
-  createAllPaths() {
+  _createAllPaths() {
     const projectRoot = process.cwd();
     const frameworkRoot = this.path.resolve(__dirname, "../runtime/");
 
@@ -78,6 +82,7 @@ module.exports = class System {
     this.config.subcommandsPath = this.path.join(projectRoot, "subcommands");
 
     this.config.pathsToLoad = [
+      this.path.join(frameworkRoot, "core"),
       this.path.join(frameworkRoot, "handlers"),
       this.path.join(frameworkRoot, "modules"),
       this.config.commandsPath,
@@ -88,12 +93,33 @@ module.exports = class System {
       this.config.pathsToLoad.push(...this.config.customPaths);
   }
 
+  _instantiateLoading() {
+    this._createAllPaths();
+
+    this._changeSystemEntry("Loader", new this.Loader(this));
+
+    this.Loader.start();
+  }
+
   start() {
-    this.createAllPaths();
+    this.term.clear();
+    this.term.grabInput();
+    this.term.grabInput({ mouse: "button" });
+    this.term.fullscreen(true);
 
-    new this.Loader(this).start();
+    this._instantiateLoading();
 
-    console.log(this.modules);
+    this.RenderState = new RenderState(this);
+    this.Renderer = new Renderer(this);
+
+    this.RenderState.on("changed", () => this.Renderer.render());
+    this.term.on("resize", () => this.Renderer.render());
+
+    this.Renderer.render({ initialRender: true });
+
+    // console.log(this.commands);
+
+    // this.handlers.commandHandler(this, "test");
 
     this.term.on("key", (name) => {
       if (name === "CTRL_C") {
@@ -101,13 +127,5 @@ module.exports = class System {
         term.fullscreen(false);
       }
     });
-
-    // this.term.clear();
-    // this.term.grabInput();
-    // this.term.grabInput({ mouse: "button" });
-    // this.term.fullscreen(true);
-
-    // this.Renderer = new this.Renderer(this);
-    // this.Renderer.render();
   }
 };

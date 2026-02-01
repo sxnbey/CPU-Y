@@ -34,7 +34,7 @@ let body = "hallo du mann o i j lj h p j p j2j l2jl l2j lkj kl2j l l2jlk".split(
 class Renderer {
   constructor() {
     this.system = {
-      toRender: {},
+      RenderState: {},
       renderState: {
         header: ["CPU-Y - Header-Platzhaltertext, der maximal tuff ist"],
         body: body,
@@ -57,7 +57,7 @@ class Renderer {
 
     this.layout = {};
 
-    // this.system.toRender.on("changed", () => this.render());
+    // this.system.RenderState.on("changed", () => this.render());
   }
 
   render() {

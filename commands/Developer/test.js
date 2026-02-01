@@ -1,15 +1,16 @@
-module.exports = { dontLoad: true };
+module.exports = { type: "command", value: run };
 
 const fetch = require("node-fetch");
 
 module.exports.config = {
-  name: "test",
   aliases: [],
   desc: "test",
   listed: true,
 };
 
-module.exports.run = async (system, args) => {
+async function run(system, args) {
+  console.log("hi aus command");
+
   return;
 
   system.functions.banner();
@@ -46,4 +47,4 @@ module.exports.run = async (system, args) => {
   };
 
   console.log(crAccount);
-};
+}
