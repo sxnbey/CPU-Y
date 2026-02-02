@@ -23,92 +23,80 @@ module.exports = {
     }
 
     _initBuffer() {
-      if (!this.ScreenBuffer)
-        this.ScreenBuffer = new ScreenBuffer({
-          dst: this.term,
-        });
+      this.ScreenBuffer = new ScreenBuffer({
+        dst: this.term,
+      });
     }
 
     render({ initialRender = false } = {}) {
+      if (initialRender) this.term.clear();
+
       this._initBuffer();
 
       const sb = this.ScreenBuffer;
 
-      this.calculateLayout();
-      this.calculateScroll();
+      this._calculateLayout();
+      this._calculateScroll();
 
-      this.clear(sb);
+      this._clear(sb);
 
-      [this.drawBanner, this.drawHeaderAndFooter, this.drawBody].forEach(
-        (func) => func.call(this, sb),
-      );
-
-      // Le prompt & input field (coming soon)
-
-      sb.put(
-        { x: 2, y: this.term.height - 2 },
-        ">".padEnd(this.term.width, " "),
-      );
-
-      // The canvas shall be filled now.
+      [
+        this._drawBanner,
+        this._drawHeaderAndFooter,
+        this._drawBody,
+        this._drawInput,
+      ].forEach((func) => func.call(this, sb));
 
       sb.draw();
 
-      this.term.moveTo(5, this.term.height - 1);
+      this.term.moveTo(
+        Math.max(this.RenderState.getInput().length + 5, 5),
+        this.term.height - 1,
+      );
     }
 
-    calculateLayout() {
-      this.bannerHeight = this.RenderState.banner.split("\n").length;
-      this.headerHeight = this.RenderState.header.length;
-      this.footerHeight = this.RenderState.footer.length;
-      this.input = this.RenderState.input;
+    _calculateLayout() {
+      const bannerHeight = this.RenderState.banner.split("\n").length;
+      const headerHeight = this.RenderState.header.length;
+      const footerHeight = this.RenderState.footer.length;
 
+      const promptHeight = 3; // Le prompt + some padding
       const sectionGap = 1;
-      const reserved =
-        this.bannerHeight +
-        this.headerHeight +
-        this.footerHeight +
-        sectionGap * 3 + // header gap, body gap, footer gap
-        3; // the ">" (le prompt + some padding)
 
-      this.bodyHeight = Math.max(0, this.term.height - reserved);
+      const bannerY = 0;
+      const headerY = bannerHeight + sectionGap;
 
-      let y = this.bannerHeight;
+      const footerY = this.term.height - footerHeight - promptHeight;
 
-      this.layout.header = {
-        centered: false,
-        height: this.headerHeight,
-        y: y + sectionGap,
+      const inputY = this.term.height - 2;
+
+      const bodyStart = headerY + headerHeight + sectionGap;
+      const bodyEnd = footerY - sectionGap;
+      const bodyHeight = Math.max(0, bodyEnd - bodyStart);
+
+      this.layout = {
+        banner: { y: bannerY, height: bannerHeight },
+        header: { y: headerY, height: headerHeight, centered: false },
+        footer: { y: footerY, height: footerHeight, centered: false },
+        input: { y: inputY },
+        body: {
+          start: bodyStart,
+          end: bodyEnd,
+          height: bodyHeight,
+          centered: true,
+          paddingOffset: 0,
+        },
       };
 
-      y += this.layout.header.height + sectionGap;
+      this.bannerHeight = bannerHeight;
+      this.headerHeight = headerHeight;
+      this.bodyHeight = bodyHeight;
+      this.footerHeight = footerHeight;
 
-      this.layout.body = {
-        centered: true,
-        height: this.bodyHeight,
-        y: y + sectionGap,
-        paddingOffset: 0,
-      };
-
-      y += this.layout.body.height + sectionGap;
-
-      this.layout.footer = {
-        centered: false,
-        height: this.footerHeight,
-        y: y + sectionGap,
-      };
-
-      this.calculatePaddingOffset();
-
-      // Body isn't allowed to draw outside his area.
-
-      this.layout.body.start =
-        this.layout.body.y + this.layout.body.paddingOffset;
-
-      this.layout.body.end = this.layout.body.y + this.layout.body.height;
+      this._calculatePaddingOffset();
     }
 
-    calculateScroll() {
+    _calculateScroll() {
       const maxScroll = Math.max(
         0,
         this.RenderState.body.length - this.bodyHeight,
@@ -121,7 +109,7 @@ module.exports = {
       );
     }
 
-    calculatePaddingOffset() {
+    _calculatePaddingOffset() {
       Object.entries(this.layout).forEach(([section, config]) => {
         if (!config.centered) return;
 
@@ -132,21 +120,21 @@ module.exports = {
       });
     }
 
-    clear(sb) {
+    _clear(sb) {
       //* Only changed soon!
 
       for (let y = 0; y < this.term.height; y++) {
-        sb.put({ x: 1, y }, " ".padEnd(this.term.width, ""));
+        sb.put({ x: 0, y }, " ".padEnd(this.term.width, " "));
       }
     }
 
-    drawBanner(sb) {
+    _drawBanner(sb) {
       this.RenderState.banner.split("\n").forEach((line, index) => {
         sb.put({ x: 1, y: index }, line.padEnd(this.term.width, " "));
       });
     }
 
-    drawHeaderAndFooter(sb) {
+    _drawHeaderAndFooter(sb) {
       ["header", "footer"].forEach((section) =>
         this.RenderState[section].forEach((line, index) =>
           sb.put(
@@ -160,7 +148,7 @@ module.exports = {
       );
     }
 
-    drawBody(sb) {
+    _drawBody(sb) {
       for (let y = 0; y < this.bodyHeight; y++) {
         const posY = this.layout.body.start + y;
 
@@ -172,6 +160,12 @@ module.exports = {
       }
     }
 
-    drawInput(sb) {}
+    _drawInput(sb) {
+      const y = this.layout.input.y;
+
+      sb.put({ x: 2, y }, ">".padEnd(this.term.width, " "));
+
+      sb.put({ x: 4, y }, this.RenderState.input.join(""));
+    }
   },
 };

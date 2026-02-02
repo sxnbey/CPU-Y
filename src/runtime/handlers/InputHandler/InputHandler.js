@@ -15,9 +15,22 @@ module.exports = {
     }
 
     _onKey(key) {
+      if (key == "CTRL_C") {
+        this.system.term.processExit(0);
+        this.system.term.fullscreen(false);
+
+        return;
+      }
+
+      if (key == "ENTER")
+        return this.system.handlers.commandHandler(
+          this.system,
+          this.system.RenderState.getInput(),
+        );
+
       this.input.push(key);
 
-      console.log(this.input.join(""));
+      this.system.RenderState.setInput(this.input);
 
       return;
     }

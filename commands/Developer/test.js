@@ -1,15 +1,17 @@
-module.exports = { type: "command", value: run };
+module.exports = {
+  type: "command",
+  value: run,
+  config: {
+    aliases: [],
+    desc: "test",
+    listed: true,
+  },
+};
 
 const fetch = require("node-fetch");
 
-module.exports.config = {
-  aliases: [],
-  desc: "test",
-  listed: true,
-};
-
 async function run(system, args) {
-  console.log("hi aus command");
+  system.RenderState.setBody(["hi aus command"]);
 
   return;
 

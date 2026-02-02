@@ -109,6 +109,8 @@ module.exports = class System {
 
     this._instantiateLoading();
 
+    // return console.log(this.commands);
+
     this.RenderState = new RenderState(this);
     this.Renderer = new Renderer(this);
 
@@ -120,12 +122,5 @@ module.exports = class System {
     // console.log(this.commands);
 
     // this.handlers.commandHandler(this, "test");
-
-    this.term.on("key", (name) => {
-      if (name === "CTRL_C") {
-        term.processExit(0);
-        term.fullscreen(false);
-      }
-    });
   }
 };
