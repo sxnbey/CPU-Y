@@ -7,5 +7,8 @@ async function handle(system, msg) {
     (i) => i.name == inputCmd || i.config.aliases.includes(inputCmd),
   );
 
+  if (!command)
+    return system.RenderState.setBody([`Command ${inputCmd} not found`]);
+
   await command.value(system, args);
 }

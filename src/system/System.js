@@ -109,7 +109,7 @@ module.exports = class System {
 
     this._instantiateLoading();
 
-    // return console.log(this.commands);
+    // return console.log(this.allRegisteredModules);
 
     this.RenderState = new RenderState(this);
     this.Renderer = new Renderer(this);

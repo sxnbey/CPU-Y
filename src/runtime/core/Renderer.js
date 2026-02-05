@@ -84,7 +84,6 @@ module.exports = {
           end: bodyEnd,
           height: bodyHeight,
           centered: true,
-          paddingOffset: 0,
         },
       };
 
@@ -114,9 +113,11 @@ module.exports = {
         if (!config.centered) return;
 
         const extraLines = config.height - this.RenderState[section].length;
+        const padding = Math.floor(extraLines / 2);
 
         if (extraLines > 1)
-          this.layout[section].paddingOffset = Math.floor(extraLines / 2);
+          if (config.y) this.layout[section].y += padding;
+          else this.layout[section].start += padding;
       });
     }
 

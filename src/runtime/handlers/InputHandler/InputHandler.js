@@ -9,12 +9,16 @@ module.exports = {
 
       this.input = [];
 
+      this.specialKeys = specialKeys.value;
+
       this.system.term.on("key", (e) => {
         this._onKey(e);
       });
     }
 
     _onKey(key) {
+      if (this.specialKeys.includes(key)) return;
+
       if (key == "CTRL_C") {
         this.system.term.processExit(0);
         this.system.term.fullscreen(false);
@@ -22,13 +26,11 @@ module.exports = {
         return;
       }
 
-      if (key == "ENTER")
-        return this.system.handlers.commandHandler(
-          this.system,
-          this.system.RenderState.getInput(),
-        );
+      if (key == "ENTER") {
+        this.system.handlers.commandHandler(this.system, this.input.join(""));
 
-      this.input.push(key);
+        this.input = [];
+      } else this.input.push(key);
 
       this.system.RenderState.setInput(this.input);
 

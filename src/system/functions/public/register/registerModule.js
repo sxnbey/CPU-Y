@@ -22,4 +22,6 @@ module.exports = function registerModule(module) {
         `Unknown file type: ${module.type}${module.path ? `\n${module.path}` : ""}`,
       );
   }
+
+  this.allRegisteredModules.push(module);
 };

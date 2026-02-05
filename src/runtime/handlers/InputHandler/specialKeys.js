@@ -1,17 +1,16 @@
-module.exports = { dontLoad: true, value: specialKeys };
-
-function specialKeys() {
-  const allSpecialKeys = [
+module.exports = {
+  dontLoad: true,
+  value: [
     "ESCAPE",
-    "ENTER",
-    "BACKSPACE",
+    // "ENTER",
+    // "BACKSPACE",
     "NUL",
-    "TAB",
+    // "TAB",
     "SHIFT_TAB",
     "UP",
     "DOWN",
-    "RIGHT",
-    "LEFT",
+    // "RIGHT",
+    // "LEFT",
     "INSERT",
     "DELETE",
     "HOME",
@@ -123,7 +122,5 @@ function specialKeys() {
     "ALT_TAB",
     "ALT_SPACE",
     "CTRL_ALT_SPACE",
-  ];
-
-  return allSpecialKeys;
-}
+  ],
+};
