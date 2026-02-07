@@ -6,6 +6,6 @@ module.exports = class FunctionModule extends BaseModule {
   }
 
   register() {
-    this.system._registerRuntimeFunction(this);
+    this.system.registerRuntimeFunction(this);
   }
 };

@@ -5,35 +5,31 @@ module.exports = {
   type: "class",
   value: class Renderer {
     constructor(system) {
-      this.system = system;
-      this.term = system.term;
+      this._system = system;
+      this._term = system.term;
 
-      this.ScreenBuffer;
-      this.RenderState = system.RenderState;
+      this._sb;
+      this._RenderState = system.RenderState;
+
       this.lastRender = {};
       this.layout = {};
 
-      this.bannerHeight = null;
-      this.headerHeight = null;
-      this.bodyHeight = null;
-      this.footerHeight = null;
-
       this.scrollIndex = 0;
-      this.visibleLines = [];
+      this._visibleLines = [];
     }
 
     _initBuffer() {
-      this.ScreenBuffer = new ScreenBuffer({
-        dst: this.term,
+      this._sb = new ScreenBuffer({
+        dst: this._term,
       });
     }
 
     render({ initialRender = false } = {}) {
-      if (initialRender) this.term.clear();
+      if (initialRender) this._term.clear();
 
       this._initBuffer();
 
-      const sb = this.ScreenBuffer;
+      const sb = this._sb;
 
       this._calculateLayout();
       this._calculateScroll();
@@ -49,16 +45,16 @@ module.exports = {
 
       sb.draw();
 
-      this.term.moveTo(
-        Math.max(this.RenderState.getInput().length + 5, 5),
-        this.term.height - 1,
+      this._term.moveTo(
+        Math.max(this._RenderState.getInput().length + 5, 5),
+        this._term.height - 1,
       );
     }
 
     _calculateLayout() {
-      const bannerHeight = this.RenderState.banner.split("\n").length;
-      const headerHeight = this.RenderState.header.length;
-      const footerHeight = this.RenderState.footer.length;
+      const bannerHeight = this._RenderState.banner.split("\n").length;
+      const headerHeight = this._RenderState.header.length;
+      const footerHeight = this._RenderState.footer.length;
 
       const promptHeight = 3; // Le prompt + some padding
       const sectionGap = 1;
@@ -66,9 +62,9 @@ module.exports = {
       const bannerY = 0;
       const headerY = bannerHeight + sectionGap;
 
-      const footerY = this.term.height - footerHeight - promptHeight;
+      const footerY = this._term.height - footerHeight - promptHeight;
 
-      const inputY = this.term.height - 2;
+      const inputY = this._term.height - 2;
 
       const bodyStart = headerY + headerHeight + sectionGap;
       const bodyEnd = footerY - sectionGap;
@@ -87,24 +83,19 @@ module.exports = {
         },
       };
 
-      this.bannerHeight = bannerHeight;
-      this.headerHeight = headerHeight;
-      this.bodyHeight = bodyHeight;
-      this.footerHeight = footerHeight;
-
       this._calculatePaddingOffset();
     }
 
     _calculateScroll() {
       const maxScroll = Math.max(
         0,
-        this.RenderState.body.length - this.bodyHeight,
+        this._RenderState.body.length - this.layout.body.height,
       );
 
       this.scrollIndex = Math.max(0, Math.min(this.scrollIndex, maxScroll));
-      this.visibleLines = this.RenderState.body.slice(
+      this._visibleLines = this._RenderState.body.slice(
         this.scrollIndex,
-        this.scrollIndex + this.bodyHeight,
+        this.scrollIndex + this.layout.body.height,
       );
     }
 
@@ -112,7 +103,7 @@ module.exports = {
       Object.entries(this.layout).forEach(([section, config]) => {
         if (!config.centered) return;
 
-        const extraLines = config.height - this.RenderState[section].length;
+        const extraLines = config.height - this._RenderState[section].length;
         const padding = Math.floor(extraLines / 2);
 
         if (extraLines > 1)
@@ -124,49 +115,49 @@ module.exports = {
     _clear(sb) {
       //* Only changed soon!
 
-      for (let y = 0; y < this.term.height; y++) {
-        sb.put({ x: 0, y }, " ".padEnd(this.term.width, " "));
+      for (let y = 0; y < this._term.height; y++) {
+        sb.put({ x: 0, y }, " ".padEnd(this._term.width, " "));
       }
     }
 
     _drawBanner(sb) {
-      this.RenderState.banner.split("\n").forEach((line, index) => {
-        sb.put({ x: 1, y: index }, line.padEnd(this.term.width, " "));
+      this._RenderState.banner.split("\n").forEach((line, index) => {
+        sb.put({ x: 1, y: index }, line.padEnd(this._term.width, " "));
       });
     }
 
     _drawHeaderAndFooter(sb) {
       ["header", "footer"].forEach((section) =>
-        this.RenderState[section].forEach((line, index) =>
+        this._RenderState[section].forEach((line, index) =>
           sb.put(
             {
               x: 1,
               y: this.layout[section].y + index,
             },
-            line.padEnd(this.term.width, " "),
+            line.padEnd(this._term.width, " "),
           ),
         ),
       );
     }
 
     _drawBody(sb) {
-      for (let y = 0; y < this.bodyHeight; y++) {
+      for (let y = 0; y < this.layout.body.height; y++) {
         const posY = this.layout.body.start + y;
 
         if (posY >= this.layout.body.end) break;
 
-        const line = this.visibleLines[y] || " ".padEnd(this.term.width, " ");
+        const line = this._visibleLines[y] || " ".padEnd(this._term.width, " ");
 
-        sb.put({ x: 1, y: posY }, line.padEnd(this.term.width, " "));
+        sb.put({ x: 1, y: posY }, line.padEnd(this._term.width, " "));
       }
     }
 
     _drawInput(sb) {
       const y = this.layout.input.y;
 
-      sb.put({ x: 2, y }, ">".padEnd(this.term.width, " "));
+      sb.put({ x: 2, y }, ">".padEnd(this._term.width, " "));
 
-      sb.put({ x: 4, y }, this.RenderState.input.join(""));
+      sb.put({ x: 4, y }, this._RenderState.input);
     }
   },
 };

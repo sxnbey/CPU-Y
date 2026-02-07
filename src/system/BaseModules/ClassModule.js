@@ -6,6 +6,6 @@ module.exports = class ClassModule extends BaseModule {
   }
 
   register() {
-    this.system._registerClass(this);
+    this.system.registerClass(this);
   }
 };

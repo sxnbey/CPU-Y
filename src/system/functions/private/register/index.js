@@ -1,5 +1,5 @@
-const _registerRuntimeFunction = require("./registerRuntimeFunction.js");
-const _registerClass = require("./registerClass.js");
-const _registerCommand = require("./registerCommand.js");
+const registerRuntimeFunction = require("./registerRuntimeFunction.js");
+const registerClass = require("./registerClass.js");
+const registerCommand = require("./registerCommand.js");
 
-module.exports = { _registerRuntimeFunction, _registerClass, _registerCommand };
+module.exports = { registerRuntimeFunction, registerClass, registerCommand };

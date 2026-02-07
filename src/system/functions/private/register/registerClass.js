@@ -1,4 +1,4 @@
-module.exports = function _registerClass(module) {
+module.exports = function registerClass(module) {
   // if (typeof name != "string")
   //   throw new TypeError(`Expected string got ${typeof name} instead`);
 

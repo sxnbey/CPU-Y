@@ -6,6 +6,6 @@ module.exports = class CommandModule extends BaseModule {
   }
 
   register() {
-    this.system._registerCommand(this);
+    this.system.registerCommand(this);
   }
 };

@@ -1,4 +1,4 @@
-module.exports = function _registerRuntimeFunction(module) {
+module.exports = function registerRuntimeFunction(module) {
   if (module.category && typeof module.category == "string")
     this._addToSystemEntry({
       name: module.category,

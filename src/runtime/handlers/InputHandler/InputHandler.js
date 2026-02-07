@@ -8,11 +8,12 @@ module.exports = {
       this.system = system;
 
       this.input = [];
+      this.inputString = "";
 
       this.specialKeys = specialKeys.value;
 
-      this.system.term.on("key", (e) => {
-        this._onKey(e);
+      this.system.term.on("key", (key) => {
+        this._onKey(key);
       });
     }
 
@@ -27,14 +28,21 @@ module.exports = {
       }
 
       if (key == "ENTER") {
-        this.system.handlers.commandHandler(this.system, this.input.join(""));
+        this.system.handlers.commandHandler(this.system, this.inputString);
 
-        this.input = [];
+        this._clearInput();
       } else this.input.push(key);
 
       this.system.RenderState.setInput(this.input);
 
       return;
+    }
+
+    _addInput(key) {}
+
+    _clearInput() {
+      this.input = [];
+      this.inputString = "";
     }
   },
 };

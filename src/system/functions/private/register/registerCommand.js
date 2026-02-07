@@ -1,4 +1,4 @@
-module.exports = function _registerCommand(module) {
+module.exports = function registerCommand(module) {
   this.commands.push(module.file);
 
   return this;

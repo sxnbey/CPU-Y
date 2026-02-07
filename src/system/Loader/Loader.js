@@ -38,7 +38,7 @@ module.exports = class Loader {
 
   load() {
     this.pathsToLoad.forEach((path) => {
-      const files = this.system._scanDirectoryRecursive(path);
+      const files = this.system.scanDirectoryRecursive(path);
 
       let file;
 

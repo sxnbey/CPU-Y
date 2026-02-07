@@ -1,3 +1,3 @@
-const _scanDirectoryRecursive = require("./scanDirectoryRecursive.js");
+const scanDirectoryRecursive = require("./scanDirectoryRecursive.js");
 
-module.exports = { _scanDirectoryRecursive };
+module.exports = { scanDirectoryRecursive };

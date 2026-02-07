@@ -22,7 +22,7 @@ module.exports = {
           " ",
         );
       this.footer = ["CPU-Y - Footer-Platzhaltertext, der maximal tuff ist"];
-      this.input = [];
+      this.input = "";
     }
 
     setHeader(title) {
@@ -60,22 +60,15 @@ module.exports = {
       return this;
     }
 
-    addInput(letter) {
-      this.input.push(letter);
-      this.emit("changed");
-
-      return this;
-    }
-
     getInput() {
-      return this.input.join("");
+      return this.input;
     }
 
     clear() {
       this.header = [];
       this.lines = [];
       this.footer = [];
-      this.input = [];
+      this.input = "";
 
       return this;
     }
