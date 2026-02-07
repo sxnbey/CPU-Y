@@ -1,5 +1,9 @@
 module.exports = function registerRuntimeFunction(module) {
-  if (module.category && typeof module.category == "string")
+  if (
+    module.category &&
+    typeof module.category == "string" &&
+    module.category != "ROOT"
+  )
     this._addToSystemEntry({
       name: module.category,
       key: module.name,

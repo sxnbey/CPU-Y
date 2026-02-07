@@ -1,7 +1,7 @@
 const ScreenBuffer = require("terminal-kit").ScreenBuffer;
 
 module.exports = {
-  dontLoad: true,
+  category: "ROOT",
   type: "class",
   value: class Renderer {
     constructor(system) {
@@ -11,6 +11,7 @@ module.exports = {
       this._sb;
       this._RenderState = system.RenderState;
 
+      this._toRender = {};
       this.lastRender = {};
       this.layout = {};
 
@@ -18,22 +19,16 @@ module.exports = {
       this._visibleLines = [];
     }
 
-    _initBuffer() {
-      this._sb = new ScreenBuffer({
-        dst: this._term,
-      });
-    }
-
-    render({ initialRender = false } = {}) {
+    render({ initialRender = false, resetCursor = false } = {}) {
       if (initialRender) this._term.clear();
 
       this._initBuffer();
 
       const sb = this._sb;
 
+      this._createToRender();
       this._calculateLayout();
       this._calculateScroll();
-
       this._clear(sb);
 
       [
@@ -45,16 +40,33 @@ module.exports = {
 
       sb.draw();
 
-      this._term.moveTo(
-        Math.max(this._RenderState.getInput().length + 5, 5),
-        this._term.height - 1,
-      );
+      if (resetCursor || initialRender)
+        this._term.moveTo(
+          Math.max(this._toRender.input.length + 5, 5),
+          this._term.height - 1,
+        );
+    }
+
+    _initBuffer() {
+      this._sb = new ScreenBuffer({
+        dst: this._term,
+      });
+    }
+
+    _createToRender() {
+      this._toRender = {
+        banner: this._RenderState.getBanner(),
+        header: this._RenderState.getHeader(),
+        body: this._RenderState.getBody(),
+        footer: this._RenderState.getFooter(),
+        input: this._RenderState.getInput(),
+      };
     }
 
     _calculateLayout() {
-      const bannerHeight = this._RenderState.banner.split("\n").length;
-      const headerHeight = this._RenderState.header.length;
-      const footerHeight = this._RenderState.footer.length;
+      const bannerHeight = this._toRender.banner.split("\n").length;
+      const headerHeight = this._toRender.header.length;
+      const footerHeight = this._toRender.footer.length;
 
       const promptHeight = 3; // Le prompt + some padding
       const sectionGap = 1;
@@ -73,14 +85,14 @@ module.exports = {
       this.layout = {
         banner: { y: bannerY, height: bannerHeight },
         header: { y: headerY, height: headerHeight, centered: false },
-        footer: { y: footerY, height: footerHeight, centered: false },
-        input: { y: inputY },
         body: {
           start: bodyStart,
           end: bodyEnd,
           height: bodyHeight,
           centered: true,
         },
+        footer: { y: footerY, height: footerHeight, centered: false },
+        input: { y: inputY },
       };
 
       this._calculatePaddingOffset();
@@ -89,11 +101,11 @@ module.exports = {
     _calculateScroll() {
       const maxScroll = Math.max(
         0,
-        this._RenderState.body.length - this.layout.body.height,
+        this._toRender.body.length - this.layout.body.height,
       );
 
       this.scrollIndex = Math.max(0, Math.min(this.scrollIndex, maxScroll));
-      this._visibleLines = this._RenderState.body.slice(
+      this._visibleLines = this._toRender.body.slice(
         this.scrollIndex,
         this.scrollIndex + this.layout.body.height,
       );
@@ -103,7 +115,7 @@ module.exports = {
       Object.entries(this.layout).forEach(([section, config]) => {
         if (!config.centered) return;
 
-        const extraLines = config.height - this._RenderState[section].length;
+        const extraLines = config.height - this._toRender[section].length;
         const padding = Math.floor(extraLines / 2);
 
         if (extraLines > 1)
@@ -121,14 +133,14 @@ module.exports = {
     }
 
     _drawBanner(sb) {
-      this._RenderState.banner.split("\n").forEach((line, index) => {
+      this._toRender.banner.split("\n").forEach((line, index) => {
         sb.put({ x: 1, y: index }, line.padEnd(this._term.width, " "));
       });
     }
 
     _drawHeaderAndFooter(sb) {
       ["header", "footer"].forEach((section) =>
-        this._RenderState[section].forEach((line, index) =>
+        this._toRender[section].forEach((line, index) =>
           sb.put(
             {
               x: 1,
@@ -157,7 +169,7 @@ module.exports = {
 
       sb.put({ x: 2, y }, ">".padEnd(this._term.width, " "));
 
-      sb.put({ x: 4, y }, this._RenderState.input);
+      sb.put({ x: 4, y }, this._toRender.input);
     }
   },
 };

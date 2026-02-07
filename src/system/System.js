@@ -9,9 +9,6 @@ const term = terminalkit.terminal;
 
 const Loader = require("./Loader/Loader.js");
 
-const RenderState = require("../runtime/core/RenderState.js").value;
-const Renderer = require("../runtime/core/Renderer.js").value;
-
 const privateAPI = require("./functions/private/index.js");
 const publicAPI = require("./functions/public/index.js");
 
@@ -48,8 +45,9 @@ module.exports = class System {
     this._bindFunctions(publicAPI);
 
     this.Loader = Loader;
-    this.Renderer = Renderer;
-    this.RenderState = RenderState;
+    this.Renderer;
+    this.RenderState;
+    this.InputHandler;
 
     this.commands = [];
     this.subcommands = [];
@@ -109,18 +107,12 @@ module.exports = class System {
 
     this._instantiateLoading();
 
-    // return console.log(this.allRegisteredModules);
-
-    this.RenderState = new RenderState(this);
-    this.Renderer = new Renderer(this);
+    // Soon load priority. Cant instantiate Renderer on loading cuz RenderState has to exist first
+    this.Renderer = new this.Renderer(this);
 
     this.RenderState.on("changed", () => this.Renderer.render());
-    this.term.on("resize", () => this.Renderer.render());
+    this.term.on("resize", () => this.Renderer.render({ resetCursor: true }));
 
     this.Renderer.render({ initialRender: true });
-
-    // console.log(this.commands);
-
-    // this.handlers.commandHandler(this, "test");
   }
 };

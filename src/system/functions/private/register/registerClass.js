@@ -9,7 +9,11 @@ module.exports = function registerClass(module) {
     ? new module.value(this)
     : module.value;
 
-  if (module.category && typeof module.category == "string")
+  if (
+    module.category &&
+    typeof module.category == "string" &&
+    module.category != "ROOT"
+  )
     this._addToSystemEntry({
       name: module.category,
       key: module.name,
