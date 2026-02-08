@@ -13,7 +13,7 @@ module.exports = {
       this._inputString = "";
 
       this._cursorPosX = null;
-      this._updateCursorPosX();
+      this._recalculateCursorPosX();
 
       this._specialKeys = specialKeys.value;
 
@@ -25,37 +25,62 @@ module.exports = {
     _onKey(key) {
       if (this._specialKeys.includes(key)) return;
 
-      if (key == "CTRL_C") {
-        this._term.processExit(0);
-        this._term.fullscreen(false);
+      switch (key) {
+        case "CTRL_C":
+          return this._onExit();
 
-        return;
+        case "ENTER":
+          this._onEnter();
+          break;
+
+        case "BACKSPACE":
+          this._onBackspace();
+          break;
+
+        default:
+          this._addInput(key);
       }
 
-      if (key == "ENTER") {
-        this._system.handlers.commandHandler(this._system, this._inputString);
-
-        this._clearInput();
-      } else this._addInput(key);
+      this._recalculateCursorPosX();
 
       this._system.RenderState.setInput(this._inputString);
 
-      // this._term.moveTo(this._cursorPosX, this._term.height - 1);
+      this._term.moveTo(this._cursorPosX, this._term.height - 1);
 
       return;
     }
 
+    _onExit() {
+      this._term.processExit(0);
+      this._term.fullscreen(false);
+    }
+
+    _onEnter() {
+      this._system.handlers.commandHandler(this._system, this._inputString);
+
+      this._clearInput();
+    }
+
+    _onBackspace() {
+      this._input.pop();
+      this._syncInputString();
+    }
+
     _addInput(key) {
       this._input.push(key);
-      this._inputString = this._input.join("");
+      this._syncInputString();
     }
 
     _clearInput() {
       this._input = [];
-      this._inputString = "";
+      this._syncInputString();
     }
 
-    _updateCursorPosX() {
+    _syncInputString() {
+      this._inputString = this._input.join("");
+    }
+
+    _recalculateCursorPosX() {
       this._cursorPosX = Math.max(this._input.length + 5, 5);
     }
 

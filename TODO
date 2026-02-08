@@ -1,2 +1,10 @@
-1. Alles
-2. Noch mehr
+todo ABER NICHT in der Reihenfolge (es ist nicht alles, nur ein leitfaden für mich)
+
+- hot reload basis
+- system methoden in Aufgabenbereiche (klassen) aufteilen + alle methoden in Dateien
+- render Komponenten (brainstorm notwendig + maybe Zukunftsmusik)
+- renderer clear only changed
+- error handling
+- id gen für modules
+- Inputhandler finalisieren (history, meintest du: xy? ding, cursor Manipulation)
+- auf ner guten basis modularer rework

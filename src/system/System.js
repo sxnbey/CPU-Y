@@ -105,6 +105,8 @@ module.exports = class System {
     this.term.grabInput({ mouse: "button" });
     this.term.fullscreen(true);
 
+    console.log("Booting...");
+
     this._instantiateLoading();
 
     // Soon load priority. Cant instantiate Renderer on loading cuz RenderState has to exist first

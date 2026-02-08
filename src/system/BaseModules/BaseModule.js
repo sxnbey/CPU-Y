@@ -5,7 +5,7 @@ module.exports = class BaseModule {
     this.file = file;
 
     this.name = file.name;
-    this.category = file.category || null;
+    this.category = file.category || null; // Category "ROOT" will put the module in system.MODULENAME
     this.type = file.type;
     this.value = file.value;
     this.filePath = file.path || null;

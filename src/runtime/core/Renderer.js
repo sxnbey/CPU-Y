@@ -11,9 +11,9 @@ module.exports = {
       this._sb;
       this._RenderState = system.RenderState;
 
-      this._toRender = {};
+      this._renderSnapshot = {};
       this.lastRender = {};
-      this.layout = {};
+      this.layoutMap = {};
 
       this.scrollIndex = 0;
       this._visibleLines = [];
@@ -26,8 +26,8 @@ module.exports = {
 
       const sb = this._sb;
 
-      this._createToRender();
-      this._calculateLayout();
+      this._createRenderSnapshot();
+      this._calculateLayoutMap();
       this._calculateScroll();
       this._clear(sb);
 
@@ -42,7 +42,7 @@ module.exports = {
 
       if (resetCursor || initialRender)
         this._term.moveTo(
-          Math.max(this._toRender.input.length + 5, 5),
+          this._system.InputHandler.getCursorPosX(),
           this._term.height - 1,
         );
     }
@@ -53,8 +53,8 @@ module.exports = {
       });
     }
 
-    _createToRender() {
-      this._toRender = {
+    _createRenderSnapshot() {
+      this._renderSnapshot = {
         banner: this._RenderState.getBanner(),
         header: this._RenderState.getHeader(),
         body: this._RenderState.getBody(),
@@ -63,10 +63,10 @@ module.exports = {
       };
     }
 
-    _calculateLayout() {
-      const bannerHeight = this._toRender.banner.split("\n").length;
-      const headerHeight = this._toRender.header.length;
-      const footerHeight = this._toRender.footer.length;
+    _calculateLayoutMap() {
+      const bannerHeight = this._renderSnapshot.banner.split("\n").length;
+      const headerHeight = this._renderSnapshot.header.length;
+      const footerHeight = this._renderSnapshot.footer.length;
 
       const promptHeight = 3; // Le prompt + some padding
       const sectionGap = 1;
@@ -82,7 +82,7 @@ module.exports = {
       const bodyEnd = footerY - sectionGap;
       const bodyHeight = Math.max(0, bodyEnd - bodyStart);
 
-      this.layout = {
+      this.layoutMap = {
         banner: { y: bannerY, height: bannerHeight },
         header: { y: headerY, height: headerHeight, centered: false },
         body: {
@@ -101,26 +101,26 @@ module.exports = {
     _calculateScroll() {
       const maxScroll = Math.max(
         0,
-        this._toRender.body.length - this.layout.body.height,
+        this._renderSnapshot.body.length - this.layoutMap.body.height,
       );
 
       this.scrollIndex = Math.max(0, Math.min(this.scrollIndex, maxScroll));
-      this._visibleLines = this._toRender.body.slice(
+      this._visibleLines = this._renderSnapshot.body.slice(
         this.scrollIndex,
-        this.scrollIndex + this.layout.body.height,
+        this.scrollIndex + this.layoutMap.body.height,
       );
     }
 
     _calculatePaddingOffset() {
-      Object.entries(this.layout).forEach(([section, config]) => {
+      Object.entries(this.layoutMap).forEach(([section, config]) => {
         if (!config.centered) return;
 
-        const extraLines = config.height - this._toRender[section].length;
+        const extraLines = config.height - this._renderSnapshot[section].length;
         const padding = Math.floor(extraLines / 2);
 
         if (extraLines > 1)
-          if (config.y) this.layout[section].y += padding;
-          else this.layout[section].start += padding;
+          if (config.y) this.layoutMap[section].y += padding;
+          else this.layoutMap[section].start += padding;
       });
     }
 
@@ -133,18 +133,18 @@ module.exports = {
     }
 
     _drawBanner(sb) {
-      this._toRender.banner.split("\n").forEach((line, index) => {
+      this._renderSnapshot.banner.split("\n").forEach((line, index) => {
         sb.put({ x: 1, y: index }, line.padEnd(this._term.width, " "));
       });
     }
 
     _drawHeaderAndFooter(sb) {
       ["header", "footer"].forEach((section) =>
-        this._toRender[section].forEach((line, index) =>
+        this._renderSnapshot[section].forEach((line, index) =>
           sb.put(
             {
               x: 1,
-              y: this.layout[section].y + index,
+              y: this.layoutMap[section].y + index,
             },
             line.padEnd(this._term.width, " "),
           ),
@@ -153,10 +153,10 @@ module.exports = {
     }
 
     _drawBody(sb) {
-      for (let y = 0; y < this.layout.body.height; y++) {
-        const posY = this.layout.body.start + y;
+      for (let y = 0; y < this.layoutMap.body.height; y++) {
+        const posY = this.layoutMap.body.start + y;
 
-        if (posY >= this.layout.body.end) break;
+        if (posY >= this.layoutMap.body.end) break;
 
         const line = this._visibleLines[y] || " ".padEnd(this._term.width, " ");
 
@@ -165,11 +165,11 @@ module.exports = {
     }
 
     _drawInput(sb) {
-      const y = this.layout.input.y;
+      const y = this.layoutMap.input.y;
 
       sb.put({ x: 2, y }, ">".padEnd(this._term.width, " "));
 
-      sb.put({ x: 4, y }, this._toRender.input);
+      sb.put({ x: 4, y }, this._renderSnapshot.input);
     }
   },
 };
