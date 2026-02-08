@@ -22,6 +22,8 @@ module.exports = {
       });
     }
 
+    // FÜr die history: history array erstellen, array[0] leerer string. pfeil hoch runter index +- 1, beim tippen array[0] = array[index] und clampen. ez
+
     _onKey(key) {
       if (this._specialKeys.includes(key)) return;
 
