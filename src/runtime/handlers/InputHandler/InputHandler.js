@@ -12,6 +12,9 @@ module.exports = {
       this._input = [];
       this._inputString = "";
 
+      this._commandHistory = ["", "history1", "history2"];
+      this._historyIndex = 0;
+
       this._cursorPosX = null;
       this._recalculateCursorPosX();
 
@@ -22,11 +25,7 @@ module.exports = {
       });
     }
 
-    // FÜr die history: history array erstellen, array[0] leerer string. pfeil hoch runter index +- 1, beim tippen array[0] = array[index] und clampen. ez
-
     _onKey(key) {
-      if (this._specialKeys.includes(key)) return;
-
       switch (key) {
         case "CTRL_C":
           return this._onExit();
@@ -39,8 +38,20 @@ module.exports = {
           this._onBackspace();
           break;
 
+        case "UP":
+          this._historyIndex++;
+
+          this._syncInputAndCommandHistory();
+          break;
+
+        case "DOWN":
+          this._historyIndex--;
+
+          this._syncInputAndCommandHistory();
+          break;
+
         default:
-          this._addInput(key);
+          if (!this._specialKeys.includes(key)) this._addInput(key);
       }
 
       this._recalculateCursorPosX();
@@ -52,6 +63,8 @@ module.exports = {
       return;
     }
 
+    // Alles hier drunter wird ausgelagert
+
     _onExit() {
       this._term.processExit(0);
       this._term.fullscreen(false);
@@ -59,6 +72,9 @@ module.exports = {
 
     _onEnter() {
       this._system.handlers.commandHandler(this._system, this._inputString);
+
+      if (this._inputString.trim() != "")
+        this._commandHistory.push(this._inputString);
 
       this._clearInput();
     }
@@ -69,12 +85,19 @@ module.exports = {
     }
 
     _addInput(key) {
+      this._historyIndex = 0;
+
       this._input.push(key);
       this._syncInputString();
     }
 
     _clearInput() {
       this._input = [];
+      this._syncInputString();
+    }
+
+    _syncInputAndCommandHistory() {
+      this._input = [...this._commandHistory[this._historyIndex]];
       this._syncInputString();
     }
 
