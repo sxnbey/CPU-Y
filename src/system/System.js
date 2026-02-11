@@ -41,8 +41,8 @@ module.exports = class System {
     this.fs = fs;
     this.term = term;
 
-    this._bindFunctions(privateAPI);
-    this._bindFunctions(publicAPI);
+    this.bindFunctions(privateAPI);
+    this.bindFunctions(publicAPI);
 
     this.Loader = Loader;
     this.Renderer;
@@ -67,9 +67,9 @@ module.exports = class System {
 
   //! Error checks will be better soon with own error handler and stuff
 
-  _bindFunctions(functions) {
+  bindFunctions(functions, destination = this) {
     for (const [name, func] of Object.entries(functions))
-      this[name] = func.bind(this);
+      destination[name] = func.bind(destination);
   }
 
   _createAllPaths() {
@@ -83,6 +83,7 @@ module.exports = class System {
       this.path.join(frameworkRoot, "core"),
       this.path.join(frameworkRoot, "handlers"),
       this.path.join(frameworkRoot, "modules"),
+      this.path.join(frameworkRoot, "utils"),
       this.config.commandsPath,
       this.config.subcommandsPath,
     ];

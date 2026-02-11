@@ -1,4 +1,7 @@
-const specialKeys = require("./specialKeys.js");
+const cursorManagement = require("./methods/cursorManagement.js").value;
+const commandHistory = require("./methods/commandHistory.js").value;
+const keyHandling = require("./methods/keyHandling.js").value;
+const synchronisation = require("./methods/synchronisation.js").value;
 
 module.exports = {
   options: { instantiate: true },
@@ -9,23 +12,32 @@ module.exports = {
       this._system = system;
       this._term = system.term;
 
+      this._system.bindFunctions(
+        {
+          ...cursorManagement,
+          ...commandHistory,
+          ...keyHandling,
+          ...synchronisation,
+        },
+        this,
+      );
+
       this._input = [];
       this._inputString = "";
 
-      this._commandHistory = ["", "history1", "history2"];
+      this._commandHistory = [""];
       this._historyIndex = 0;
 
+      this._cursorIndex = 0;
       this._cursorPosX = null;
       this._recalculateCursorPosX();
 
-      this._specialKeys = specialKeys.value;
-
-      this._term.on("key", (key) => {
-        this._onKey(key);
+      this._term.on("key", (key, matches, data) => {
+        this._onKey(key, data);
       });
     }
 
-    _onKey(key) {
+    _onKey(key, data) {
       switch (key) {
         case "CTRL_C":
           return this._onExit();
@@ -39,19 +51,24 @@ module.exports = {
           break;
 
         case "UP":
-          this._historyIndex++;
-
-          this._syncInputAndCommandHistory();
+          this._moveHistory(1);
           break;
 
         case "DOWN":
-          this._historyIndex--;
+          this._moveHistory(-1);
+          break;
 
-          this._syncInputAndCommandHistory();
+        case "LEFT":
+          this._moveCursor(-1);
+          break;
+
+        case "RIGHT":
+          this._moveCursor(1);
           break;
 
         default:
-          if (!this._specialKeys.includes(key)) this._addInput(key);
+          if (data.isCharacter) this._addInput(key);
+          else return;
       }
 
       this._recalculateCursorPosX();
@@ -59,54 +76,6 @@ module.exports = {
       this._system.RenderState.setInput(this._inputString);
 
       this._term.moveTo(this._cursorPosX, this._term.height - 1);
-
-      return;
-    }
-
-    // Alles hier drunter wird ausgelagert
-
-    _onExit() {
-      this._term.processExit(0);
-      this._term.fullscreen(false);
-    }
-
-    _onEnter() {
-      this._system.handlers.commandHandler(this._system, this._inputString);
-
-      if (this._inputString.trim() != "")
-        this._commandHistory.push(this._inputString);
-
-      this._clearInput();
-    }
-
-    _onBackspace() {
-      this._input.pop();
-      this._syncInputString();
-    }
-
-    _addInput(key) {
-      this._historyIndex = 0;
-
-      this._input.push(key);
-      this._syncInputString();
-    }
-
-    _clearInput() {
-      this._input = [];
-      this._syncInputString();
-    }
-
-    _syncInputAndCommandHistory() {
-      this._input = [...this._commandHistory[this._historyIndex]];
-      this._syncInputString();
-    }
-
-    _syncInputString() {
-      this._inputString = this._input.join("");
-    }
-
-    _recalculateCursorPosX() {
-      this._cursorPosX = Math.max(this._input.length + 5, 5);
     }
 
     getInput() {
