@@ -38,38 +38,19 @@ module.exports = {
     }
 
     _onKey(key, data) {
-      switch (key) {
-        case "CTRL_C":
-          return this._onExit();
+      const keys = {
+        CTRL_C: () => this._onExit(),
+        ENTER: () => this._onEnter(),
+        BACKSPACE: () => this._onBackspace(),
+        UP: () => this._moveHistory(1),
+        DOWN: () => this._moveHistory(-1),
+        LEFT: () => this._moveCursor(-1),
+        RIGHT: () => this._moveCursor(1),
+      };
 
-        case "ENTER":
-          this._onEnter();
-          break;
-
-        case "BACKSPACE":
-          this._onBackspace();
-          break;
-
-        case "UP":
-          this._moveHistory(1);
-          break;
-
-        case "DOWN":
-          this._moveHistory(-1);
-          break;
-
-        case "LEFT":
-          this._moveCursor(-1);
-          break;
-
-        case "RIGHT":
-          this._moveCursor(1);
-          break;
-
-        default:
-          if (data.isCharacter) this._addInput(key);
-          else return;
-      }
+      if (keys[key]) keys[key]();
+      else if (data.isCharacter) this._addInput(key);
+      else return;
 
       this._recalculateCursorPosX();
 
