@@ -19,6 +19,27 @@ module.exports = {
       this._visibleLines = [];
     }
 
+    // render({ initialRender = false, resetCursor = false } = {}) {
+    //   if (initialRender) this._term.clear();
+
+    //   this._initBuffer();
+
+    //   const sb = this._sb;
+
+    //   this._clear(sb);
+
+    //   const fff = { body: {}, header: {}, input: {} };
+
+    //   function alignVertical(items) {
+    //     for (const item in items)
+    //       switch (item.fillType) {
+    //         case "fixed":
+    //       }
+    //   }
+
+    //   sb.draw();
+    // }
+
     render({ initialRender = false, resetCursor = false } = {}) {
       if (initialRender) this._term.clear();
 
@@ -95,7 +116,7 @@ module.exports = {
         input: { y: inputY },
       };
 
-      this._calculatePaddingOffset();
+      // this._calculatePaddingOffset();
     }
 
     _calculateScroll() {
@@ -105,6 +126,7 @@ module.exports = {
       );
 
       this.scrollIndex = Math.max(0, Math.min(this.scrollIndex, maxScroll));
+
       this._visibleLines = this._renderSnapshot.body.slice(
         this.scrollIndex,
         this.scrollIndex + this.layoutMap.body.height,
@@ -152,16 +174,57 @@ module.exports = {
       );
     }
 
-    _drawBody(sb) {
-      for (let y = 0; y < this.layoutMap.body.height; y++) {
-        const posY = this.layoutMap.body.start + y;
+    _drawBox(sb, title, { x, y, w, h }) {
+      for (let i = 0; i < h; i++) sb.put({ x, y: y + i }, " ".repeat(w));
 
-        if (posY >= this.layoutMap.body.end) break;
+      sb.put({ x, y }, "┌" + "─".repeat(w - 2) + "┐");
 
-        const line = this._visibleLines[y] || " ".padEnd(this._term.width, " ");
-
-        sb.put({ x: 1, y: posY }, line.padEnd(this._term.width, " "));
+      for (let i = 1; i < h - 1; i++) {
+        sb.put({ x: x, y: y + i }, "│");
+        sb.put({ x: x + w - 1, y: y + i }, "│");
       }
+
+      sb.put({ x: x, y: y + h - 1 }, "└" + "─".repeat(w - 2) + "┘");
+
+      if (title) sb.put({ x: x + 2, y: y }, ` ${title} `);
+    }
+
+    _drawBody(sb) {
+      const body = this.layoutMap.body;
+
+      this._drawBox(sb, "coole box", {
+        x: 1,
+        y: body.start,
+        w: this._term.width - 2,
+        h: body.height,
+      });
+
+      this._visibleLines = this._wrapText(this._visibleLines, 20);
+
+      // for (let y = 0; y < body.height - 2; y++) {
+      //   const posY = body.start + 1 + y;
+      //   const line = this._visibleLines[y] || " ".repeat(this._term.width - 2);
+
+      //   sb.put({ x: 3, y: posY }, line.padEnd(this._term.width - 5, " "));
+      // }
+    }
+
+    _wrapText(text, width) {
+      const lines = [];
+      const words = text.join(" ").split(" ");
+
+      let current = "";
+
+      for (const word of words)
+        if ((current + word).length > width) {
+          lines.push(current.trimEnd());
+
+          current = word + " ";
+        } else current += word + " ";
+
+      if (current.trim()) lines.push(current.trimEnd());
+
+      return lines;
     }
 
     _drawInput(sb) {

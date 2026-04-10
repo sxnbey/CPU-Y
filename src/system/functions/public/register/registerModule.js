@@ -1,9 +1,9 @@
-const { validate } = require("../../../contracts/moduleContract.js");
+const { validate } = require("../../../../contracts/moduleContract.js");
 
-const FunctionModule = require("../../../BaseModules/FunctionModule.js");
-const ClassModule = require("../../../BaseModules/ClassModule.js");
-const CommandModule = require("../../../BaseModules/CommandModule.js");
-const UtilModule = require("../../../BaseModules/UtilModule.js");
+const FunctionModule = require("../../../../blueprints/modules/FunctionModule.js");
+const ClassModule = require("../../../../blueprints/modules/ClassModule.js");
+const CommandModule = require("../../../../blueprints/modules/CommandModule.js");
+const UtilModule = require("../../../../blueprints/modules/UtilModule.js");
 
 module.exports = function registerModule(module) {
   validate(module);

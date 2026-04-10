@@ -7,10 +7,7 @@ const terminalkit = require("terminal-kit");
 
 const term = terminalkit.terminal;
 
-const Loader = require("./Loader/Loader.js");
-
-const privateAPI = require("./functions/private/index.js");
-const publicAPI = require("./functions/public/index.js");
+const Loader = require("./loader/Loader.js");
 
 /**
  * Core system runtime.
@@ -40,29 +37,6 @@ module.exports = class System {
     this.path = path;
     this.fs = fs;
     this.term = term;
-
-    this.bindFunctions(privateAPI);
-    this.bindFunctions(publicAPI);
-
-    this.Loader = Loader;
-    this.Renderer;
-    this.RenderState;
-    this.InputHandler;
-
-    this.commands = [];
-    this.subcommands = [];
-    this.core = {};
-    this.handlers = {};
-    this.modules = {};
-    this.utils = {};
-
-    this.allRegisteredModules = [];
-    this.allModuleIds = [];
-
-    this.survivesHotReload = [];
-
-    this.lastCommand = {};
-    this.bootLog = [];
   }
 
   //! Error checks will be better soon with own error handler and stuff
@@ -94,10 +68,6 @@ module.exports = class System {
 
   _instantiateLoading() {
     this._createAllPaths();
-
-    this._changeSystemEntry("Loader", new this.Loader(this));
-
-    this.Loader.start();
   }
 
   start() {
@@ -110,12 +80,14 @@ module.exports = class System {
 
     this._instantiateLoading();
 
+    console.log(this);
+
     // Soon load priority. Cant instantiate Renderer on loading cuz RenderState has to exist first
-    this.Renderer = new this.Renderer(this);
+    // this.Renderer = new this.Renderer(this);
 
-    this.RenderState.on("changed", () => this.Renderer.render());
-    this.term.on("resize", () => this.Renderer.render({ resetCursor: true }));
+    // this.RenderState.on("changed", () => this.Renderer.render());
+    // this.term.on("resize", () => this.Renderer.render({ resetCursor: true }));
 
-    this.Renderer.render({ initialRender: true });
+    // this.Renderer.render({ initialRender: true });
   }
 };

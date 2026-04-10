@@ -2,7 +2,7 @@
  * @typedef {import("../System.js")} System
  */
 
-const { validate } = require("../contracts/moduleContract.js");
+const { validate } = require("../../contracts/moduleContract.js");
 
 /**
  * Loader is responsible for loading:
@@ -32,8 +32,6 @@ module.exports = class Loader {
 
   start() {
     this.load();
-
-    return this;
   }
 
   load() {
