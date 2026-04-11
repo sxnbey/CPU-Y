@@ -1,17 +1,7 @@
-module.exports = class BaseModule {
-  constructor(system, file) {
-    this.system = system;
-
-    this.file = file;
-
-    this.name = file.name;
-    this.category = file.category || null; // Category "ROOT" will put the module in system.MODULENAME
-    this.type = file.type;
-    this.value = file.value;
-    this.filePath = file.path || null;
-    this.Id = "FFgAAOe";
-
-    this.options = this._normalizeOptions(file.options);
+module.exports = class BaseRole {
+  constructor({ options = {} }) {
+    this.id = options.id || null;
+    this.type = options.type || null;
   }
 
   // _normalizeOptions(options) {

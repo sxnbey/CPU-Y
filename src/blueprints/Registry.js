@@ -1,8 +1,12 @@
 const EventEmitter = require("events");
 
-module.exports = class BaseRegistry extends EventEmitter {
-  constructor() {
+module.exports = class RegistryBlueprint extends EventEmitter {
+  constructor(options = {}) {
     super();
+
+    this.name = options.name || null;
+    this.alias = options.alias || null;
+    this.prefix = options.prefix || null;
 
     this._storage = new Map();
   }

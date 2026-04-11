@@ -1,11 +1,4 @@
-const BaseRegistry = require("../../blueprints/BaseRegistry.js");
-
-const registries = {
-  actors: require("./Actors.js"),
-  blueprints: require("./Blueprints.js"),
-  resources: require("./Resources.js"),
-  config: require("./Config.js"),
-};
+const BaseRegistry = require("../../../blueprints/Registry.js");
 
 module.exports = class MainRegistry extends BaseRegistry {
   constructor() {

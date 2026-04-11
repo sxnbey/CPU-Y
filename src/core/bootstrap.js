@@ -1,6 +1,6 @@
-const System = require("./core/System.js");
-const MainRegistry = require("./core/registry/Main.js");
-const TerminalHandler = require("./engine/handlers/terminalhandler/TerminalHandler.js");
+const System = require("./System.js");
+const MainRegistry = require("./core/registry/core/Main.js");
+const TerminalHandler = require("../engine/handlers/terminalhandler/TerminalHandler.js");
 
 const path = require("path");
 const fs = require("fs");
