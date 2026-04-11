@@ -1,43 +1,27 @@
-module.exports = class MainRegistry extends EventEmitter {
+const BaseRegistry = require("./Base.js");
+
+const ActorRegistry = require("./Actors.js");
+const BlueprintRegistry = require("./Blueprints.js");
+const ResourceRegistry = require("./Resources.js");
+
+module.exports = class MainRegistry extends BaseRegistry {
   constructor() {
     super();
 
-    this._storage = new Map();
+    this.register("actors", new ActorRegistry());
+    this.register("blueprints", new BlueprintRegistry());
+    this.register("resources", new ResourceRegistry());
   }
 
-  register(id, value) {
-    this._storage.set(id, value);
-
-    this.emit("register", id, value);
-
-    return value;
+  get actors() {
+    return this.get("actors");
   }
 
-  delete(id) {
-    this._storage.delete(id);
-
-    this.emit("delete", id);
-
-    return this;
+  get blueprints() {
+    return this.get("blueprints");
   }
 
-  get(id) {
-    return this._storage.get(id);
-  }
-
-  has(id) {
-    return this._storage.has(id);
-  }
-
-  get engine() {
-    return this._storage.get("engine");
-  }
-
-  get modules() {
-    return this._storage.get("modules");
-  }
-
-  get view() {
-    return this._storage.get("view");
+  get resources() {
+    return this.get("resources");
   }
 };

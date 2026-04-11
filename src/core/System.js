@@ -7,8 +7,6 @@ const terminalkit = require("terminal-kit");
 
 const term = terminalkit.terminal;
 
-const Loader = require("./loader/Loader.js");
-
 /**
  * Core system runtime.
  *
@@ -66,28 +64,17 @@ module.exports = class System {
       this.config.pathsToLoad.push(...this.config.customPaths);
   }
 
-  _instantiateLoading() {
-    this._createAllPaths();
-  }
-
   start() {
     this.term.clear();
-    this.term.grabInput();
-    this.term.grabInput({ mouse: "button" });
-    this.term.fullscreen(true);
+    // this.term.grabInput();
+    // this.term.grabInput({ mouse: "button" });
+    // this.term.fullscreen(true);
 
     console.log("Booting...");
 
-    this._instantiateLoading();
+    const registry = require("./registry/Main.js");
+    this.Registry = new registry();
 
-    console.log(this);
-
-    // Soon load priority. Cant instantiate Renderer on loading cuz RenderState has to exist first
-    // this.Renderer = new this.Renderer(this);
-
-    // this.RenderState.on("changed", () => this.Renderer.render());
-    // this.term.on("resize", () => this.Renderer.render({ resetCursor: true }));
-
-    // this.Renderer.render({ initialRender: true });
+    console.log(this.Registry);
   }
 };
