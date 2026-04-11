@@ -1,4 +1,4 @@
-const System = require("./src/core/System.js");
-const CPUY = new System();
+const CPUY = require("./src/bootstrap.js");
+const system = new CPUY();
 
-CPUY.start();
+system.initialize();

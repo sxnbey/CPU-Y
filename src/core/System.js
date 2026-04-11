@@ -1,15 +1,3 @@
-/**
- * Core system runtime.
- *
- * Initializes:
- * - rendering
- * - file loading
- * - input handling
- * - and more :3
- *
- * @class System
- */
-
 module.exports = class System {
   constructor(options = {}) {
     this.config = {
@@ -47,5 +35,7 @@ module.exports = class System {
       this.config.pathsToLoad.push(...this.config.customPaths);
   }
 
-  start() {}
+  start() {
+    console.log("hello!");
+  }
 };

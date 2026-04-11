@@ -1,5 +1,6 @@
 const System = require("./core/System");
 const MainRegistry = require("./core/registry/Main.js");
+const TerminalHandler = require("./engine/handlers/terminalhandler/TerminalHandler.js");
 
 const path = require("path");
 const fs = require("fs");
@@ -13,7 +14,7 @@ class CPUY extends System {
   constructor(options = {}) {
     super(options);
 
-    this.Registry = new MainRegistry();
+    this.registry = new MainRegistry();
 
     this._dev = env.dev?.split(",").includes(os.userInfo().username);
   }
@@ -22,23 +23,30 @@ class CPUY extends System {
     const resources = { path, fs, term, system: this };
 
     Object.entries(resources).forEach(([name, resource]) => {
-      this.Registry.resources.register(name, resource);
+      this.registry.resources.register(name, resource);
     });
 
-    const terminal = this.Registry.resources.get("term");
+    const terminal = this.registry.resources.get("term");
+    const terminalHandler = this.registry.resources.register(
+      "terminalHandler",
+      new TerminalHandler(terminal),
+    );
 
-    [
-      { func: "clear" },
-      { func: "grabInput" },
-      { func: "grabInput", args: [{ mouse: "button" }] },
-      { func: "fullscreen", args: [true] },
-    ].forEach((action) => {
-      const args = action.args || [];
+    terminalHandler.initializeScene();
 
-      terminal[action.func](...args);
+    terminal.on("key", (name, matches, data) => {
+      if (name == "CTRL_C") this.shutdown();
     });
 
     console.log("Booting...");
+
+    this.start();
+  }
+
+  shutdown() {
+    this.registry.resources.get("terminalHandler").closeScene();
+
+    process.exit(0);
   }
 }
 

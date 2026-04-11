@@ -1,27 +1,32 @@
 const BaseRegistry = require("./Base.js");
 
-const ActorRegistry = require("./Actors.js");
-const BlueprintRegistry = require("./Blueprints.js");
-const ResourceRegistry = require("./Resources.js");
+const registries = {
+  actors: require("./Actors.js"),
+  blueprints: require("./Blueprints.js"),
+  resources: require("./Resources.js"),
+  config: require("./Config.js"),
+};
 
 module.exports = class MainRegistry extends BaseRegistry {
   constructor() {
     super();
 
-    this.register("actors", new ActorRegistry());
-    this.register("blueprints", new BlueprintRegistry());
-    this.register("resources", new ResourceRegistry());
+    this._initialize();
   }
 
-  get actors() {
-    return this.get("actors");
-  }
+  _initialize() {
+    Object.entries(registries).forEach(([key, Registry]) => {
+      const instance = new Registry();
 
-  get blueprints() {
-    return this.get("blueprints");
-  }
+      this.register(key, instance);
 
-  get resources() {
-    return this.get("resources");
+      Object.defineProperty(this, key, {
+        get: function () {
+          return this.get(key);
+        },
+        enumerable: true,
+        configurable: false,
+      });
+    });
   }
 };
