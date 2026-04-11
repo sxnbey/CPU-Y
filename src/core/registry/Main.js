@@ -1,4 +1,4 @@
-const BaseRegistry = require("./Base.js");
+const BaseRegistry = require("../../blueprints/BaseRegistry.js");
 
 const registries = {
   actors: require("./Actors.js"),

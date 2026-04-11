@@ -1,4 +1,4 @@
-const System = require("./core/System");
+const System = require("./core/System.js");
 const MainRegistry = require("./core/registry/Main.js");
 const TerminalHandler = require("./engine/handlers/terminalhandler/TerminalHandler.js");
 
@@ -10,7 +10,7 @@ require("dotenv").config();
 const env = process.env;
 const os = require("os");
 
-class CPUY extends System {
+module.exports = class CPUY extends System {
   constructor(options = {}) {
     super(options);
 
@@ -34,6 +34,7 @@ class CPUY extends System {
 
     terminalHandler.initializeScene();
 
+    // soon inputhandler back
     terminal.on("key", (name, matches, data) => {
       if (name == "CTRL_C") this.shutdown();
     });
@@ -48,6 +49,4 @@ class CPUY extends System {
 
     process.exit(0);
   }
-}
-
-module.exports = CPUY;
+};

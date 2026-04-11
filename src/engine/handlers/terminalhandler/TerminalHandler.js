@@ -3,6 +3,14 @@ module.exports = class TerminalHandler {
     this._term = term;
   }
 
+  _executeTermActions(actions) {
+    actions.forEach((action) => {
+      const args = action.args || [];
+
+      this._term[action.func](...args);
+    });
+  }
+
   initializeScene() {
     this._executeTermActions([
       { func: "clear" },
@@ -18,13 +26,5 @@ module.exports = class TerminalHandler {
       { func: "fullscreen", args: [false] },
       { func: "hideCursor", args: [false] },
     ]);
-  }
-
-  _executeTermActions(actions) {
-    actions.forEach((action) => {
-      const args = action.args || [];
-
-      this._term[action.func](...args);
-    });
   }
 };

@@ -14,11 +14,11 @@ module.exports = class BaseModule {
     this.options = this._normalizeOptions(file.options);
   }
 
-  _normalizeOptions(options) {
-    return {
-      persistent: options?.persistent || false,
-      execute: options?.execute || false,
-      instantiate: options?.instantiate || false,
-    };
-  }
+  // _normalizeOptions(options) {
+  //   return {
+  //     persistent: options?.persistent || false,
+  //     execute: options?.execute || false,
+  //     instantiate: options?.instantiate || false,
+  //   };
+  // }
 };

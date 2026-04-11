@@ -35,6 +35,8 @@ module.exports = class System {
       this.config.pathsToLoad.push(...this.config.customPaths);
   }
 
+  _createAliases() {}
+
   start() {
     console.log("hello!");
   }
