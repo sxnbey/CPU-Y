@@ -3,7 +3,6 @@ const { validate } = require("../../../contracts/roleContract.js");
 const FunctionRole = require("../../../blueprints/roles/Function.js");
 const ClassRole = require("../../../blueprints/roles/Class.js");
 const CommandRole = require("../../../blueprints/roles/Command.js");
-const UtilRole = require("../../../blueprints/roles/Util.js");
 
 module.exports = function registerBlueprint(blueprint) {
   validate(blueprint);
@@ -12,7 +11,6 @@ module.exports = function registerBlueprint(blueprint) {
     function: () => new FunctionRole(this, blueprint).register(),
     class: () => new ClassRole(this, blueprint).register(),
     command: () => new CommandRole(this, blueprint).register(),
-    util: () => new UtilRole(this, blueprint).register(),
   };
 
   const run = handlers[blueprint.type];
