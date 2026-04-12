@@ -1,6 +1,11 @@
 const System = require("./System.js");
-const MainRegistry = require("./core/registry/core/Main.js");
-const TerminalHandler = require("../engine/handlers/terminalhandler/TerminalHandler.js");
+const MainRegistry = require("./registry/Main.js");
+const registries = {
+  blueprint: require("./registry/Blueprints.js"),
+  contract: require("./registry/Contracts.js"),
+  resources: require("./registry/Resources.js"),
+};
+const TerminalHandler = require("../../engine/handlers/terminalhandler/TerminalHandler.js");
 
 const path = require("path");
 const fs = require("fs");

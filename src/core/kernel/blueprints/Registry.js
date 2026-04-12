@@ -1,6 +1,6 @@
 const EventEmitter = require("events");
 
-module.exports = class RegistryBlueprint extends EventEmitter {
+module.exports = class BaseRegistry extends EventEmitter {
   constructor(options = {}) {
     super();
 

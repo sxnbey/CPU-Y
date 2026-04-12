@@ -1,4 +1,4 @@
-const BaseRegistry = require("../../../blueprints/Registry.js");
+const BaseRegistry = require("../blueprints/Registry.js");
 
 module.exports = class MainRegistry extends BaseRegistry {
   constructor() {
@@ -8,7 +8,7 @@ module.exports = class MainRegistry extends BaseRegistry {
   }
 
   _initialize() {
-    Object.entries(registries).forEach(([key, Registry]) => {
+    Object.entries(kernelRegistries).forEach(([key, Registry]) => {
       const instance = new Registry();
 
       this.register(key, instance);
