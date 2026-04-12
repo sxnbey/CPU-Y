@@ -1,4 +1,4 @@
-const BaseRegistry = require("../blueprints/Registry.js");
+const BaseRegistry = require("../blueprints/registry/Registry.js");
 
 module.exports = class MainRegistry extends BaseRegistry {
   constructor() {
