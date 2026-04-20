@@ -1,4 +1,4 @@
-class BaseBlueprint {
+module.exports = class BaseBlueprint {
   static id = "baseblueprint";
   static type = "blueprint";
   static contract = "basecontract";
@@ -27,4 +27,4 @@ class BaseBlueprint {
   onRegister() {
     return false;
   }
-}
+};

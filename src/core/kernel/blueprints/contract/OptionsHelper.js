@@ -1,72 +1,76 @@
 const BaseBlueprint = require("../Base.js");
 
-class OptionsHelper extends BaseBlueprint {
+module.exports = class OptionsHelper extends BaseBlueprint {
   static id = "optionshelper";
 
-  static get required() {
+  static get options() {
     return new Set([
-      { option: "id", type: "string" },
-      { option: "type", type: "string" },
-      { option: "registry", type: "string" },
-      { option: "contract", type: "string" },
+      { name: "id", type: "string", required: true },
+      { name: "type", type: "string", required: true },
+      { name: "registry", type: "string", required: true },
+      { name: "contract", type: "string", required: true },
     ]);
-  }
-  static get optional() {
-    return new Set();
   }
 
   constructor(data = {}) {
-    this._required = new Set(this.constructor.required);
-    this._optional = new Set(this.constructor.optional);
+    super(data);
+
+    this._options = new Set(this.constructor.options);
 
     this._initialize(data);
-
-    super(data);
   }
 
-  get required() {
-    return this._required;
-  }
-
-  get optional() {
-    return this._optional;
+  get options() {
+    return this._options;
   }
 
   _initialize(data) {
-    Object.entries({ required: "_required", optional: "_optional" }).forEach(
-      ([key, attribute]) => {
-        const dataArray = Array.from(data[key]);
-
-        // !
-
-        if (!dataArray?.forEach)
-          throw new Error(
-            `${key} options must be an array or set for ${this.constructor.id}`,
-          );
-
-        dataArray.forEach((newOption) => {
-          const exists = [...this[attribute]].some(
-            (existing) => existing.option == newOption.option,
-          );
-
-          if (!exists) this[attribute].add(newOption);
-        });
-      },
+    let dataOptions = data.options;
+    const isValidCollection =
+      dataOptions && (dataOptions instanceof Set || Array.isArray(dataOptions));
+    const existingOptionNames = new Set(
+      [...this._options].map(({ name }) => name),
     );
+
+    if (!isValidCollection)
+      throw new Error("Options must be an array or a set");
+
+    if (Array.isArray(dataOptions)) dataOptions = new Set(dataOptions);
+
+    dataOptions.forEach((option) => {
+      if (!existingOptionNames.has(option.name)) this._options.add(option);
+    });
 
     this._validateMyself();
   }
 
   _validateMyself() {
-    const allRules = [...this._required, ...this._optional];
+    this._options.forEach((optionObject) => {
+      const isValidFormat =
+        optionObject != null &&
+        typeof optionObject == "object" &&
+        !Array.isArray(optionObject);
 
-    allRules.forEach(({ option, type }) => {
-      if (typeof option != "string")
-        throw new Error(`Option name ${option} must be a string`);
+      if (!isValidFormat)
+        throw new Error(
+          `Option must be an object, but is ${typeof optionObject}\n${JSON.stringify(optionObject)}`,
+        );
+
+      const { name, type, required } = optionObject;
+
+      if (typeof name != "string")
+        throw new Error(
+          `Option attribute "name" ${name} must be a string, but is ${typeof name}\n${JSON.stringify(optionObject)}`,
+        );
 
       if (typeof type != "string")
         throw new Error(
-          `Option type ${type} for option ${option} must be a string`,
+          `Option attribute "type" ${type} for option ${name} must be a string, but is ${typeof type}\n${JSON.stringify(optionObject)}`,
+        );
+
+      if (typeof required != "boolean")
+        throw new Error(
+          `Option attribute "required" ${required} for option ${name} must be a boolean, but is ${typeof required}\n${JSON.stringify(optionObject)}`,
         );
     });
   }
@@ -105,4 +109,4 @@ class OptionsHelper extends BaseBlueprint {
         );
     });
   }
-}
+};
