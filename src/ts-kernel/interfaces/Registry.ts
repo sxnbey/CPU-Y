@@ -1,6 +1,8 @@
-export interface Registry {
-  register(id: string, value: any): any;
+export interface Registry<T> {
+  getName(): string;
+
+  register(id: string, value: T): T;
   delete(id: string): this;
-  get(id: string): any;
+  get(id: string): T | undefined;
   has(id: string): boolean;
 }

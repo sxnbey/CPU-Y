@@ -1,14 +1,15 @@
 import { Blueprint } from "../interfaces/Blueprint.js";
+import { Registry } from "../interfaces/Registry.js";
 
 export abstract class BaseBlueprint implements Blueprint {
-  protected static registry: Partial<Blueprint>;
+  protected static registry: Registry<Blueprint>;
 
-  readonly id: string | undefined;
-  readonly kind: string | undefined;
-  readonly validator: string | undefined;
-  readonly location: string | undefined;
+  readonly id: string;
+  readonly kind: string;
+  readonly validator: string;
+  readonly location: string;
 
-  constructor(data: Partial<Blueprint> = {}) {
+  constructor(data: Blueprint) {
     this.id = data.id;
     this.kind = data.kind;
     this.validator = data.validator;

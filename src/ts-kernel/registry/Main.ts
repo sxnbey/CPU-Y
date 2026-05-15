@@ -1,7 +1,8 @@
 import { BaseRegistry } from "./Base";
+import { Blueprint } from "../interfaces/Blueprint";
 
-export class MainRegistry extends BaseRegistry {
+export class MainRegistry extends BaseRegistry<Blueprint> {
   constructor() {
-    super();
+    super({ name: "MainRegistry" });
   }
 }

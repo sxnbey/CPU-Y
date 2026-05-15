@@ -1,16 +1,27 @@
 import { EventEmitter } from "node:events";
 import { Registry } from "../interfaces/Registry";
 
-export abstract class BaseRegistry extends EventEmitter implements Registry {
-  protected storage: Map<string, any>;
+interface RegistryOptions {
+  name: string;
+}
 
-  constructor() {
+export abstract class BaseRegistry<T>
+  extends EventEmitter
+  implements Registry<T>
+{
+  protected storage: Map<string, T>;
+
+  constructor(protected readonly options: RegistryOptions) {
     super();
 
     this.storage = new Map();
   }
 
-  register(id: string, value: any): any {
+  public getName(): string {
+    return this.options.name;
+  }
+
+  public register(id: string, value: T): T {
     this.storage.set(id, value);
 
     this.emit("register", id, value);
@@ -18,7 +29,7 @@ export abstract class BaseRegistry extends EventEmitter implements Registry {
     return value;
   }
 
-  delete(id: string): this {
+  public delete(id: string): this {
     this.storage.delete(id);
 
     this.emit("delete", id);
@@ -26,11 +37,11 @@ export abstract class BaseRegistry extends EventEmitter implements Registry {
     return this;
   }
 
-  get(id: string): any {
+  public get(id: string): T | undefined {
     return this.storage.get(id);
   }
 
-  has(id: string): boolean {
+  public has(id: string): boolean {
     return this.storage.has(id);
   }
 }

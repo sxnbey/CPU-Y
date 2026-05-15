@@ -1,6 +1,6 @@
 export interface Blueprint {
-  id: string | undefined;
-  kind: string | undefined;
-  validator: string | undefined;
-  location: string | undefined;
+  id: string;
+  kind: string;
+  validator: string;
+  location: string;
 }
