@@ -24,6 +24,8 @@ module.exports = class OptionsHelper extends BaseBlueprint {
     return this._options;
   }
 
+  //! REFACTOR TO MAP
+
   _initialize(data) {
     let dataOptions = data.options;
     const isValidCollection =
