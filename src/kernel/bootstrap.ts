@@ -24,6 +24,8 @@ export class CPUY implements ISystem {
   public start(): boolean {
     // other
 
+    console.log("packs in der bag");
+
     return true;
   }
 }
