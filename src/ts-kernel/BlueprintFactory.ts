@@ -1,10 +1,11 @@
-import { Registry } from "./interfaces/Registry";
-import { Blueprint } from "./interfaces/Blueprint";
+import { IRegistry } from "./contracts/IRegistry";
+import { Process } from "./contracts/Process";
+import { IBlueprint } from "./contracts/IBlueprint";
 
 export class BlueprintFactory {
-  constructor(private readonly registry: Registry<Blueprint>) {}
+  constructor(private readonly registry: IRegistry<Process>) {}
 
-  public create(data: Blueprint): Blueprint {
+  public create(data: IBlueprint): IBlueprint {
     this.registry.register(data.id, data);
 
     return data;

@@ -1,4 +1,4 @@
-export interface Registry<T> {
+export interface IRegistry<T> {
   getName(): string;
 
   register(id: string, value: T): T;

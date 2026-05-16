@@ -1,4 +1,4 @@
-export interface Blueprint {
+export interface IBlueprint {
   id: string;
   kind: string;
   validator: string;

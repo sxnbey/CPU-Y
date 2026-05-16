@@ -1,17 +1,17 @@
 import { EventEmitter } from "node:events";
-import { Registry } from "../interfaces/Registry";
+import { IRegistry } from "../contracts/IRegistry";
 
-interface RegistryOptions {
+interface IRegistryOptions {
   name: string;
 }
 
 export abstract class BaseRegistry<T>
   extends EventEmitter
-  implements Registry<T>
+  implements IRegistry<T>
 {
   protected storage: Map<string, T>;
 
-  constructor(protected readonly options: RegistryOptions) {
+  constructor(protected readonly options: IRegistryOptions) {
     super();
 
     this.storage = new Map();
