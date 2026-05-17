@@ -2,7 +2,7 @@ import { IMainRegistry } from "../contracts/IMainRegistry";
 import { RegistryMap } from "../contracts/RegistryMap";
 
 export class MainRegistry implements IMainRegistry {
-  private registries: Map<keyof RegistryMap, any>;
+  private registries: Map<keyof RegistryMap, RegistryMap[keyof RegistryMap]>;
 
   constructor() {
     this.registries = new Map();
