@@ -1,6 +1,6 @@
 import { IMainRegistry } from "./contracts/IMainRegistry";
 
-import { BlueprintFactory } from "./BlueprintFactory";
+import { ProcessFactory } from "./ProcessFactory";
 
 import { RegistryBridge } from "./RegistryBridge";
 
@@ -14,13 +14,13 @@ interface ISystem {
 
 export class CPUY implements ISystem {
   registry: IMainRegistry;
-  factory: BlueprintFactory;
+  factory: ProcessFactory;
 
   constructor() {
     this.registry = new MainRegistry();
     this.createRegistries();
 
-    this.factory = new BlueprintFactory(this.createRegistryBridge());
+    this.factory = new ProcessFactory(this.createRegistryBridge());
   }
 
   public start(): boolean {

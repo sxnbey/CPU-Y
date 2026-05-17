@@ -4,7 +4,7 @@ import { Process } from "./contracts/Process";
 
 import { RegistryBridge } from "./RegistryBridge";
 
-export class BlueprintFactory {
+export class ProcessFactory {
   readonly processRegistry: IRegistry<Process>;
 
   constructor(private readonly registryBridge: RegistryBridge) {
