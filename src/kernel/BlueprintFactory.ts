@@ -8,9 +8,7 @@ export class BlueprintFactory {
   readonly processRegistry: IRegistry<Process>;
 
   constructor(private readonly registryBridge: RegistryBridge) {
-    this.processRegistry = this.registryBridge
-      .getRegistry()
-      .get("processRegistry") as IRegistry<Process>;
+    this.processRegistry = this.registryBridge.get("processRegistry");
   }
 
   public create(data: IBlueprint): IBlueprint {

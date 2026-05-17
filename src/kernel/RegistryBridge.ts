@@ -1,15 +1,17 @@
 import { IMainRegistry } from "./contracts/IMainRegistry";
+import { RegistryMap } from "./contracts/RegistryMap";
 
 export class RegistryBridge {
-  private registry: IMainRegistry | null = null;
+  private registryInstance?: IMainRegistry;
 
   public setRegistry(registry: IMainRegistry): void {
-    this.registry = registry;
+    this.registryInstance = registry;
   }
 
-  public getRegistry(): IMainRegistry {
-    if (!this.registry) throw new Error("Registry not set");
+  public get<K extends keyof RegistryMap>(key: K): RegistryMap[K] {
+    if (!this.registryInstance)
+      throw new Error("RegistryBridge: Registry not set yet");
 
-    return this.registry;
+    return this.registryInstance.get(key);
   }
 }
