@@ -1,23 +1,24 @@
 import { EventEmitter } from "node:events";
+
 import { IRegistry } from "../contracts/IRegistry";
 
-interface IRegistryOptions {
-  name: string;
+interface IRegistryOptions<N extends string> {
+  name: N;
 }
 
-export abstract class BaseRegistry<T>
+export abstract class BaseRegistry<T, N extends string>
   extends EventEmitter
   implements IRegistry<T>
 {
   protected storage: Map<string, T>;
 
-  constructor(protected readonly options: IRegistryOptions) {
+  constructor(protected readonly options: IRegistryOptions<N>) {
     super();
 
     this.storage = new Map();
   }
 
-  public getName(): string {
+  public getName(): N {
     return this.options.name;
   }
 

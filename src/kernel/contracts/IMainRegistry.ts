@@ -1,4 +1,6 @@
-import { IRegistry } from "./IRegistry";
-import { Resource } from "./Resource";
+import { RegistryMap } from "./RegistryMap";
 
-export interface IMainRegistry extends IRegistry<IRegistry<Resource>> {}
+export interface IMainRegistry {
+  register<K extends keyof RegistryMap>(key: K, registry: RegistryMap[K]): void;
+  get<K extends keyof RegistryMap>(key: K): RegistryMap[K];
+}

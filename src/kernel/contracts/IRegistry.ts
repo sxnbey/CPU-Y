@@ -3,6 +3,7 @@ export interface IRegistry<T> {
 
   register(id: string, value: T): T;
   delete(id: string): this;
+
   get(id: string): T | undefined;
   has(id: string): boolean;
 }

@@ -1,7 +1,10 @@
 import { IMainRegistry } from "./contracts/IMainRegistry";
+
 import { BlueprintFactory } from "./BlueprintFactory";
+import { RegistryBridge } from "./RegistryBridge";
 import { MainRegistry } from "./registry/MainRegistry";
 import { ProcessRegistry } from "./registry/ProcessRegistry";
+import { BlueprintRegistry } from "./registry/BlueprintRegistry";
 
 interface ISystem {
   start(): boolean;
@@ -13,19 +16,32 @@ export class CPUY implements ISystem {
 
   constructor() {
     this.registry = new MainRegistry();
+    this.createRegistries();
 
-    const processRegistry = new ProcessRegistry();
-
-    this.registry.register(processRegistry.getName(), processRegistry);
-
-    this.factory = new BlueprintFactory(processRegistry);
+    this.factory = new BlueprintFactory(this.createRegistryBridge());
   }
 
   public start(): boolean {
-    // other
+    // other soon
 
     console.log("packs in der bag");
 
     return true;
+  }
+
+  private createRegistries(): void {
+    const allRegistries = [new ProcessRegistry(), new BlueprintRegistry()];
+
+    allRegistries.forEach((registry) => {
+      this.registry.register(registry.getName(), registry);
+    });
+  }
+
+  private createRegistryBridge(): RegistryBridge {
+    const registryBridge = new RegistryBridge();
+
+    registryBridge.setRegistry(this.registry);
+
+    return registryBridge;
   }
 }

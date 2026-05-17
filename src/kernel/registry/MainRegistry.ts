@@ -1,13 +1,21 @@
-import { BaseRegistry } from "./BaseRegistry";
-import { IRegistry } from "../contracts/IRegistry";
-import { Resource } from "../contracts/Resource";
 import { IMainRegistry } from "../contracts/IMainRegistry";
+import { RegistryMap } from "../contracts/RegistryMap";
 
-export class MainRegistry
-  extends BaseRegistry<IRegistry<Resource>>
-  implements IMainRegistry
-{
+export class MainRegistry implements IMainRegistry {
+  private registries: Map<keyof RegistryMap, any>;
+
   constructor() {
-    super({ name: "mainRegistry" });
+    this.registries = new Map();
+  }
+
+  public register<K extends keyof RegistryMap>(
+    key: K,
+    registry: RegistryMap[K],
+  ): void {
+    this.registries.set(key, registry);
+  }
+
+  public get<K extends keyof RegistryMap>(key: K): RegistryMap[K] {
+    return this.registries.get(key) as RegistryMap[K];
   }
 }
