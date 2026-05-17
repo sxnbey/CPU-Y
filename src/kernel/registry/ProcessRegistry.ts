@@ -1,6 +1,6 @@
-import { BaseRegistry } from "./BaseRegistry";
-
 import { Process } from "../contracts/Process";
+
+import { BaseRegistry } from "./BaseRegistry";
 
 export class ProcessRegistry extends BaseRegistry<Process, "processRegistry"> {
   constructor() {

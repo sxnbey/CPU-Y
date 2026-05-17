@@ -1,6 +1,6 @@
 import { IRegistry } from "./contracts/IRegistry";
-import { Process } from "./contracts/Process";
 import { IBlueprint } from "./contracts/IBlueprint";
+import { Process } from "./contracts/Process";
 
 import { RegistryBridge } from "./RegistryBridge";
 

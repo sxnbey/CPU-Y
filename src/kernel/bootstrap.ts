@@ -1,7 +1,9 @@
 import { IMainRegistry } from "./contracts/IMainRegistry";
 
 import { BlueprintFactory } from "./BlueprintFactory";
+
 import { RegistryBridge } from "./RegistryBridge";
+
 import { MainRegistry } from "./registry/MainRegistry";
 import { ProcessRegistry } from "./registry/ProcessRegistry";
 import { BlueprintRegistry } from "./registry/BlueprintRegistry";
