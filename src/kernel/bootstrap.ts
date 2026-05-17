@@ -2,7 +2,7 @@ import { IMainRegistry } from "./contracts/IMainRegistry";
 
 import { ProcessFactory } from "./ProcessFactory";
 
-import { RegistryBridge } from "./RegistryBridge";
+import { KernelBridge } from "./KernelBridge";
 
 import { MainRegistry } from "./registry/MainRegistry";
 import { ProcessRegistry } from "./registry/ProcessRegistry";
@@ -39,11 +39,11 @@ export class CPUY implements ISystem {
     });
   }
 
-  private createRegistryBridge(): RegistryBridge {
-    const registryBridge = new RegistryBridge();
+  private createRegistryBridge(): KernelBridge {
+    const kernelBridge = new KernelBridge();
 
-    registryBridge.setRegistry(this.registry);
+    kernelBridge.setRegistry(this.registry);
 
-    return registryBridge;
+    return kernelBridge;
   }
 }

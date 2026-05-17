@@ -1,6 +1,6 @@
 import { IBlueprint, IBlueprintOptions } from "../contracts/IBlueprint";
 
-import { RegistryBridge } from "../RegistryBridge";
+import { KernelBridge } from "../KernelBridge";
 
 export abstract class BaseBlueprint implements IBlueprint {
   readonly id!: string;
@@ -10,7 +10,7 @@ export abstract class BaseBlueprint implements IBlueprint {
 
   constructor(
     data: IBlueprintOptions,
-    protected readonly bridge: RegistryBridge,
+    protected readonly bridge: KernelBridge,
   ) {
     Object.assign(this, data);
   }

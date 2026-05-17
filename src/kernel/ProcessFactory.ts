@@ -2,13 +2,13 @@ import { IRegistry } from "./contracts/IRegistry";
 import { IBlueprint } from "./contracts/IBlueprint";
 import { Process } from "./contracts/Process";
 
-import { RegistryBridge } from "./RegistryBridge";
+import { KernelBridge } from "./KernelBridge";
 
 export class ProcessFactory {
   readonly processRegistry: IRegistry<Process>;
 
-  constructor(private readonly registryBridge: RegistryBridge) {
-    this.processRegistry = this.registryBridge.get("processRegistry");
+  constructor(private readonly kernelBridge: KernelBridge) {
+    this.processRegistry = this.kernelBridge.get("processRegistry");
   }
 
   public create(data: IBlueprint): IBlueprint {
