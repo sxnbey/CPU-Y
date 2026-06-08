@@ -1,26 +1,24 @@
 import { IMainRegistry } from "./contracts/IMainRegistry";
 
-import { ProcessFactory } from "./ProcessFactory";
-
-import { KernelBridge } from "./KernelBridge";
+import { KernelContext } from "./KernelContext";
 
 import { MainRegistry } from "./registry/MainRegistry";
 import { ProcessRegistry } from "./registry/ProcessRegistry";
 import { BlueprintRegistry } from "./registry/BlueprintRegistry";
 
-interface ISystem {
+interface ICPUY {
   start(): boolean;
 }
 
-export class CPUY implements ISystem {
-  registry: IMainRegistry;
-  factory: ProcessFactory;
+export class CPUY implements ICPUY {
+  private registry: IMainRegistry;
+  context: KernelContext;
 
   constructor() {
     this.registry = new MainRegistry();
     this.createRegistries();
 
-    this.factory = new ProcessFactory(this.createRegistryBridge());
+    this.context = new KernelContext(this.registry);
   }
 
   public start(): boolean {
@@ -37,13 +35,5 @@ export class CPUY implements ISystem {
     allRegistries.forEach((registry) => {
       this.registry.register(registry.getName(), registry);
     });
-  }
-
-  private createRegistryBridge(): KernelBridge {
-    const kernelBridge = new KernelBridge();
-
-    kernelBridge.setRegistry(this.registry);
-
-    return kernelBridge;
   }
 }
