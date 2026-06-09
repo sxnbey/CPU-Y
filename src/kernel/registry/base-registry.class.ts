@@ -1,8 +1,8 @@
 import { EventEmitter } from "node:events";
 
-import { IRegistry } from "../contracts/IRegistry";
+import { IRegistry } from "../contracts/interfaces/registry.interface";
 
-interface IRegistryOptions<N extends string> {
+export interface IRegistryOptions<N extends string> {
   name: N;
 }
 

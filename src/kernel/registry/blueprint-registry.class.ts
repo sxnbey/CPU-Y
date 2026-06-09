@@ -1,6 +1,6 @@
-import { IBlueprint } from "../contracts/IBlueprint";
+import { IBlueprint } from "../contracts/interfaces/blueprint.interface";
 
-import { BaseRegistry } from "./BaseRegistry";
+import { BaseRegistry } from "./base-registry.class";
 
 export class BlueprintRegistry extends BaseRegistry<
   IBlueprint,
