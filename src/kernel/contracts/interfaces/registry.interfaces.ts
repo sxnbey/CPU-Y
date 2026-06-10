@@ -24,8 +24,3 @@ export interface IRegistryMap {
   serviceRegistry: IRegistry<Service, "serviceRegistry">;
   blueprintRegistry: IRegistry<IBlueprint, "blueprintRegistry">;
 }
-
-export interface IRegistryStoredTypeMap {
-  serviceRegistry: Service;
-  blueprintRegistry: IBlueprint;
-}

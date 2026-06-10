@@ -4,7 +4,7 @@ import { KernelContext } from "../../kernel-context.class";
 
 export interface IBlueprintOptions {
   id: string;
-  targetLocation: keyof IRegistryMap;
+  targetRegistry: keyof IRegistryMap;
 }
 
 export interface IBlueprint extends IBlueprintOptions {
