@@ -1,5 +1,4 @@
-import { IMainRegistry } from "./contracts/interfaces/main-registry.interface";
-import { IRegistryMap } from "./contracts/interfaces/registry-map.interface";
+import { IMainRegistry, IRegistryMap } from "./contracts/interfaces";
 
 import { KernelContext } from "./kernel-context.class";
 import { MainRegistry } from "./registries/main-registry.class";

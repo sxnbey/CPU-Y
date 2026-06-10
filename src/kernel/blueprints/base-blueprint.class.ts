@@ -1,7 +1,9 @@
-import { IBlueprint } from "../contracts/interfaces/blueprint.interface";
-import { IBlueprintOptions } from "../contracts/interfaces/blueprint-options.interface";
-import { IRegistryMap } from "../contracts/interfaces/registry-map.interface";
-import { ValidationRules } from "../contracts/types/validation-rules.type";
+import {
+  IBlueprint,
+  IBlueprintOptions,
+  IRegistryMap,
+} from "../contracts/interfaces";
+import { ValidationRules } from "../contracts/types";
 
 import { KernelContext } from "../kernel-context.class";
 

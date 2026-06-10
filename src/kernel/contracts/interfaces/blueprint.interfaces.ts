@@ -1,5 +1,11 @@
+import { IRegistryMap } from "./registry.interfaces";
+
 import { KernelContext } from "../../kernel-context.class";
-import { IBlueprintOptions } from "./blueprint-options.interface";
+
+export interface IBlueprintOptions {
+  id: string;
+  targetLocation: keyof IRegistryMap;
+}
 
 export interface IBlueprint extends IBlueprintOptions {
   initialize(context: KernelContext): void;

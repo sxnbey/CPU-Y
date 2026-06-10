@@ -1,7 +1,6 @@
 import { EventEmitter } from "node:events";
 
-import { IRegistry } from "../contracts/interfaces/registry.interface";
-import { IRegistryMap } from "../contracts/interfaces/registry-map.interface";
+import { IRegistry, IRegistryMap } from "../contracts/interfaces";
 
 export abstract class BaseRegistry<T, N extends keyof IRegistryMap>
   extends EventEmitter

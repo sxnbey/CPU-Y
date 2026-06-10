@@ -1,7 +1,7 @@
 import { System } from "./kernel/system.class.js";
 
-import { ServiceRegistry } from "./kernel/registries/service-registry.class.js";
-import { BlueprintRegistry } from "./kernel/registries/blueprint-registry.class.js";
+import { ServiceRegistry } from "./core/registries/service-registry.class.js";
+import { BlueprintRegistry } from "./core/registries/blueprint-registry.class.js";
 
 const system = new System();
 
