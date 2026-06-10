@@ -7,6 +7,6 @@ export class BlueprintRegistry extends BaseRegistry<
   "blueprintRegistry"
 > {
   constructor() {
-    super({ name: "blueprintRegistry" });
+    super("blueprintRegistry");
   }
 }

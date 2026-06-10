@@ -1,14 +1,12 @@
 import { System } from "./kernel/system.class.js";
 
-import { ServiceRegistry } from "./kernel/registry/service-registry.class.js";
-import { BlueprintRegistry } from "./kernel/registry/blueprint-registry.class.js";
+import { ServiceRegistry } from "./kernel/registries/service-registry.class.js";
+import { BlueprintRegistry } from "./kernel/registries/blueprint-registry.class.js";
 
 const system = new System();
 
-const serviceRegistry = new ServiceRegistry();
-const blueprintRegistry = new BlueprintRegistry();
+const allRegistries = [new ServiceRegistry(), new BlueprintRegistry()];
 
-system.connectRegistry(serviceRegistry);
-system.connectRegistry(blueprintRegistry);
+allRegistries.forEach((registry) => system.connectRegistry(registry));
 
 system.start();

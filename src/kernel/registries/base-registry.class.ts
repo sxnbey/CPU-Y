@@ -3,24 +3,20 @@ import { EventEmitter } from "node:events";
 import { IRegistry } from "../contracts/interfaces/registry.interface";
 import { IRegistryMap } from "../contracts/interfaces/registry-map.interface";
 
-export interface IRegistryOptions<N extends keyof IRegistryMap> {
-  name: N;
-}
-
 export abstract class BaseRegistry<T, N extends keyof IRegistryMap>
   extends EventEmitter
   implements IRegistry<T, N>
 {
   protected storage: Map<string, T>;
 
-  constructor(protected readonly options: IRegistryOptions<N>) {
+  constructor(protected readonly name: N) {
     super();
 
     this.storage = new Map();
   }
 
   public getName(): N {
-    return this.options.name;
+    return this.name;
   }
 
   public register(id: string, value: T): T {

@@ -1,14 +1,14 @@
 import { IRegistry } from "../../kernel/contracts/interfaces/registry.interface";
 import { IBlueprint } from "../../kernel/contracts/interfaces/blueprint.interface";
-import { Process } from "../../kernel/contracts/types/service.type";
+import { Service } from "../../kernel/contracts/types/service.type";
 
 import { KernelContext } from "../../kernel/kernel-context.class";
 
-export class ProcessFactory {
-  private readonly processRegistry: IRegistry<Process>;
+export class ServiceFactory {
+  private readonly serviceRegistry: IRegistry<Service, "serviceRegistry">;
 
   constructor(private readonly context: KernelContext) {
-    this.processRegistry = this.context.get("processRegistry");
+    this.serviceRegistry = this.context.get("serviceRegistry");
   }
 
   public createFromBlueprint(BlueprintClass: new () => IBlueprint): void {

@@ -2,7 +2,7 @@ import { IMainRegistry } from "./contracts/interfaces/main-registry.interface";
 import { IRegistryMap } from "./contracts/interfaces/registry-map.interface";
 
 import { KernelContext } from "./kernel-context.class";
-import { MainRegistry } from "./registry/main-registry.class";
+import { MainRegistry } from "./registries/main-registry.class";
 
 export class System {
   private registry: IMainRegistry;
