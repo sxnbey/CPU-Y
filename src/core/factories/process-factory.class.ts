@@ -1,8 +1,8 @@
-import { IRegistry } from "../contracts/interfaces/registry.interface";
-import { IBlueprint } from "../contracts/interfaces/blueprint.interface";
-import { Process } from "../contracts/types/process.type";
+import { IRegistry } from "../../kernel/contracts/interfaces/registry.interface";
+import { IBlueprint } from "../../kernel/contracts/interfaces/blueprint.interface";
+import { Process } from "../../kernel/contracts/types/service.type";
 
-import { KernelContext } from "../kernel-context.class";
+import { KernelContext } from "../../kernel/kernel-context.class";
 
 export class ProcessFactory {
   private readonly processRegistry: IRegistry<Process>;

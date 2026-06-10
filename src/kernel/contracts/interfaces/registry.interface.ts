@@ -1,9 +1,9 @@
-import { IBaseRegistry } from "./base-registry.interface";
+export interface IRegistry<V, N> {
+  getName(): N;
 
-export interface IRegistry<T> extends IBaseRegistry {
-  register(id: string, value: T): T;
+  register(id: string, value: V): V;
   delete(id: string): this;
 
-  get(id: string): T | undefined;
+  get(id: string): V | undefined;
   has(id: string): boolean;
 }

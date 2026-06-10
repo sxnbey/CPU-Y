@@ -1,9 +1,11 @@
 import { IMainRegistry } from "../contracts/interfaces/main-registry.interface";
 import { IRegistryMap } from "../contracts/interfaces/registry-map.interface";
-import { RegistryMapValue } from "../contracts/types/registry-map-value.type";
 
 export class MainRegistry implements IMainRegistry {
-  private registries = new Map<keyof IRegistryMap, RegistryMapValue>();
+  private registries = new Map<
+    keyof IRegistryMap,
+    IRegistryMap[keyof IRegistryMap]
+  >();
 
   public register<K extends keyof IRegistryMap>(
     key: K,
