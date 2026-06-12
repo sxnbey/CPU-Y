@@ -2,11 +2,11 @@ import { EventEmitter } from "node:events";
 
 import { IRegistry, IRegistryMap } from "../contracts/interfaces";
 
-export abstract class BaseRegistry<T, N extends keyof IRegistryMap>
+export abstract class BaseRegistry<V, N extends keyof IRegistryMap>
   extends EventEmitter
-  implements IRegistry<T, N>
+  implements IRegistry<V, N>
 {
-  protected storage: Map<string, T>;
+  protected storage: Map<string, V>;
 
   constructor(protected readonly name: N) {
     super();
@@ -18,7 +18,7 @@ export abstract class BaseRegistry<T, N extends keyof IRegistryMap>
     return this.name;
   }
 
-  public register(id: string, value: T): T {
+  public register(id: string, value: V): V {
     this.storage.set(id, value);
 
     this.emit("register", id, value);
@@ -34,7 +34,7 @@ export abstract class BaseRegistry<T, N extends keyof IRegistryMap>
     return this;
   }
 
-  public get(id: string): T | undefined {
+  public get(id: string): V | undefined {
     return this.storage.get(id);
   }
 

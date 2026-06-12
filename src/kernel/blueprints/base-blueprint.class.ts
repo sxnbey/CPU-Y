@@ -2,19 +2,19 @@ import {
   IBlueprint,
   IBlueprintOptions,
   IRegistryMap,
-} from "./contracts/interfaces";
-import { ValidationRules } from "./contracts/types";
+} from "../contracts/interfaces";
+import { BlueprintSchemaRules } from "../contracts/types";
 
-import { KernelContext } from "./kernel-context.class";
+import { KernelContext } from "../kernel-context.class";
 
 export abstract class BaseBlueprint implements IBlueprint {
-  static readonly rules: ValidationRules = {
+  static readonly rules: BlueprintSchemaRules = {
     id: { type: "string", required: true },
     targetRegistry: { type: "string", required: true },
   };
 
-  readonly id: string;
-  readonly targetRegistry: keyof IRegistryMap;
+  readonly id!: string;
+  readonly targetRegistry!: keyof IRegistryMap;
 
   private _context!: KernelContext;
 
