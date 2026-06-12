@@ -4,13 +4,13 @@ import { BaseBlueprint } from "../../kernel/blueprints/base-blueprint.class";
 import { DynamicBlueprint } from "../../kernel/blueprints/dynamic-blueprint.class";
 
 export class ServiceFactory {
-  /**  If source is a child of BaseBlueprint, it returns the instantiated class. */
+  /**  If source is a child of BaseBlueprint, it returns the instantiated service. */
   public create<C extends new () => BaseBlueprint>(source: C): InstanceType<C>;
 
   /** If source is a child instance of BaseBlueprint, it returns the instance. */
   public create<I extends BaseBlueprint>(source: I): I;
 
-  /** If source is a plain object satisfying the IBlueprint interface, it returns an instantiated service. */
+  /** If source is a plain object satisfying the IBlueprint interface, it returns the instantiated service. */
   public create<T extends IBlueprint>(source: T): DynamicBlueprint & T;
 
   public create(source: any): any {
