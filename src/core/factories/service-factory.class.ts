@@ -7,7 +7,7 @@ export class ServiceFactory {
   /**  If source is a child of BaseBlueprint, it returns the instantiated class. */
   public create<C extends new () => BaseBlueprint>(source: C): InstanceType<C>;
 
-  /** If source is an instance that's extending BaseBlueprint, it returns the instance. */
+  /** If source is a child instance of BaseBlueprint, it returns the instance. */
   public create<I extends BaseBlueprint>(source: I): I;
 
   /** If source is a plain object satisfying the IBlueprint interface, it returns an instantiated service. */
