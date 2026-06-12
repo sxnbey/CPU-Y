@@ -4,8 +4,8 @@ import { BaseBlueprint } from "../../kernel/blueprints/base-blueprint.class";
 import { DynamicBlueprint } from "../../kernel/blueprints/dynamic-blueprint.class";
 
 export class ServiceFactory {
-  /**  If source is a class implementing IBlueprint, it returns the instantiated class. */
-  public create<C extends new () => IBlueprint>(source: C): InstanceType<C>;
+  /**  If source is a child of BaseBlueprint, it returns the instantiated class. */
+  public create<C extends new () => BaseBlueprint>(source: C): InstanceType<C>;
 
   /** If source is an instance that's extending BaseBlueprint, it returns the instance. */
   public create<I extends BaseBlueprint>(source: I): I;
@@ -14,6 +14,8 @@ export class ServiceFactory {
   public create<T extends IBlueprint>(source: T): DynamicBlueprint & T;
 
   public create(source: any): any {
+    // runtime checks still needed
+
     if (this.isChildClassOfBlueprint(source)) {
       const RawService = source;
 

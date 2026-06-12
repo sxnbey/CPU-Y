@@ -13,8 +13,8 @@ export abstract class BaseBlueprint implements IBlueprint {
     targetRegistry: { type: "string", required: true },
   };
 
-  readonly id!: string;
-  readonly targetRegistry!: keyof IRegistryMap;
+  readonly id: string;
+  readonly targetRegistry: keyof IRegistryMap;
 
   private _context!: KernelContext;
 
