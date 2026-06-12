@@ -4,39 +4,36 @@ import { BaseBlueprint } from "../../kernel/blueprints/base-blueprint.class";
 import { DynamicBlueprint } from "../../kernel/blueprints/dynamic-blueprint.class";
 
 export class ServiceFactory {
-  public create<C extends new () => IBlueprint>(RawService: C): InstanceType<C>;
+  /**  If source is a class implementing IBlueprint, it returns the instantiated class. */
+  public create<C extends new () => IBlueprint>(source: C): InstanceType<C>;
 
-  public create<I extends BaseBlueprint>(RawService: I): I;
+  /** If source is an instance that's extending BaseBlueprint, it returns the instance. */
+  public create<I extends BaseBlueprint>(source: I): I;
 
-  public create<T extends Record<string, any>>(
-    RawService: T,
-  ): DynamicBlueprint & T;
+  /** If source is a plain object satisfying the IBlueprint interface, it returns an instantiated service. */
+  public create<T extends IBlueprint>(source: T): DynamicBlueprint & T;
 
-  public create(RawService: any): any {
-    if (this.isChildClassOfBlueprint(RawService)) {
-      const serviceInstance = new RawService();
+  public create(source: any): any {
+    if (this.isChildClassOfBlueprint(source)) {
+      const RawService = source;
 
-      return serviceInstance;
+      return new RawService();
     }
 
-    if (this.isChildInstanceOfBlueprint(RawService)) return RawService;
+    if (this.isChildInstanceOfBlueprint(source)) return source;
 
-    const rawServiceObject = RawService;
-
-    return new DynamicBlueprint(rawServiceObject);
+    return new DynamicBlueprint(source);
   }
 
   private isChildClassOfBlueprint(
-    target: (new () => IBlueprint) | IBlueprint,
+    target: unknown,
   ): target is new () => BaseBlueprint {
     if (typeof target != "function") return false;
 
     return target.prototype instanceof BaseBlueprint;
   }
 
-  private isChildInstanceOfBlueprint(
-    target: (new () => IBlueprint) | IBlueprint,
-  ): target is BaseBlueprint {
+  private isChildInstanceOfBlueprint(target: unknown): target is BaseBlueprint {
     return target instanceof BaseBlueprint;
   }
 }
