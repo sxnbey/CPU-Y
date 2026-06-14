@@ -14,7 +14,7 @@ export abstract class BaseBlueprint implements IBlueprint {
   readonly id: string;
   readonly targetRegistry: keyof IRegistryMap;
 
-  static readonly rules: BlueprintSchemaRules = {
+  readonly rules: BlueprintSchemaRules = {
     id: { type: "string", required: true },
     targetRegistry: { type: "string", required: true },
   };
@@ -22,7 +22,7 @@ export abstract class BaseBlueprint implements IBlueprint {
   private _context!: KernelContext;
 
   constructor(options?: IBlueprintOptions) {
-    const StaticSource = this.constructor as typeof BaseBlueprint;
+    const StaticSource = this.constructor as any;
 
     const id = options?.id || StaticSource.id;
     const targetRegistry =
@@ -48,8 +48,6 @@ export abstract class BaseBlueprint implements IBlueprint {
 
     this.onInitialize();
   }
-
-  // Optional method for custom logic after init.
 
   protected onInitialize(): void {}
 }

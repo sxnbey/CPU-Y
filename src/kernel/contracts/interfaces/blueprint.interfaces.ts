@@ -2,6 +2,11 @@ import { IRegistryMap } from "./registry.interfaces";
 
 import { KernelContext } from "../../kernel-context.class";
 
+export interface IBlueprintMetaStatics {
+  id: string;
+  targetRegistry: keyof IRegistryMap;
+}
+
 export interface IBlueprintOptions {
   id: string;
   targetRegistry: keyof IRegistryMap;

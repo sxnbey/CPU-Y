@@ -25,4 +25,6 @@ export class System {
   ): void {
     this.registry.register(registry.getName(), registry);
   }
+
+  public register(): void {}
 }

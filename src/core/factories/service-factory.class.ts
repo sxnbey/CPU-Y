@@ -1,6 +1,7 @@
 import {
   IDynamicBlueprintOptions,
   IBlueprintOptions,
+  IBlueprintMetaStatics,
 } from "../../kernel/contracts/interfaces";
 
 import { BaseBlueprint } from "../../kernel/blueprints/base-blueprint.class";
@@ -20,16 +21,37 @@ type ReturnValue =
   | DynamicBlueprint;
 
 export class ServiceFactory {
-  /**  If source is a child of BaseBlueprint, it returns the instantiated service. */
-  public create<C extends BaseBlueprintChild>(
+  /** Generates a new service from a given blueprint. Statics with metadata are mandatory.
+   *  Source class has to accept their configuration object as first parameter in constructor.
+   *
+   *  @param source - The blueprint to instantiate.
+   *  @param options - The configuration object.
+   */
+  public create<C extends BaseBlueprintChild & IBlueprintMetaStatics>(
     source: C,
     options?: ConstructorParameters<C>[0],
   ): InstanceType<C>;
 
-  /** If source is a child instance of BaseBlueprint, it returns the instance. */
+  /** Generates a new service from a given blueprint. Options with metadata are mandatory.
+   *  Source class has to accept their configuration object as first parameter in constructor.
+   *
+   *  @param source - The blueprint to instantiate.
+   *  @param options - The configuration object.
+   */
+  public create<C extends BaseBlueprintChild>(
+    source: C,
+    options: ConstructorParameters<C>[0] & IBlueprintOptions,
+  ): InstanceType<C>;
+
+  /** Passes through an already instantiated service.
+   *
+   *  @param source - The instantiated service.
+   */
   public create<I extends BaseBlueprintChildInstance>(source: I): I;
 
-  /** If source is a plain object satisfying the IDynamicBlueprintOptions interface, it returns the instantiated service. */
+  /** Generates a new service from a raw configuration object.
+   *  @param source - The raw configuration object.
+   */
   public create<T extends RawBlueprintOptions>(source: T): DynamicBlueprint & T;
 
   public create(source: Source, options?: IBlueprintOptions): ReturnValue {
@@ -51,7 +73,7 @@ export class ServiceFactory {
   ): target is new (options?: IBlueprintOptions) => BaseBlueprint {
     if (typeof target != "function") return false;
 
-    return target.prototype instanceof BaseBlueprint;
+    return BaseBlueprint.isPrototypeOf(target);
   }
 
   private isChildInstanceOfBlueprint(target: unknown): target is BaseBlueprint {
