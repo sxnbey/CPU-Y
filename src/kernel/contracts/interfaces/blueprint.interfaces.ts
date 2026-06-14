@@ -5,11 +5,18 @@ import { KernelContext } from "../../kernel-context.class";
 export interface IBlueprintOptions {
   id: string;
   targetRegistry: keyof IRegistryMap;
-  [key: string]: any;
 }
 
 export interface IBlueprint extends IBlueprintOptions {
   initialize(context: KernelContext): void;
+}
+
+export interface IDynamicBlueprintOptions extends IBlueprintOptions {
+  [key: string]: unknown;
+}
+
+export interface IDynamicBlueprint extends IBlueprint {
+  [key: string]: unknown;
 }
 
 export interface IBlueprintSchemaRule {
