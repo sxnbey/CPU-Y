@@ -21,12 +21,12 @@ export abstract class BaseBlueprint implements IBlueprint {
 
   private _context!: KernelContext;
 
-  constructor(options?: IBlueprintConfig) {
-    const StaticSource = this.constructor as any;
+  constructor(config?: IBlueprintConfig) {
+    const StaticSource = this.constructor as any as BaseBlueprint;
 
-    const id = options?.id || StaticSource.id;
+    const id = config?.id || StaticSource.id;
     const targetRegistry =
-      options?.targetRegistry || StaticSource.targetRegistry;
+      config?.targetRegistry || StaticSource.targetRegistry;
 
     if (!id || !targetRegistry)
       throw new Error(
