@@ -1,18 +1,18 @@
 import {
   IBlueprint,
-  IBlueprintOptions,
-  IRegistryMap,
-} from "../contracts/interfaces";
-import { BlueprintSchemaRules } from "../contracts/types";
+  IBlueprintConfig,
+  BlueprintSchemaRules,
+  RegistryMap,
+} from "../contracts";
 
 import { KernelContext } from "../kernel-context.class";
 
 export abstract class BaseBlueprint implements IBlueprint {
   static id: string;
-  static targetRegistry: keyof IRegistryMap;
+  static targetRegistry: keyof RegistryMap;
 
   readonly id: string;
-  readonly targetRegistry: keyof IRegistryMap;
+  readonly targetRegistry: keyof RegistryMap;
 
   readonly rules: BlueprintSchemaRules = {
     id: { type: "string", required: true },
@@ -21,7 +21,7 @@ export abstract class BaseBlueprint implements IBlueprint {
 
   private _context!: KernelContext;
 
-  constructor(options?: IBlueprintOptions) {
+  constructor(options?: IBlueprintConfig) {
     const StaticSource = this.constructor as any;
 
     const id = options?.id || StaticSource.id;

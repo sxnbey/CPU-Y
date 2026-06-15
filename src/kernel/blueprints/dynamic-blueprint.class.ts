@@ -1,7 +1,4 @@
-import {
-  IDynamicBlueprintOptions,
-  IDynamicBlueprint,
-} from "../contracts/interfaces";
+import { IDynamicBlueprintConfig, IDynamicBlueprint } from "../contracts";
 
 import { BaseBlueprint } from "./base-blueprint.class";
 
@@ -11,14 +8,14 @@ export class DynamicBlueprint
 {
   [key: string]: unknown;
 
-  constructor(options?: IDynamicBlueprintOptions) {
-    super(options);
+  constructor(config?: IDynamicBlueprintConfig) {
+    super(config);
 
-    if (options) this.assignProperties(options);
+    if (config) this.assignProperties(config);
   }
 
-  private assignProperties(options: IDynamicBlueprintOptions): void {
-    Object.entries(options).forEach(([key, value]) => {
+  private assignProperties(config: IDynamicBlueprintConfig): void {
+    Object.entries(config).forEach(([key, value]) => {
       if (Object.hasOwn(this, key)) return;
 
       this[key] = value;

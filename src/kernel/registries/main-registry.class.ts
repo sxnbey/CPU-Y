@@ -1,19 +1,21 @@
-import { IMainRegistry, IRegistryMap } from "../contracts/interfaces";
+import { IMainRegistry, RegistryMap } from "../contracts";
 
 export class MainRegistry implements IMainRegistry {
   private registries = new Map<
-    keyof IRegistryMap,
-    IRegistryMap[keyof IRegistryMap]
+    keyof RegistryMap,
+    RegistryMap[keyof RegistryMap]
   >();
 
-  public register<K extends keyof IRegistryMap>(
+  // tuple als mapped type über registrymap
+
+  public register<K extends keyof RegistryMap>(
     key: K,
-    registry: IRegistryMap[K],
+    registry: RegistryMap[K],
   ): void {
     this.registries.set(key, registry);
   }
 
-  public get<K extends keyof IRegistryMap>(key: K): IRegistryMap[K] {
-    return this.registries.get(key) as IRegistryMap[K];
+  public get<K extends keyof RegistryMap>(key: K): RegistryMap[K] {
+    return this.registries.get(key) as RegistryMap[K];
   }
 }

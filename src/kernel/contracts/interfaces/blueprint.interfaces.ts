@@ -1,22 +1,17 @@
-import { IRegistryMap } from "./registry.interfaces";
+import { RegistryMap } from "..";
 
 import { KernelContext } from "../../kernel-context.class";
 
-export interface IBlueprintMetaStatics {
+export interface IBlueprintConfig {
   id: string;
-  targetRegistry: keyof IRegistryMap;
+  targetRegistry: keyof RegistryMap;
 }
 
-export interface IBlueprintOptions {
-  id: string;
-  targetRegistry: keyof IRegistryMap;
-}
-
-export interface IBlueprint extends IBlueprintOptions {
+export interface IBlueprint extends IBlueprintConfig {
   initialize(context: KernelContext): void;
 }
 
-export interface IDynamicBlueprintOptions extends IBlueprintOptions {
+export interface IDynamicBlueprintConfig extends IBlueprintConfig {
   [key: string]: unknown;
 }
 
@@ -27,4 +22,9 @@ export interface IDynamicBlueprint extends IBlueprint {
 export interface IBlueprintSchemaRule {
   type: "string" | "number" | "boolean";
   required: boolean;
+}
+
+export interface IBlueprintMetadata {
+  id: string;
+  targetRegistry: keyof RegistryMap;
 }

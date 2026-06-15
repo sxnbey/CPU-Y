@@ -1,7 +1,6 @@
-import { IBlueprint } from "./blueprint.interfaces";
-import { Service } from "../types/service.type";
+import { IBlueprintMetadata, RegistryMap } from "..";
 
-export interface IRegistry<V, N> {
+export interface IRegistry<N, V> {
   getName(): N;
 
   register(id: string, value: V): V;
@@ -12,15 +11,12 @@ export interface IRegistry<V, N> {
 }
 
 export interface IMainRegistry {
-  register<K extends keyof IRegistryMap>(
-    key: K,
-    registry: IRegistryMap[K],
-  ): void;
+  register<K extends keyof RegistryMap>(key: K, registry: RegistryMap[K]): void;
 
-  get<K extends keyof IRegistryMap>(key: K): IRegistryMap[K];
+  get<K extends keyof RegistryMap>(key: K): RegistryMap[K];
 }
 
-export interface IRegistryMap {
-  serviceRegistry: IRegistry<Service, "serviceRegistry">;
-  blueprintRegistry: IRegistry<IBlueprint, "blueprintRegistry">;
+export interface IRegistryPayloadMap {
+  serviceRegistry: IBlueprintMetadata;
+  blueprintRegistry: IBlueprintMetadata;
 }

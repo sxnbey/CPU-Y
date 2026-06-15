@@ -1,15 +1,12 @@
-import { IMainRegistry, IRegistryMap } from "./contracts/interfaces";
+import { IMainRegistry, RegistryMap } from "./contracts";
 
-import { KernelContext } from "./kernel-context.class";
 import { MainRegistry } from "./registries/main-registry.class";
 
 export class System {
   private registry: IMainRegistry;
-  context: KernelContext;
 
   constructor() {
     this.registry = new MainRegistry();
-    this.context = new KernelContext(this.registry);
   }
 
   public start(): boolean {
@@ -20,8 +17,8 @@ export class System {
     return true;
   }
 
-  public connectRegistry<K extends keyof IRegistryMap>(
-    registry: IRegistryMap[K],
+  public connectRegistry<K extends keyof RegistryMap>(
+    registry: RegistryMap[K],
   ): void {
     this.registry.register(registry.getName(), registry);
   }
