@@ -8,12 +8,12 @@ import { DynamicBlueprint } from "../../kernel/blueprints/dynamic-blueprint.clas
 
 type BaseBlueprintChild = new (...args: any[]) => BaseBlueprint;
 type BaseBlueprintChildInstance = BaseBlueprint;
-type RawBlueprintOptions = IDynamicBlueprintConfig;
+type RawBlueprintConfig = IDynamicBlueprintConfig;
 
 type Source =
   | BaseBlueprintChild
   | BaseBlueprintChildInstance
-  | RawBlueprintOptions;
+  | RawBlueprintConfig;
 type ReturnValue =
   | InstanceType<BaseBlueprintChild>
   | BaseBlueprintChildInstance
@@ -21,25 +21,25 @@ type ReturnValue =
 
 export class InstanceFactory {
   /** Generates a new instance from a given blueprint. Statics with metadata are mandatory.
-   *  Source class has to accept their configuration object as first parameter in constructor.
+   *  Source class has to accept their configuration object as first parameter in constructor, if one is provided.
    *
    *  @param source - The blueprint to instantiate.
-   *  @param options - The configuration object.
+   *  @param config - The configuration object.
    */
   public create<C extends BaseBlueprintChild & IBlueprintConfig>(
     source: C,
-    options?: ConstructorParameters<C>[0],
+    config?: ConstructorParameters<C>[0],
   ): InstanceType<C>;
 
-  /** Generates a new instance from a given blueprint. Options with metadata are mandatory.
+  /** Generates a new instance from a given blueprint. Config with metadata is mandatory.
    *  Source class has to accept their configuration object as first parameter in constructor.
    *
    *  @param source - The blueprint to instantiate.
-   *  @param options - The configuration object.
+   *  @param config - The configuration object.
    */
   public create<C extends BaseBlueprintChild>(
     source: C,
-    options: ConstructorParameters<C>[0] & IBlueprintConfig,
+    config: ConstructorParameters<C>[0] & IBlueprintConfig,
   ): InstanceType<C>;
 
   /** Passes an instance through.
@@ -51,15 +51,15 @@ export class InstanceFactory {
   /** Generates a new instance from a raw configuration object.
    *  @param source - The raw configuration object.
    */
-  public create<T extends RawBlueprintOptions>(source: T): DynamicBlueprint & T;
+  public create<T extends RawBlueprintConfig>(source: T): DynamicBlueprint & T;
 
-  public create(source: Source, options?: IBlueprintConfig): ReturnValue {
+  public create(source: Source, config?: IBlueprintConfig): ReturnValue {
     // runtime checks still needed
 
     if (this.isChildClassOfBlueprint(source)) {
       const RawService = source;
 
-      return new RawService(options);
+      return new RawService(config);
     }
 
     if (this.isChildInstanceOfBlueprint(source)) return source;
