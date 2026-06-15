@@ -49,6 +49,7 @@ export class InstanceFactory {
   public create<I extends BaseBlueprintChildInstance>(source: I): I;
 
   /** Generates a new instance from a raw configuration object.
+   *
    *  @param source - The raw configuration object.
    */
   public create<T extends RawBlueprintConfig>(source: T): DynamicBlueprint & T;
