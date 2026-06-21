@@ -1,16 +1,12 @@
-import {
-  IBlueprint,
-  IBlueprintConfig,
-  BlueprintSchemaRules,
-  RegistryMap,
-} from "../contracts";
+import "reflect-metadata";
+
+import { IBlueprint, BlueprintSchemaRules, RegistryMap } from "../contracts";
 
 import { KernelContext } from "../kernel-context.class";
 
-export abstract class BaseBlueprint implements IBlueprint {
-  static id: string;
-  static targetRegistry: keyof RegistryMap;
-
+export abstract class BaseBlueprint<
+  TConfig = {},
+> implements IBlueprint<TConfig> {
   readonly id: string;
   readonly targetRegistry: keyof RegistryMap;
 
@@ -21,20 +17,16 @@ export abstract class BaseBlueprint implements IBlueprint {
 
   private _context!: KernelContext;
 
-  constructor(config?: IBlueprintConfig) {
-    const StaticSource = this.constructor as any as BaseBlueprint;
+  constructor(readonly config?: TConfig) {
+    const metadata = Reflect.getMetadata("system:metadata", this);
 
-    const id = config?.id || StaticSource.id;
-    const targetRegistry =
-      config?.targetRegistry || StaticSource.targetRegistry;
-
-    if (!id || !targetRegistry)
+    if (!metadata?.id || !metadata?.targetRegistry)
       throw new Error(
-        "Blueprint must have an id and targetRegistry defined, either as static properties or passed in the options.",
+        `Blueprint ${this.constructor.name} must have an "id" and "targetRegistry" set via @Metadata decorator.`,
       );
 
-    this.id = id;
-    this.targetRegistry = targetRegistry;
+    this.id = metadata?.id;
+    this.targetRegistry = metadata?.targetRegistry;
   }
 
   protected get context(): KernelContext {

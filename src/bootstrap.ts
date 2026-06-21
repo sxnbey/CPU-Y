@@ -1,11 +1,9 @@
 import { System } from "./kernel/system.class";
-
-import { ServiceRegistry } from "./core/registries/service-registry.class";
-import { BlueprintRegistry } from "./core/registries/blueprint-registry.class";
+import { InstanceRegistry } from "./core/registries/instance-registry.class";
 
 const system = new System();
 
-const allRegistries = [new ServiceRegistry(), new BlueprintRegistry()];
+const allRegistries = [new InstanceRegistry()];
 
 allRegistries.forEach((registry) => system.connectRegistry(registry));
 

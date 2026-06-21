@@ -2,8 +2,8 @@ import { IDynamicBlueprintConfig, IDynamicBlueprint } from "../contracts";
 
 import { BaseBlueprint } from "./base-blueprint.class";
 
-export class DynamicBlueprint
-  extends BaseBlueprint
+export abstract class DynamicBlueprint
+  extends BaseBlueprint<IDynamicBlueprintConfig>
   implements IDynamicBlueprint
 {
   [key: string]: unknown;
@@ -16,7 +16,7 @@ export class DynamicBlueprint
 
   private assignProperties(config: IDynamicBlueprintConfig): void {
     Object.entries(config).forEach(([key, value]) => {
-      if (Object.hasOwn(this, key)) return;
+      if (key in this) return;
 
       this[key] = value;
     });

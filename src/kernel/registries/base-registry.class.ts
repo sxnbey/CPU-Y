@@ -1,10 +1,10 @@
 import { EventEmitter } from "node:events";
 
-import { IRegistry, RegistryMap } from "../contracts";
+import { IRegistry, IRegistryPayloadMap, RegistryMap } from "../contracts";
 
 export abstract class BaseRegistry<
   N extends keyof RegistryMap,
-  V extends RegistryMap[N] = RegistryMap[N],
+  V = IRegistryPayloadMap[N],
 >
   extends EventEmitter
   implements IRegistry<N, V>

@@ -1,4 +1,4 @@
-import { IBlueprintMetadata, RegistryMap } from "..";
+import { IMetadata, RegistryMap } from "..";
 
 export interface IRegistry<N, V> {
   getName(): N;
@@ -13,10 +13,14 @@ export interface IRegistry<N, V> {
 export interface IMainRegistry {
   register<K extends keyof RegistryMap>(key: K, registry: RegistryMap[K]): void;
 
-  get<K extends keyof RegistryMap>(key: K): RegistryMap[K];
+  get<R extends keyof RegistryMap>(registry: R): RegistryMap[R];
+  has<R extends keyof RegistryMap>(
+    registry: R | string,
+  ): registry is keyof RegistryMap;
+
+  getAllRegistries<K extends keyof RegistryMap>(): RegistryMap[K][];
 }
 
 export interface IRegistryPayloadMap {
-  serviceRegistry: IBlueprintMetadata;
-  blueprintRegistry: IBlueprintMetadata;
+  instanceRegistry: IMetadata;
 }

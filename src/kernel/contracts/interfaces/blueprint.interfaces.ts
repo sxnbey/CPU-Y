@@ -1,30 +1,25 @@
-import { RegistryMap } from "..";
+import { IMetadata, RegistryMap } from "..";
 
 import { KernelContext } from "../../kernel-context.class";
 
-export interface IBlueprintConfig {
-  id: string;
-  targetRegistry: keyof RegistryMap;
-}
+export interface IBlueprint<TConfig> extends IMetadata {
+  config?: TConfig | undefined;
 
-export interface IBlueprint extends IBlueprintConfig {
   initialize(context: KernelContext): void;
 }
 
-export interface IDynamicBlueprintConfig extends IBlueprintConfig {
+export interface IDynamicBlueprintConfig {
+  id: string;
+  targetRegistry: keyof RegistryMap;
+
   [key: string]: unknown;
 }
 
-export interface IDynamicBlueprint extends IBlueprint {
+export interface IDynamicBlueprint extends IBlueprint<IDynamicBlueprintConfig> {
   [key: string]: unknown;
 }
 
 export interface IBlueprintSchemaRule {
   type: "string" | "number" | "boolean";
   required: boolean;
-}
-
-export interface IBlueprintMetadata {
-  id: string;
-  targetRegistry: keyof RegistryMap;
 }

@@ -23,5 +23,16 @@ export class System {
     this.registry.register(registry.getName(), registry);
   }
 
-  public register(): void {}
+  public find<K extends keyof RegistryMap>(target: K): RegistryMap[K];
+
+  public find(target: string): any;
+
+  public find(target: string): any {
+    if (this.registry.has(target)) return this.registry.get(target);
+
+    return this.registry
+      .getAllRegistries()
+      .find((registry) => registry.has(target))
+      ?.get(target);
+  }
 }
