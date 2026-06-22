@@ -1,11 +1,7 @@
-import { IMetadata, RegistryMap } from "..";
-
-import { KernelContext } from "../../kernel-context.class";
+import { IMetadata, RegistryMap } from "../index.js";
 
 export interface IBlueprint<TConfig> extends IMetadata {
   config?: TConfig | undefined;
-
-  initialize(context: KernelContext): void;
 }
 
 export interface IDynamicBlueprintConfig {

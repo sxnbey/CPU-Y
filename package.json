@@ -20,5 +20,10 @@
   },
   "devDependencies": {
     "@types/node": "^25.8.0"
+  },
+  "type": "module",
+  "imports": {
+    "#kernel/*": "./dist/kernel/*.js",
+    "#core/*": "./dist/core/*.js"
   }
 }

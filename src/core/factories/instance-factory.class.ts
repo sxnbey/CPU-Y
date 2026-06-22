@@ -1,11 +1,11 @@
 import "reflect-metadata";
 
-import { IDynamicBlueprintConfig } from "../../kernel/contracts";
+import type { IDynamicBlueprintConfig } from "#kernel/contracts/index";
 
-import { BaseBlueprint } from "../../kernel/blueprints/base-blueprint.class";
-import { DynamicBlueprint } from "../../kernel/blueprints/dynamic-blueprint.class";
-import { InstanceRegistry } from "../registries/instance-registry.class";
-import { Metadata, Inject } from "../../kernel/decorators";
+import { BaseBlueprint } from "#kernel/blueprints/base-blueprint.class";
+import { DynamicBlueprint } from "#kernel/blueprints/dynamic-blueprint.class";
+import { RegistryResolver } from "#kernel/registry-resolver.class";
+import { Metadata, Inject } from "#kernel/decorators/index";
 
 type BaseBlueprintChild = new (...args: any[]) => BaseBlueprint<unknown>;
 type RawBlueprintConfig = IDynamicBlueprintConfig;
@@ -15,7 +15,10 @@ type ReturnValue = InstanceType<BaseBlueprintChild> | DynamicBlueprint;
 
 @Metadata({ id: "instanceFactory", targetRegistry: "instanceRegistry" })
 export class InstanceFactory {
-  constructor(@Inject("instanceRegistry") instanceRegistry: InstanceRegistry) {}
+  constructor(
+    @Inject("instanceRegistry")
+    private readonly registryResolver: RegistryResolver,
+  ) {}
 
   public create<C extends BaseBlueprintChild>(
     source: C,

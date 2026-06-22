@@ -1,6 +1,6 @@
 import "reflect-metadata";
 
-export function InjectConfig(): Function {
+export function Config(): Function {
   return (
     target: Object,
     _propertyKey: string | symbol | undefined,

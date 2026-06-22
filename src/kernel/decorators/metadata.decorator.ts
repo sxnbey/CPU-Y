@@ -1,6 +1,6 @@
 import "reflect-metadata";
 
-import { IMetadata } from "../contracts";
+import { IMetadata } from "../contracts/index.js";
 
 export function Metadata(metadata: IMetadata): Function {
   return (target: Function) => {

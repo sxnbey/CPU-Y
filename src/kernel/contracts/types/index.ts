@@ -1,2 +1,2 @@
-export type * from "./blueprint-schema-rules.type";
-export type * from "./registry-map.type";
+export type * from "./blueprint-schema-rules.type.js";
+export type * from "./registry-map.type.js";

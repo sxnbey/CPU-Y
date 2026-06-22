@@ -1,5 +1,5 @@
-import { System } from "./kernel/system.class";
-import { InstanceRegistry } from "./core/registries/instance-registry.class";
+import { System } from "#core/system.class";
+import { InstanceRegistry } from "#core/registries/instance-registry.class";
 
 const system = new System();
 

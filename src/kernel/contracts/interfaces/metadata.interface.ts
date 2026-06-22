@@ -1,4 +1,4 @@
-import { RegistryMap } from "..";
+import { RegistryMap } from "../index.js";
 
 export interface IMetadata {
   id: string;

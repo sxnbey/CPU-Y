@@ -7,7 +7,7 @@ export function Inject(id: string): Function {
     parameterIndex: number,
   ) => {
     const existingDependencies: string[] =
-      Reflect.getMetadata("system:dependencies", target) || [];
+      Reflect.getOwnMetadata("system:dependencies", target) || [];
     const dependencies = [...existingDependencies];
 
     dependencies[parameterIndex] = id;

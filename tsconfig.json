@@ -22,7 +22,11 @@
     "noFallthroughCasesInSwitch": true,
     "allowJs": true,
     "emitDecoratorMetadata": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "paths": {
+      "#kernel/*": ["./src/kernel/*"],
+      "#core/*": ["./src/core/*"]
+    }
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

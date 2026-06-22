@@ -1,3 +1,4 @@
-export { Metadata } from "./metadata.decorator";
-export { InjectConfig } from "./inject-config.decorator";
-export { Inject } from "./inject-parameter.decorator";
+export { Metadata } from "./metadata.decorator.js";
+export { Config } from "./inject-config.decorator.js";
+export { Inject } from "./inject-parameter.decorator.js";
+export { Rules } from "./rules.decorator.js";

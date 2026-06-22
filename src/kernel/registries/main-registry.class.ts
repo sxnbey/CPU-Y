@@ -1,6 +1,6 @@
-import { IMainRegistry, RegistryMap } from "../contracts";
+import { RegistryMap } from "../contracts/index.js";
 
-export class MainRegistry implements IMainRegistry {
+export class MainRegistry {
   private registries: Partial<RegistryMap> = {};
 
   public register<K extends keyof RegistryMap>(

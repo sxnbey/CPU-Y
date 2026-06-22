@@ -1,4 +1,4 @@
-import { IMetadata, RegistryMap } from "..";
+import { IMetadata } from "../index.js";
 
 export interface IRegistry<N, V> {
   getName(): N;
@@ -8,17 +8,6 @@ export interface IRegistry<N, V> {
 
   get(id: string): V | undefined;
   has(id: string): boolean;
-}
-
-export interface IMainRegistry {
-  register<K extends keyof RegistryMap>(key: K, registry: RegistryMap[K]): void;
-
-  get<R extends keyof RegistryMap>(registry: R): RegistryMap[R];
-  has<R extends keyof RegistryMap>(
-    registry: R | string,
-  ): registry is keyof RegistryMap;
-
-  getAllRegistries<K extends keyof RegistryMap>(): RegistryMap[K][];
 }
 
 export interface IRegistryPayloadMap {

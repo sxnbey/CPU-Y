@@ -1,6 +1,9 @@
-import { IDynamicBlueprintConfig, IDynamicBlueprint } from "../contracts";
+import {
+  IDynamicBlueprintConfig,
+  IDynamicBlueprint,
+} from "../contracts/index.js";
 
-import { BaseBlueprint } from "./base-blueprint.class";
+import { BaseBlueprint } from "./base-blueprint.class.js";
 
 export abstract class DynamicBlueprint
   extends BaseBlueprint<IDynamicBlueprintConfig>
@@ -9,7 +12,7 @@ export abstract class DynamicBlueprint
   [key: string]: unknown;
 
   constructor(config?: IDynamicBlueprintConfig) {
-    super(config);
+    super();
 
     if (config) this.assignProperties(config);
   }

@@ -1,3 +1,3 @@
-export type * from "./blueprint.interfaces";
-export type * from "./registry.interfaces";
-export type * from "./metadata.interface";
+export type * from "./blueprint.interfaces.js";
+export type * from "./registry.interfaces.js";
+export type * from "./metadata.interface.js";
