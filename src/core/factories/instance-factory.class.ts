@@ -16,33 +16,52 @@ type ReturnValue = InstanceType<BaseBlueprintChild> | DynamicBlueprint;
 @Metadata({ id: "instanceFactory", targetRegistry: "instanceRegistry" })
 export class InstanceFactory {
   constructor(
-    @Inject("instanceRegistry")
+    @Inject("registryResolver")
     private readonly registryResolver: RegistryResolver,
   ) {}
 
   public create<C extends BaseBlueprintChild>(
     source: C,
-    config: ConstructorParameters<C>[0],
+    config: Record<string, unknown>,
   ): InstanceType<C>;
 
   public create<T extends RawBlueprintConfig>(source: T): DynamicBlueprint & T;
 
-  public create(source: Source, config?: any): ReturnValue {
+  public create(source: Source, config?: Record<string, unknown>): ReturnValue {
     if (this.isChildClassOfBlueprint(source)) {
       const Blueprint = source;
+      const args = [];
 
-      return new Blueprint(config);
+      const configIndex = Reflect.getMetadata("system:config", Blueprint);
+      const injectableParameters: Record<number, string> =
+        Reflect.getMetadata("system:dependencies", Blueprint) || {};
+
+      for (let i = 0; i < Blueprint.length; i++) {
+        const dependencyId = injectableParameters?.[i];
+
+        if (i != configIndex && !dependencyId)
+          throw new Error(
+            `Missing dependency for parameter at index ${i} in blueprint ${Blueprint.name}. Please use the @Inject decorator to provide a dependency or @Config decorator to provide a configuration.`,
+          );
+
+        if (dependencyId) {
+          const dependency = this.registryResolver.find(dependencyId);
+
+          if (!dependency)
+            throw new Error(
+              `Dependency with id ${dependencyId} not found in the registry for blueprint ${Blueprint.name}.`,
+            );
+
+          args[i] = dependency;
+        }
+
+        if (i == configIndex) args[i] = config;
+      }
+
+      return new Blueprint(...args);
     }
 
-    class DynamicClass extends DynamicBlueprint {}
-
-    Reflect.defineMetadata(
-      "system:metadata",
-      { id: source.id, targetRegistry: source.targetRegistry },
-      DynamicClass,
-    );
-
-    return new DynamicClass(source);
+    return new DynamicBlueprint(source);
   }
 
   private isChildClassOfBlueprint(

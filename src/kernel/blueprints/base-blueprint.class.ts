@@ -11,7 +11,13 @@ export abstract class BaseBlueprint<
   constructor() {
     const metadata = Reflect.getMetadata("system:metadata", this.constructor);
 
-    this.id = metadata?.id;
-    this.targetRegistry = metadata?.targetRegistry;
+    if (!metadata || !metadata.id || !metadata.targetRegistry) {
+      throw new Error(
+        `Missing metadata for blueprint ${this.constructor.name}. Please use the @Metadata decorator to provide metadata.`,
+      );
+    }
+
+    this.id = metadata.id;
+    this.targetRegistry = metadata.targetRegistry;
   }
 }

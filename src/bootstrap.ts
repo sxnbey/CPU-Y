@@ -7,4 +7,4 @@ const allRegistries = [new InstanceRegistry()];
 
 allRegistries.forEach((registry) => system.connectRegistry(registry));
 
-system.start();
+system.boot();

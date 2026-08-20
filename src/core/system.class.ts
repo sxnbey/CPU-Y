@@ -1,23 +1,28 @@
-import { RegistryMap } from "#kernel/contracts/index";
+import { RegistryMap, IRegistry } from "#kernel/contracts/index";
 
 import { MainRegistry } from "#kernel/registries/main-registry.class";
+import { InstanceRegistry } from "#core/registries/instance-registry.class";
 
 export class System {
-  private registry: MainRegistry;
+  private registry = new MainRegistry();
+  private registryArray: (new (...args: any) => IRegistry<unknown, unknown>)[] =
+    [InstanceRegistry];
 
-  constructor() {
-    this.registry = new MainRegistry();
-  }
-
-  public start(): boolean {
-    console.log("packs in der bag");
-
-    return true;
+  public boot(): void {
+    //! nächste baustelle
   }
 
   public connectRegistry<K extends keyof RegistryMap>(
     registry: RegistryMap[K],
   ): void {
     this.registry.register(registry.getName(), registry);
+  }
+
+  private initializeRegistries(): void {
+    this.registryArray.forEach((RegistryClass) => {
+      const registryInstance = new RegistryClass();
+
+      this.connectRegistry(registryInstance as RegistryMap[keyof RegistryMap]);
+    });
   }
 }
