@@ -8,3 +8,7 @@ const allRegistries = [new InstanceRegistry()];
 allRegistries.forEach((registry) => system.connectRegistry(registry));
 
 system.boot();
+
+export function bootstrap(): System {
+  return system;
+}

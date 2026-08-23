@@ -6,7 +6,7 @@ export function Inject(id: string): ParameterDecorator {
     _propertyKey: string | symbol | undefined,
     parameterIndex: number,
   ) => {
-    if (_propertyKey != undefined)
+    if (_propertyKey !== undefined)
       throw new Error(
         `@Inject decorator can only be used on constructor parameters, not on method parameters.`,
       );
