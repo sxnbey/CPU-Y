@@ -7,8 +7,9 @@ export abstract class BaseBlueprint<
 > implements IBlueprint<TConfig> {
   readonly id: string;
   readonly targetRegistry: keyof RegistryMap;
+  readonly config?: TConfig | undefined;
 
-  constructor() {
+  constructor(config?: TConfig) {
     const metadata = Reflect.getMetadata("system:metadata", this.constructor);
 
     if (!metadata || !metadata.id || !metadata.targetRegistry) {
@@ -19,5 +20,6 @@ export abstract class BaseBlueprint<
 
     this.id = metadata.id;
     this.targetRegistry = metadata.targetRegistry;
+    this.config = config;
   }
 }
