@@ -1,21 +1,17 @@
-import {
-  BaseBlueprintChild,
-  ArgumentsBuilder,
-} from "./arguments-builder.class.js";
+import { BaseBlueprintChild, ArgumentsBuilder } from "./arguments-builder.js";
 
-import type { IDynamicBlueprintConfig } from "#kernel/contracts/index";
+import type { IDynamicBlueprintConfig } from "#kernel/contract/index";
 
-import { BaseBlueprint } from "#kernel/blueprints/base-blueprint.class";
-import { DynamicBlueprint } from "#kernel/blueprints/dynamic-blueprint.class";
-import { RegistryResolver } from "#kernel/registry-resolver.class";
-import { Metadata, Inject } from "#kernel/decorators/index";
+import { BaseBlueprint } from "#kernel/blueprint/base-blueprint";
+import { DynamicBlueprint } from "#kernel/blueprint/dynamic-blueprint";
+import { RegistryResolver } from "#kernel/registry/registry-resolver";
+import { Inject } from "#kernel/decorator/index";
 
 type RawBlueprintConfig = IDynamicBlueprintConfig;
 
 type Source = BaseBlueprintChild | RawBlueprintConfig;
 type ReturnValue = InstanceType<BaseBlueprintChild> | DynamicBlueprint;
 
-@Metadata({ id: "instanceFactory", targetRegistry: "instanceRegistry" })
 export class InstanceFactory {
   private readonly argumentBuilder: ArgumentsBuilder = new ArgumentsBuilder();
 

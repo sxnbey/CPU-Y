@@ -1,12 +1,12 @@
 import {
   IDynamicBlueprintConfig,
   IDynamicBlueprint,
-  RegistryMap,
-} from "../contracts/index.js";
+  IRegistryMap,
+} from "../contract/index.js";
 
 export class DynamicBlueprint implements IDynamicBlueprint {
   readonly id!: string;
-  readonly targetRegistry!: keyof RegistryMap;
+  readonly targetRegistry!: keyof IRegistryMap;
   [key: string]: unknown;
 
   constructor(config: IDynamicBlueprintConfig) {
@@ -14,7 +14,7 @@ export class DynamicBlueprint implements IDynamicBlueprint {
 
     if (!id || !targetRegistry)
       throw new Error(
-        `Missing required properties 'id' and 'targetRegistry' in dynamic blueprint configuration.`,
+        `Missing required properties "id" and "targetRegistry" in dynamic blueprint configuration.`,
       );
 
     Object.assign(this, config);

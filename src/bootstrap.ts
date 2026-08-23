@@ -1,14 +1,25 @@
-import { System } from "#core/system.class";
-import { InstanceRegistry } from "#core/registries/instance-registry.class";
+import { IRegistry } from "#kernel/contract/index";
+import { IRegistryMap } from "#kernel/contract/index";
 
-const system = new System();
+import { System } from "./system.js";
 
-const allRegistries = [new InstanceRegistry()];
-
-allRegistries.forEach((registry) => system.connectRegistry(registry));
-
-system.boot();
+import { MainRegistry } from "#kernel/registry/main-registry";
+import { RegistryResolver } from "#kernel/registry/registry-resolver";
+import { ServiceRegistry } from "#core/registry/service-registry";
 
 export function bootstrap(): System {
+  const mainRegistry = new MainRegistry();
+  const registryResolver = new RegistryResolver(mainRegistry);
+
+  const registries = [new ServiceRegistry()] satisfies IRegistry<
+    keyof IRegistryMap
+  >[];
+
+  registries.forEach((registry) => {
+    mainRegistry.register(registry.getName(), registry);
+  });
+
+  const system = new System(mainRegistry, registryResolver);
+
   return system;
 }

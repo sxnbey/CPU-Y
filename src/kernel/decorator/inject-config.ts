@@ -11,6 +11,6 @@ export function Config(): ParameterDecorator {
         `@Config decorator can only be used on constructor parameters, not on method parameters.`,
       );
 
-    Reflect.defineMetadata("system:config", { index: parameterIndex }, target);
+    Reflect.defineMetadata("system:config", parameterIndex, target);
   };
 }

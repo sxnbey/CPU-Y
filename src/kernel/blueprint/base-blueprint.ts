@@ -1,12 +1,12 @@
 import "reflect-metadata";
 
-import { IBlueprint, RegistryMap } from "../contracts/index.js";
+import { IBlueprint, IRegistryMap } from "../contract/index.js";
 
 export abstract class BaseBlueprint<
   TConfig = {},
 > implements IBlueprint<TConfig> {
   readonly id: string;
-  readonly targetRegistry: keyof RegistryMap;
+  readonly targetRegistry: keyof IRegistryMap;
   readonly config?: TConfig | undefined;
 
   constructor(config?: TConfig) {
@@ -14,7 +14,7 @@ export abstract class BaseBlueprint<
 
     if (!metadata || !metadata.id || !metadata.targetRegistry) {
       throw new Error(
-        `Missing metadata for blueprint ${this.constructor.name}. Please use the @Metadata decorator to provide metadata.`,
+        `Missing metadata for blueprint ${this.constructor.name}. Please use the decorators to provide metadata.`,
       );
     }
 

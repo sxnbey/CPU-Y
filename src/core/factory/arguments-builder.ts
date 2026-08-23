@@ -1,9 +1,9 @@
 import "reflect-metadata";
 
-import { MetadataKeys } from "#kernel/contracts/types/metadata-keys.type";
+import { MetadataKeys } from "#kernel/contract/index";
 
-import { BaseBlueprint } from "#kernel/blueprints/base-blueprint.class";
-import { RegistryResolver } from "#kernel/registry-resolver.class";
+import { BaseBlueprint } from "#kernel/blueprint/base-blueprint";
+import { RegistryResolver } from "#kernel/registry/registry-resolver";
 
 export type BaseBlueprintChild = new (...args: any[]) => BaseBlueprint<unknown>;
 
@@ -24,32 +24,36 @@ export class ArgumentsBuilder {
 
     if (configIndex === undefined && config)
       throw new Error(
-        `Unexpected configuration provided for blueprint ${target.name}. Configuration has to be marked with @Config.`,
+        `Unexpected configuration provided for blueprint "${target.name}". Configuration has to be marked with @Config.`,
       );
 
     for (let index = 0; index < parameterCount; index++) {
       const dependencyId = injectableParameters?.[index];
 
-      if (dependencyId === undefined && index !== configIndex)
-        throw new Error(
-          `Missing dependency for parameter at index ${index} in blueprint ${target.name}. Please provide a dependency using @Inject or a configuration using @Config.`,
-        );
-
-      if (dependencyId) {
-        const dependency = registryResolver.find(dependencyId);
-
-        if (!dependency)
+      if (index === configIndex) {
+        if (!config)
           throw new Error(
-            `Dependency with id ${dependencyId} not found in the registry for blueprint ${target.name}.`,
+            `Missing configuration for parameter at index ${index} in blueprint "${target.name}". Please provide a configuration object.`,
           );
 
-        argumentsArray[index] = dependency;
-      } else if (index === configIndex && config)
         argumentsArray[index] = config;
-      else if (index === configIndex && !config)
+
+        continue;
+      }
+
+      if (dependencyId === undefined)
         throw new Error(
-          `Missing configuration for parameter at index ${index} in blueprint ${target.name}. Please provide a configuration object.`,
+          `Missing dependency for parameter at index ${index} in blueprint "${target.name}". Please provide a dependency using @Inject or a configuration using @Config.`,
         );
+
+      const dependency = registryResolver.find(dependencyId);
+
+      if (!dependency)
+        throw new Error(
+          `Dependency with id ${dependencyId} not found in the registry for blueprint "${target.name}".`,
+        );
+
+      argumentsArray[index] = dependency;
     }
 
     return argumentsArray;
