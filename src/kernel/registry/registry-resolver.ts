@@ -1,6 +1,6 @@
-import type { IRegistryMap } from "./contract/index.js";
+import type { IRegistryMap } from "../contract/index.js";
 
-import { MainRegistry } from "./registry/main-registry.js";
+import { MainRegistry } from "../registry/main-registry.js";
 
 export class RegistryResolver {
   constructor(private readonly mainRegistry: MainRegistry) {}

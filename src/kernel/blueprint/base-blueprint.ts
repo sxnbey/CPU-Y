@@ -1,15 +1,13 @@
 import "reflect-metadata";
 
-import { IBlueprint, IRegistryMap } from "../contract/index.js";
+import { IBaseMetadata, IBlueprint } from "../contract/index.js";
 
 export abstract class BaseBlueprint<
   TConfig = {},
 > implements IBlueprint<TConfig> {
-  readonly id: string;
-  readonly targetRegistry: keyof IRegistryMap;
-  readonly config?: TConfig | undefined;
+  readonly metadata: IBaseMetadata;
 
-  constructor(config?: TConfig) {
+  constructor(readonly config?: TConfig) {
     const metadata = Reflect.getMetadata("system:metadata", this.constructor);
 
     if (!metadata || !metadata.id || !metadata.targetRegistry) {
@@ -18,8 +16,9 @@ export abstract class BaseBlueprint<
       );
     }
 
-    this.id = metadata.id;
-    this.targetRegistry = metadata.targetRegistry;
-    this.config = config;
+    this.metadata = {
+      id: metadata.id,
+      targetRegistry: metadata.targetRegistry,
+    };
   }
 }

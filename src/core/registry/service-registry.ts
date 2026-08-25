@@ -13,10 +13,6 @@ export class ServiceRegistry extends BaseRegistry<
 > {
   static registryName = "serviceRegistry";
 
-  constructor() {
-    super();
-  }
-
   public listAll(): unknown[] {
     return Array.from(this.storage.values()).map((entry) => entry.service);
   }
@@ -27,6 +23,14 @@ export class ServiceRegistry extends BaseRegistry<
     if (!target) return undefined;
 
     return target.service;
+  }
+
+  public getRaw(id: string): ServiceRegistry | unknown {
+    const target = this.storage.get(id);
+
+    if (!target) return undefined;
+
+    return target;
   }
 
   public register(id: string, value: unknown): ServiceRegistryEntry {

@@ -1,4 +1,4 @@
-import { BaseBlueprintChild, ArgumentsBuilder } from "./arguments-builder.js";
+import { BaseBlueprintChild, ArgumentBuilder } from "./arguments-builder.js";
 
 import type { IDynamicBlueprintConfig } from "#kernel/contract/index";
 
@@ -13,8 +13,6 @@ type Source = BaseBlueprintChild | RawBlueprintConfig;
 type ReturnValue = InstanceType<BaseBlueprintChild> | DynamicBlueprint;
 
 export class InstanceFactory {
-  private readonly argumentBuilder: ArgumentsBuilder = new ArgumentsBuilder();
-
   constructor(
     @Inject("registryResolver")
     private readonly registryResolver: RegistryResolver,
@@ -28,24 +26,26 @@ export class InstanceFactory {
   public create<T extends RawBlueprintConfig>(source: T): DynamicBlueprint & T;
 
   public create(source: Source, config?: Record<string, unknown>): ReturnValue {
-    if (this.isChildClassOfBlueprint(source)) {
+    if (InstanceFactory.isChildClassOfBlueprint(source)) {
       const Blueprint = source;
-      const constructorArguments = this.argumentBuilder.createArgumentsArray(
+      const constructorArguments = ArgumentBuilder.createArgumentsArray(
         this.registryResolver,
         Blueprint,
         config,
       );
 
       return new Blueprint(...constructorArguments);
-    } else if (this.isRawBlueprintConfig(source))
+    }
+
+    if (InstanceFactory.isRawBlueprintConfig(source))
       return new DynamicBlueprint(source);
-    else
-      throw new Error(
-        `Invalid source provided to InstanceFactory. Expected a class extending BaseBlueprint or a raw blueprint configuration object.`,
-      );
+
+    throw new Error(
+      `Invalid source provided to InstanceFactory. Expected a class extending BaseBlueprint or a raw blueprint configuration object.`,
+    );
   }
 
-  private isChildClassOfBlueprint(
+  static isChildClassOfBlueprint(
     target: unknown,
   ): target is BaseBlueprintChild {
     if (typeof target !== "function") return false;
@@ -53,7 +53,7 @@ export class InstanceFactory {
     return BaseBlueprint.isPrototypeOf(target);
   }
 
-  private isRawBlueprintConfig(target: unknown): target is RawBlueprintConfig {
+  static isRawBlueprintConfig(target: unknown): target is RawBlueprintConfig {
     if (typeof target !== "object" || target === null) return false;
 
     return (

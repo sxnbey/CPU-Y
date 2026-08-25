@@ -1,13 +1,12 @@
-import { IBaseMetadata, IRegistryMap } from "./index.js";
+import { IBaseMetadata } from "./index.js";
 
-export interface IBlueprint<TConfig> extends IBaseMetadata {
+export interface IBlueprint<TConfig> {
+  metadata: IBaseMetadata;
+
   config?: TConfig | undefined;
 }
 
-export interface IDynamicBlueprintConfig {
-  id: string;
-  targetRegistry: keyof IRegistryMap;
-
+export interface IDynamicBlueprintConfig extends IBaseMetadata {
   [key: string]: unknown;
 }
 

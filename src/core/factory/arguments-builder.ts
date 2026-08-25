@@ -7,15 +7,15 @@ import { RegistryResolver } from "#kernel/registry/registry-resolver";
 
 export type BaseBlueprintChild = new (...args: any[]) => BaseBlueprint<unknown>;
 
-export class ArgumentsBuilder {
-  public createArgumentsArray(
+export class ArgumentBuilder {
+  static createArgumentsArray(
     registryResolver: RegistryResolver,
     target: BaseBlueprintChild,
     config?: Record<string, unknown>,
   ): any[] {
     const { configIndex, injectableParameters } =
-      this.getParameterIndexes(target);
-    const parameterCount = this.getParameterCount(
+      ArgumentBuilder.getParameterIndexes(target);
+    const parameterCount = ArgumentBuilder.getParameterCount(
       configIndex,
       injectableParameters,
     );
@@ -59,7 +59,7 @@ export class ArgumentsBuilder {
     return argumentsArray;
   }
 
-  private getParameterIndexes(target: BaseBlueprintChild): {
+  private static getParameterIndexes(target: BaseBlueprintChild): {
     configIndex: number | undefined;
     injectableParameters: Record<number, string>;
   } {
@@ -73,7 +73,7 @@ export class ArgumentsBuilder {
     return { configIndex, injectableParameters };
   }
 
-  private getParameterCount(
+  private static getParameterCount(
     configIndex: number | undefined,
     injectableParameters: Record<number, string>,
   ): number {
@@ -85,7 +85,7 @@ export class ArgumentsBuilder {
     return Math.max(lengthFromConfigIndex, lengthFromInjectableParameters);
   }
 
-  private getOwnOrInheritedMetadata<T>(
+  private static getOwnOrInheritedMetadata<T>(
     metadataKey: string,
     target: new (...args: any[]) => any,
   ): T | undefined {
