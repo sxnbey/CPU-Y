@@ -1,11 +1,11 @@
 import { EventEmitter } from "node:events";
 
-import { IRegistry, IRegistryMap } from "../contract/index.js";
+import { IRegistryMap, IRegistryEntry } from "../contract/index.js";
 
-export abstract class BaseRegistry<N extends keyof IRegistryMap, V = unknown>
-  extends EventEmitter
-  implements IRegistry<N>
-{
+export abstract class BaseRegistry<
+  N extends keyof IRegistryMap,
+  V extends IRegistryEntry<unknown> = IRegistryEntry<unknown>,
+> extends EventEmitter {
   protected name: N;
   protected storage: Map<string, V>;
 
@@ -14,7 +14,7 @@ export abstract class BaseRegistry<N extends keyof IRegistryMap, V = unknown>
 
     const constructor = this.constructor as unknown as { registryName: N };
 
-    if (!constructor.registryName)
+    if (!Object.hasOwn(constructor, "registryName"))
       throw new Error(
         `Registry ${this.constructor.name} must define a static "registryName".`,
       );
@@ -23,17 +23,57 @@ export abstract class BaseRegistry<N extends keyof IRegistryMap, V = unknown>
     this.storage = new Map();
   }
 
-  abstract listAll(): unknown[];
+  public listAll(): V["value"][] {
+    return Array.from(this.storage.values()).map((entry) => entry.value);
+  }
 
-  public get(id: string): V | unknown | undefined {
-    return this.storage.get(id);
+  public listAllRaw(): V[] {
+    return Array.from(this.storage.values());
+  }
+
+  public get(id: string): V["value"] | undefined {
+    const target = this.storage.get(id);
+
+    if (!target) return undefined;
+
+    return target.value;
+  }
+
+  public getRaw(id: string): V | undefined {
+    const target = this.storage.get(id);
+
+    if (!target) return undefined;
+
+    return target;
   }
 
   public has(id: string): boolean {
     return this.storage.has(id);
   }
 
-  public register(id: string, value: V): V {
+  public register(
+    id: string,
+    value: V["value"],
+    optionalMetadata?: Record<string, unknown>,
+  ): V {
+    if (this.storage.has(id))
+      throw new Error(`Entry with id "${id}" is already registered.`);
+
+    const entry = {
+      value,
+      metadata: { ...optionalMetadata, id, targetRegistry: this.getName() },
+    } as unknown as V;
+
+    this.storage.set(id, entry);
+
+    this.emit("register", id, entry);
+
+    return entry;
+  }
+
+  public registerWrapped(value: V): V {
+    const id = value.metadata.id;
+
     if (this.storage.has(id))
       throw new Error(`Entry with id "${id}" is already registered.`);
 
@@ -44,16 +84,22 @@ export abstract class BaseRegistry<N extends keyof IRegistryMap, V = unknown>
     return value;
   }
 
-  public delete(id: string): this {
+  public delete(id: string): boolean {
+    const entry = this.getRaw(id);
+
+    if (!entry) return false;
+
     this.storage.delete(id);
 
-    this.emit("delete", id);
+    this.emit("delete", id, entry);
 
-    return this;
+    return true;
   }
 
   public clear(): this {
     this.storage.clear();
+
+    this.emit("clear");
 
     return this;
   }

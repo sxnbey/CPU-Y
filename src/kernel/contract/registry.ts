@@ -1,11 +1,8 @@
-export interface IRegistry<N> {
-  listAll(): unknown[];
-  get(id: string): unknown | undefined;
-  has(id: string): boolean;
+import { IBaseMetadata } from "./index.js";
 
-  register(id: string, value: unknown): unknown;
-  delete(id: string): this;
-  clear(): this;
+export interface IRegistryMap {}
 
-  getName(): N;
+export interface IRegistryEntry<V> {
+  metadata: IBaseMetadata;
+  value: V;
 }

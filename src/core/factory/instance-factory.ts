@@ -1,11 +1,15 @@
+import "reflect-metadata";
+
 import { BaseBlueprintChild, ArgumentBuilder } from "./arguments-builder.js";
 
 import type { IDynamicBlueprintConfig } from "#kernel/contract/index";
+import type { MetadataKeys } from "#core/contract/metadata-keys";
+import type { IBaseMetadata } from "#kernel/contract/index";
 
 import { BaseBlueprint } from "#kernel/blueprint/base-blueprint";
 import { DynamicBlueprint } from "#kernel/blueprint/dynamic-blueprint";
 import { RegistryResolver } from "#kernel/registry/registry-resolver";
-import { Inject } from "#kernel/decorator/index";
+import { Inject } from "#core/decorator/index";
 
 type RawBlueprintConfig = IDynamicBlueprintConfig;
 
@@ -34,7 +38,9 @@ export class InstanceFactory {
         config,
       );
 
-      return new Blueprint(...constructorArguments);
+      //! metadatahelper bauen und wrapped returnen
+
+      const instance = new Blueprint(...constructorArguments);
     }
 
     if (InstanceFactory.isRawBlueprintConfig(source))

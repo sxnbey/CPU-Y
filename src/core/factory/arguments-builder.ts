@@ -1,6 +1,6 @@
 import "reflect-metadata";
 
-import { MetadataKeys } from "#kernel/contract/index";
+import { MetadataKeys } from "#core/contract/index";
 
 import { BaseBlueprint } from "#kernel/blueprint/base-blueprint";
 import { RegistryResolver } from "#kernel/registry/registry-resolver";

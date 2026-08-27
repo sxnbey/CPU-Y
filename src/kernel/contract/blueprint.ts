@@ -1,8 +1,6 @@
 import { IBaseMetadata } from "./index.js";
 
 export interface IBlueprint<TConfig> {
-  metadata: IBaseMetadata;
-
   config?: TConfig | undefined;
 }
 
