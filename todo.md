@@ -1,8 +1,6 @@
-- metadata util functions mit ONLY ownMetadata
-- argument builder als function sammlung bauen
-- factory auf metadata utils umbauen und die instanz wrapped returnen
 - custom errors
 - logger
 - loader
+- runtime validation
 - nach deps sortieren in boot()
 - dann endlich application (phase 2)

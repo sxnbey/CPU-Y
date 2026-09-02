@@ -1,20 +1,17 @@
 import "reflect-metadata";
 
-import { BaseBlueprintChild, ArgumentBuilder } from "./argument-builder.js";
+import { resolveArguments } from "#core/factory/argument-resolver";
+import { getMetadata } from "#core/util/metadata";
 
-import type { IDynamicBlueprintConfig } from "#kernel/contract/index";
-import type { MetadataKeys } from "#core/contract/metadata-keys";
-import type { IBaseMetadata } from "#kernel/contract/index";
+import type { IBaseMetadata, IRegistryEntry } from "#kernel/contract/index";
+import { type BaseBlueprintChild, MetadataKeys } from "#core/contract/index";
 
 import { BaseBlueprint } from "#kernel/blueprint/base-blueprint";
 import { DynamicBlueprint } from "#kernel/blueprint/dynamic-blueprint";
 import { RegistryResolver } from "#kernel/registry/registry-resolver";
 import { Inject } from "#core/decorator/index";
 
-type RawBlueprintConfig = IDynamicBlueprintConfig;
-
-type Source = BaseBlueprintChild | RawBlueprintConfig;
-type ReturnValue = InstanceType<BaseBlueprintChild> | DynamicBlueprint;
+type Source = BaseBlueprintChild | IBaseMetadata;
 
 export class InstanceFactory {
   constructor(
@@ -24,25 +21,49 @@ export class InstanceFactory {
 
   public create<C extends BaseBlueprintChild>(
     source: C,
-    config: Record<string, unknown>,
-  ): InstanceType<C>;
+    config?: Record<string, unknown>,
+  ): IRegistryEntry<InstanceType<C>>;
 
-  public create<C extends RawBlueprintConfig>(source: C): DynamicBlueprint & C;
+  public create<P extends Record<string, unknown>>(
+    source: IBaseMetadata,
+    payload?: P,
+  ): IRegistryEntry<DynamicBlueprint<P>>;
 
-  public create(source: Source, config?: Record<string, unknown>): ReturnValue {
+  public create(
+    source: Source,
+    config?: Record<string, unknown>,
+  ): IRegistryEntry<unknown> {
     if (InstanceFactory.isChildClassOfBlueprint(source)) {
       const Blueprint = source;
-      const constructorArguments = ArgumentBuilder.createArgumentsArray(
+      const constructorArguments = resolveArguments(
         this.registryResolver,
         Blueprint,
         config,
       );
 
-      //! hallo! hier werden bald die aktuell nicht existenten metadata utils genutzt und die instanz wrapped zurückgegeben
+      const value = new Blueprint(...constructorArguments);
+      const metadata = getMetadata<IBaseMetadata>(
+        MetadataKeys.METADATA,
+        Blueprint,
+      );
+
+      if (!metadata)
+        throw new Error(
+          `Missing metadata for blueprint "${Blueprint.name}". Please ensure that the blueprint is properly decorated.`,
+        );
+
+      return { metadata, value };
     }
 
-    if (InstanceFactory.isRawBlueprintConfig(source))
-      return new DynamicBlueprint(source);
+    if (InstanceFactory.isMetadata(source)) {
+      const value = new DynamicBlueprint(config ?? {});
+      const metadata: IBaseMetadata = {
+        id: source.id,
+        targetRegistry: source.targetRegistry,
+      };
+
+      return { metadata, value };
+    }
 
     throw new Error(
       `Invalid source provided to InstanceFactory. Expected a class extending BaseBlueprint or a raw blueprint configuration object.`,
@@ -57,14 +78,14 @@ export class InstanceFactory {
     return BaseBlueprint.isPrototypeOf(target);
   }
 
-  static isRawBlueprintConfig(target: unknown): target is RawBlueprintConfig {
+  static isMetadata(target: unknown): target is IBaseMetadata {
     if (typeof target !== "object" || target === null) return false;
 
     return (
       "id" in target &&
-      typeof (target as RawBlueprintConfig).id === "string" &&
+      typeof (target as IBaseMetadata).id === "string" &&
       "targetRegistry" in target &&
-      typeof (target as RawBlueprintConfig).targetRegistry === "string"
+      typeof (target as IBaseMetadata).targetRegistry === "string"
     );
   }
 }

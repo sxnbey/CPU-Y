@@ -1,4 +1,4 @@
-import { IRegistryMap } from "#kernel/contract/index";
+import type { IRegistryMap } from "#kernel/contract/index";
 
 export class MainRegistry {
   private registries: Partial<IRegistryMap> = {};

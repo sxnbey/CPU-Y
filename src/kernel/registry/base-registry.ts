@@ -1,6 +1,6 @@
 import { EventEmitter } from "node:events";
 
-import { IRegistryMap, IRegistryEntry } from "#kernel/contract/index";
+import type { IRegistryMap, IRegistryEntry } from "#kernel/contract/index";
 
 export abstract class BaseRegistry<
   N extends keyof IRegistryMap,

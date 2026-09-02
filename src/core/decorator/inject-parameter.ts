@@ -1,8 +1,10 @@
-import "reflect-metadata";
+import { MetadataKeys } from "#core/contract/index";
+
+import { getMetadata, setMetadata } from "#core/util/metadata";
 
 export function Inject(id: string): ParameterDecorator {
   return (
-    target: Object,
+    target: object,
     _propertyKey: string | symbol | undefined,
     parameterIndex: number,
   ) => {
@@ -12,10 +14,11 @@ export function Inject(id: string): ParameterDecorator {
       );
 
     const existingDependencies: Record<number, string> =
-      Reflect.getOwnMetadata("system:dependencies", target) || {};
+      getMetadata<Record<number, string>>(MetadataKeys.DEPENDENCIES, target) ||
+      {};
 
-    Reflect.defineMetadata(
-      "system:dependencies",
+    setMetadata(
+      MetadataKeys.DEPENDENCIES,
       { ...existingDependencies, [parameterIndex]: id },
       target,
     );

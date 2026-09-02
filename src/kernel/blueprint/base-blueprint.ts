@@ -1,7 +1,5 @@
-import "reflect-metadata";
-
-import { IBlueprint } from "#kernel/contract/index";
-
-export abstract class BaseBlueprint<C = {}> implements IBlueprint<C> {
+export abstract class BaseBlueprint<
+  C extends Record<string, unknown> = Record<string, unknown>,
+> {
   constructor(readonly config?: C) {}
 }

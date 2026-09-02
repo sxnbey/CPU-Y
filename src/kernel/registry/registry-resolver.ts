@@ -1,4 +1,4 @@
-import { IRegistryMap } from "#kernel/contract/index";
+import type { IRegistryMap } from "#kernel/contract/index";
 
 import { MainRegistry } from "./main-registry.js";
 

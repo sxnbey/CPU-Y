@@ -1,14 +1,5 @@
-import {
-  IDynamicBlueprintConfig,
-  IDynamicBlueprint,
-} from "#kernel/contract/index";
-
-export class DynamicBlueprint implements IDynamicBlueprint {
-  [key: string]: unknown;
-
-  constructor(readonly config: IDynamicBlueprintConfig) {
-    const { _id, _targetRegistry, ...rest } = config;
-
-    Object.assign(this, rest);
-  }
+export class DynamicBlueprint<
+  P extends Record<string, unknown> = Record<string, unknown>,
+> {
+  constructor(readonly payload: P) {}
 }

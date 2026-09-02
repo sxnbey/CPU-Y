@@ -1,8 +1,10 @@
-import "reflect-metadata";
+import { MetadataKeys } from "#core/contract/index";
+
+import { setMetadata, getMetadata } from "#core/util/metadata";
 
 export function Config(): ParameterDecorator {
   return (
-    target: Object,
+    target: object,
     _propertyKey: string | symbol | undefined,
     parameterIndex: number,
   ) => {
@@ -11,6 +13,11 @@ export function Config(): ParameterDecorator {
         `@Config decorator can only be used on constructor parameters, not on method parameters.`,
       );
 
-    Reflect.defineMetadata("system:config", parameterIndex, target);
+    if (getMetadata(MetadataKeys.CONFIG, target) !== undefined)
+      throw new Error(
+        `@Config decorator can only be used once per constructor.`,
+      );
+
+    setMetadata(MetadataKeys.CONFIG, parameterIndex, target);
   };
 }
