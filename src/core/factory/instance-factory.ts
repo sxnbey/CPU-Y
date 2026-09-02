@@ -26,7 +26,7 @@ export class InstanceFactory {
 
   public create<P extends Record<string, unknown>>(
     source: IBaseMetadata,
-    payload?: P,
+    payload: P,
   ): IRegistryEntry<DynamicBlueprint<P>>;
 
   public create(
@@ -56,7 +56,14 @@ export class InstanceFactory {
     }
 
     if (InstanceFactory.isMetadata(source)) {
-      const value = new DynamicBlueprint(config ?? {});
+      const payload = config;
+
+      if (!payload)
+        throw new Error(
+          `Missing payload for dynamic blueprint "${source.id}". Please provide a payload.`,
+        );
+
+      const value = new DynamicBlueprint(payload);
       const metadata: IBaseMetadata = {
         id: source.id,
         targetRegistry: source.targetRegistry,
