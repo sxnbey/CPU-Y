@@ -1,4 +1,4 @@
-import { IRegistryMap } from "../contract/index.js";
+import { IRegistryMap } from "#kernel/contract/index";
 
 export class MainRegistry {
   private registries: Partial<IRegistryMap> = {};

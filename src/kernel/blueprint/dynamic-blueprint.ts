@@ -1,7 +1,7 @@
 import {
   IDynamicBlueprintConfig,
   IDynamicBlueprint,
-} from "../contract/index.js";
+} from "#kernel/contract/index";
 
 export class DynamicBlueprint implements IDynamicBlueprint {
   [key: string]: unknown;

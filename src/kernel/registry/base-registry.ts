@@ -1,33 +1,22 @@
 import { EventEmitter } from "node:events";
 
-import { IRegistryMap, IRegistryEntry } from "../contract/index.js";
+import { IRegistryMap, IRegistryEntry } from "#kernel/contract/index";
 
 export abstract class BaseRegistry<
   N extends keyof IRegistryMap,
   V extends IRegistryEntry<unknown> = IRegistryEntry<unknown>,
 > extends EventEmitter {
-  protected name: N;
-  protected storage: Map<string, V>;
+  protected storage: Map<string, V> = new Map();
 
-  constructor() {
+  constructor(protected name: N) {
     super();
-
-    const constructor = this.constructor as unknown as { registryName: N };
-
-    if (!Object.hasOwn(constructor, "registryName"))
-      throw new Error(
-        `Registry ${this.constructor.name} must define a static "registryName".`,
-      );
-
-    this.name = constructor.registryName;
-    this.storage = new Map();
   }
 
   public listAll(): V["value"][] {
     return Array.from(this.storage.values()).map((entry) => entry.value);
   }
 
-  public listAllRaw(): V[] {
+  public listAllWrapped(): V[] {
     return Array.from(this.storage.values());
   }
 
@@ -39,7 +28,7 @@ export abstract class BaseRegistry<
     return target.value;
   }
 
-  public getRaw(id: string): V | undefined {
+  public getWrapped(id: string): V | undefined {
     const target = this.storage.get(id);
 
     if (!target) return undefined;
@@ -85,7 +74,7 @@ export abstract class BaseRegistry<
   }
 
   public delete(id: string): boolean {
-    const entry = this.getRaw(id);
+    const entry = this.getWrapped(id);
 
     if (!entry) return false;
 

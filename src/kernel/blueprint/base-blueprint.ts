@@ -1,9 +1,7 @@
 import "reflect-metadata";
 
-import { IBlueprint } from "../contract/index.js";
+import { IBlueprint } from "#kernel/contract/index";
 
-export abstract class BaseBlueprint<
-  TConfig = {},
-> implements IBlueprint<TConfig> {
-  constructor(readonly config?: TConfig) {}
+export abstract class BaseBlueprint<C = {}> implements IBlueprint<C> {
+  constructor(readonly config?: C) {}
 }

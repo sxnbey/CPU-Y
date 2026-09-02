@@ -1,6 +1,6 @@
 import "reflect-metadata";
 
-import { BaseBlueprintChild, ArgumentBuilder } from "./arguments-builder.js";
+import { BaseBlueprintChild, ArgumentBuilder } from "./argument-builder.js";
 
 import type { IDynamicBlueprintConfig } from "#kernel/contract/index";
 import type { MetadataKeys } from "#core/contract/metadata-keys";
@@ -27,7 +27,7 @@ export class InstanceFactory {
     config: Record<string, unknown>,
   ): InstanceType<C>;
 
-  public create<T extends RawBlueprintConfig>(source: T): DynamicBlueprint & T;
+  public create<C extends RawBlueprintConfig>(source: C): DynamicBlueprint & C;
 
   public create(source: Source, config?: Record<string, unknown>): ReturnValue {
     if (InstanceFactory.isChildClassOfBlueprint(source)) {
@@ -38,9 +38,7 @@ export class InstanceFactory {
         config,
       );
 
-      //! metadatahelper bauen und wrapped returnen
-
-      const instance = new Blueprint(...constructorArguments);
+      //! hallo! hier werden bald die aktuell nicht existenten metadata utils genutzt und die instanz wrapped zurückgegeben
     }
 
     if (InstanceFactory.isRawBlueprintConfig(source))

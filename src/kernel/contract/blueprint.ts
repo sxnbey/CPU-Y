@@ -1,7 +1,7 @@
-import { IBaseMetadata } from "./index.js";
+import { IBaseMetadata } from "./metadata.js";
 
-export interface IBlueprint<TConfig> {
-  config?: TConfig | undefined;
+export interface IBlueprint<C> {
+  config?: C | undefined;
 }
 
 export interface IDynamicBlueprintConfig extends IBaseMetadata {

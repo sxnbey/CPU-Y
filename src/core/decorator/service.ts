@@ -1,14 +1,15 @@
 import "reflect-metadata";
 
-import { ServiceOptions } from "../contract/index.js";
+import { IRegistryMap } from "#kernel/contract/index";
+import { ServiceOptions } from "#core/contract/index";
 
-import { ServiceRegistry } from "#core/registry/service-registry";
+const serviceRegistryName = "serviceRegistry" satisfies keyof IRegistryMap;
 
 export function Service(metadata: ServiceOptions): ClassDecorator {
   return (target) => {
     Reflect.defineMetadata(
       "system:metadata",
-      { ...metadata, targetRegistry: ServiceRegistry.registryName },
+      { ...metadata, targetRegistry: serviceRegistryName },
       target,
     );
   };

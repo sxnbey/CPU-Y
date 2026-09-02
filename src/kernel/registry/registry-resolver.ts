@@ -1,6 +1,6 @@
-import type { IRegistryMap } from "../contract/index.js";
+import { IRegistryMap } from "#kernel/contract/index";
 
-import { MainRegistry } from "../registry/main-registry.js";
+import { MainRegistry } from "./main-registry.js";
 
 export class RegistryResolver {
   constructor(private readonly mainRegistry: MainRegistry) {}
@@ -11,7 +11,7 @@ export class RegistryResolver {
     target: T,
   ): InstanceType<T> | undefined;
 
-  public find<T = unknown>(target: string): T | undefined;
+  public find(target: string): unknown | undefined;
 
   public find(target: any): any {
     if (typeof target === "function" && target.name)

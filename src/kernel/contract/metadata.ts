@@ -1,4 +1,4 @@
-import { IRegistryMap } from "./index.js";
+import { IRegistryMap } from "./registry.js";
 
 export interface IBaseMetadata {
   id: string;

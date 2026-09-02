@@ -1,6 +1,6 @@
 import "reflect-metadata";
 
-import { BlueprintSchemaRules } from "../../kernel/contract/index.js";
+import { BlueprintSchemaRules } from "#kernel/contract/index";
 
 export function Rules(rules: BlueprintSchemaRules): ClassDecorator {
   return (target) => {
