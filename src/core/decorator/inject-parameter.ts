@@ -14,8 +14,7 @@ export function Inject(id: string): ParameterDecorator {
       );
 
     const existingDependencies: Record<number, string> =
-      getMetadata<Record<number, string>>(MetadataKeys.DEPENDENCIES, target) ||
-      {};
+      getMetadata(MetadataKeys.DEPENDENCIES, target) || {};
 
     setMetadata(
       MetadataKeys.DEPENDENCIES,
