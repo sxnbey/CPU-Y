@@ -24,6 +24,8 @@ export class InstanceFactory {
     config?: Record<string, unknown>,
   ): IRegistryEntry<InstanceType<C>>;
 
+  public create(source: IBaseMetadata): IRegistryEntry<DynamicBlueprint>;
+
   public create<P extends Record<string, unknown>>(
     source: IBaseMetadata,
     payload: P,
@@ -31,17 +33,11 @@ export class InstanceFactory {
 
   public create(
     source: Source,
-    config?: Record<string, unknown>,
+    input?: Record<string, unknown>,
   ): IRegistryEntry<unknown> {
     if (InstanceFactory.isChildClassOfBlueprint(source)) {
       const Blueprint = source;
-      const constructorArguments = resolveArguments(
-        this.registryResolver,
-        Blueprint,
-        config,
-      );
-
-      const value = new Blueprint(...constructorArguments);
+      const config = input;
       const metadata = getMetadata<IBaseMetadata>(
         MetadataKeys.METADATA,
         Blueprint,
@@ -52,22 +48,20 @@ export class InstanceFactory {
           `Missing metadata for blueprint "${Blueprint.name}". Please ensure that the blueprint is properly decorated.`,
         );
 
+      const constructorArguments = resolveArguments(
+        this.registryResolver,
+        Blueprint,
+        config,
+      );
+      const value = new Blueprint(...constructorArguments);
+
       return { metadata, value };
     }
 
     if (InstanceFactory.isMetadata(source)) {
-      const payload = config;
-
-      if (!payload)
-        throw new Error(
-          `Missing payload for dynamic blueprint "${source.id}". Please provide a payload.`,
-        );
-
+      const payload = input;
+      const metadata = source;
       const value = new DynamicBlueprint(payload);
-      const metadata: IBaseMetadata = {
-        id: source.id,
-        targetRegistry: source.targetRegistry,
-      };
 
       return { metadata, value };
     }

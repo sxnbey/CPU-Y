@@ -7,16 +7,9 @@ export class RegistryResolver {
 
   public find<K extends keyof IRegistryMap>(target: K): IRegistryMap[K];
 
-  public find<T extends new (...args: any[]) => any>(
-    target: T,
-  ): InstanceType<T> | undefined;
+  public find<T>(target: string): T | undefined;
 
-  public find(target: string): unknown | undefined;
-
-  public find(target: any): any {
-    if (typeof target === "function" && target.name)
-      return this.find(target.name);
-
+  public find(target: unknown): unknown {
     if (typeof target !== "string") return undefined;
 
     if (this.mainRegistry.has(target)) return this.mainRegistry.get(target);
@@ -29,12 +22,6 @@ export class RegistryResolver {
   }
 
   public has(target: string): boolean {
-    if (this.mainRegistry.has(target)) return true;
-
-    for (const registry of this.mainRegistry.getAllRegistries()) {
-      if (registry.has(target)) return true;
-    }
-
-    return false;
+    return this.find(target) !== undefined;
   }
 }

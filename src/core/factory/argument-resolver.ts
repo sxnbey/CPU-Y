@@ -1,5 +1,3 @@
-import "reflect-metadata";
-
 import type { BaseBlueprintChild } from "#core/contract/index";
 import { MetadataKeys } from "#core/contract/index";
 
@@ -10,11 +8,11 @@ export function resolveArguments(
   registryResolver: RegistryResolver,
   target: BaseBlueprintChild,
   config?: Record<string, unknown>,
-): any[] {
+): unknown[] {
   const { configIndex, injectableParameters } = getParameterIndexes(target);
   const parameterCount = getParameterCount(configIndex, injectableParameters);
 
-  const argumentsArray: any[] = new Array(parameterCount);
+  const argumentsArray: unknown[] = new Array(parameterCount);
 
   if (configIndex === undefined && config)
     throw new Error(
