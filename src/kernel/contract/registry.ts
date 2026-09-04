@@ -1,4 +1,4 @@
-import { IBaseMetadata } from "./metadata.js";
+import type { IBaseMetadata } from "./metadata.js";
 
 export interface IRegistryMap {}
 

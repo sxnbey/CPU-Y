@@ -1,5 +1,4 @@
-export type * from "./service-options.js";
-export type * from "./service-metadata.js";
+export type * from "./service.js";
 
 export * from "./metadata-keys.js";
 

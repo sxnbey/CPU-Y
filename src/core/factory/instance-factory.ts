@@ -1,15 +1,12 @@
-import "reflect-metadata";
-
-import { resolveArguments } from "#core/factory/argument-resolver";
-import { getMetadata } from "#core/util/metadata";
-
 import type { IBaseMetadata, IRegistryEntry } from "#kernel/contract/index";
-import { type BaseBlueprintChild, MetadataKeys } from "#core/contract/index";
+import { type BaseBlueprintChild, MetadataKey } from "#core/contract/index";
 
 import { BaseBlueprint } from "#kernel/blueprint/base-blueprint";
 import { DynamicBlueprint } from "#kernel/blueprint/dynamic-blueprint";
 import { RegistryResolver } from "#kernel/registry/registry-resolver";
 import { Inject } from "#core/decorator/index";
+import { getMetadata } from "#core/util/metadata";
+import { resolveArguments } from "./argument-resolver.js";
 
 type Source = BaseBlueprintChild | IBaseMetadata;
 
@@ -39,7 +36,7 @@ export class InstanceFactory {
       const Blueprint = source;
       const config = input;
       const metadata = getMetadata<IBaseMetadata>(
-        MetadataKeys.METADATA,
+        MetadataKey.METADATA,
         Blueprint,
       );
 
@@ -48,11 +45,11 @@ export class InstanceFactory {
           `Missing metadata for blueprint "${Blueprint.name}". Please ensure that the blueprint is properly decorated.`,
         );
 
-      const constructorArguments = resolveArguments(
-        this.registryResolver,
-        Blueprint,
+      const constructorArguments = resolveArguments({
+        registryResolver: this.registryResolver,
+        target: Blueprint,
         config,
-      );
+      });
       const value = new Blueprint(...constructorArguments);
 
       return { metadata, value };
@@ -71,7 +68,7 @@ export class InstanceFactory {
     );
   }
 
-  static isChildClassOfBlueprint(
+  private static isChildClassOfBlueprint(
     target: unknown,
   ): target is BaseBlueprintChild {
     if (typeof target !== "function") return false;
@@ -79,7 +76,7 @@ export class InstanceFactory {
     return BaseBlueprint.isPrototypeOf(target);
   }
 
-  static isMetadata(target: unknown): target is IBaseMetadata {
+  private static isMetadata(target: unknown): target is IBaseMetadata {
     if (typeof target !== "object" || target === null) return false;
 
     return (

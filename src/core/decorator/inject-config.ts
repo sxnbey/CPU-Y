@@ -1,4 +1,4 @@
-import { MetadataKeys } from "#core/contract/index";
+import { MetadataKey } from "#core/contract/index";
 
 import { setMetadata, getMetadata } from "#core/util/metadata";
 
@@ -13,11 +13,11 @@ export function Config(): ParameterDecorator {
         `@Config decorator can only be used on constructor parameters, not on method parameters.`,
       );
 
-    if (getMetadata(MetadataKeys.CONFIG, target) !== undefined)
+    if (getMetadata(MetadataKey.CONFIG, target) !== undefined)
       throw new Error(
         `@Config decorator can only be used once per constructor.`,
       );
 
-    setMetadata(MetadataKeys.CONFIG, parameterIndex, target);
+    setMetadata(MetadataKey.CONFIG, parameterIndex, target);
   };
 }

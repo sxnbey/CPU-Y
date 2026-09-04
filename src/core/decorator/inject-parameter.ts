@@ -1,4 +1,4 @@
-import { MetadataKeys } from "#core/contract/index";
+import { MetadataKey } from "#core/contract/index";
 
 import { getMetadata, setMetadata } from "#core/util/metadata";
 
@@ -14,10 +14,10 @@ export function Inject(id: string): ParameterDecorator {
       );
 
     const existingDependencies: Record<number, string> =
-      getMetadata(MetadataKeys.DEPENDENCIES, target) || {};
+      getMetadata(MetadataKey.DEPENDENCIES, target) || {};
 
     setMetadata(
-      MetadataKeys.DEPENDENCIES,
+      MetadataKey.DEPENDENCIES,
       { ...existingDependencies, [parameterIndex]: id },
       target,
     );

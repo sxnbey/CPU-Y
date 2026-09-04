@@ -1,14 +1,18 @@
 import type { BaseBlueprintChild } from "#core/contract/index";
-import { MetadataKeys } from "#core/contract/index";
+import { MetadataKey } from "#core/contract/index";
 
 import { RegistryResolver } from "#kernel/registry/registry-resolver";
 import { getMetadata } from "#core/util/metadata";
 
-export function resolveArguments(
-  registryResolver: RegistryResolver,
-  target: BaseBlueprintChild,
-  config?: Record<string, unknown>,
-): unknown[] {
+export function resolveArguments({
+  registryResolver,
+  target,
+  config,
+}: {
+  registryResolver: RegistryResolver;
+  target: BaseBlueprintChild;
+  config?: Record<string, unknown> | undefined;
+}): unknown[] {
   const { configIndex, injectableParameters } = getParameterIndexes(target);
   const parameterCount = getParameterCount(configIndex, injectableParameters);
 
@@ -55,10 +59,9 @@ function getParameterIndexes(target: BaseBlueprintChild): {
   configIndex: number | undefined;
   injectableParameters: Record<number, string>;
 } {
-  const configIndex = getMetadata<number>(MetadataKeys.CONFIG, target);
+  const configIndex = getMetadata<number>(MetadataKey.CONFIG, target);
   const injectableParameters: Record<number, string> =
-    getMetadata<Record<number, string>>(MetadataKeys.DEPENDENCIES, target) ||
-    {};
+    getMetadata<Record<number, string>>(MetadataKey.DEPENDENCIES, target) || {};
 
   return { configIndex, injectableParameters };
 }
