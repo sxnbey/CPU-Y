@@ -4,15 +4,11 @@ import { MetadataKey } from "#core/contract/index";
 import { RegistryResolver } from "#kernel/registry/registry-resolver";
 import { getMetadata } from "#core/util/metadata";
 
-export function resolveArguments({
-  registryResolver,
-  target,
-  config,
-}: {
-  registryResolver: RegistryResolver;
-  target: BaseBlueprintChild;
-  config?: Record<string, unknown> | undefined;
-}): unknown[] {
+export function resolveArguments(
+  registryResolver: RegistryResolver,
+  target: BaseBlueprintChild,
+  config?: Record<string, unknown>,
+): unknown[] {
   const { configIndex, injectableParameters } = getParameterIndexes(target);
   const parameterCount = getParameterCount(configIndex, injectableParameters);
 

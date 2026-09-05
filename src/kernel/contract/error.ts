@@ -5,6 +5,5 @@ export interface IErrorMessage {
 }
 
 export interface IErrorArgument {
-  name: string;
-  origin: string;
+  [key: string]: string;
 }

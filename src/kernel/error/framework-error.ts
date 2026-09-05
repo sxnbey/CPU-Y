@@ -2,24 +2,52 @@ import type { IErrorMessage, IErrorArgument } from "#kernel/contract/index";
 
 import { frameworkErrors } from "./framework-error.templates.js";
 
+export type ErrorTemplateArguments<
+  AllTemplates extends Record<string, IErrorMessage>,
+  K extends keyof AllTemplates & string,
+> = ResolvePlaceholderArguments<GetAllPlaceholders<AllTemplates[K]>>["args"];
+
+type ExtractPlaceholders<T extends string> =
+  T extends `${string}{${infer Placeholder}}${infer Rest}`
+    ? Lowercase<Placeholder> | ExtractPlaceholders<Rest>
+    : never;
+
+type GetAllPlaceholders<Template extends IErrorMessage> = ExtractPlaceholders<
+  | Template["headline"]
+  | Template["details"]
+  | (Template["fix"] extends string ? Template["fix"] : never)
+>;
+
+// Since never is an empty union, it gets distributed, loops 0 times and evaluates to never.
+// Wrapping in a tuple disables distributing and ensures correct comparing.
+
+type ResolvePlaceholderArguments<P extends string> = [P] extends [never]
+  ? { args?: Record<string, string> }
+  : { args: Record<P, string> };
+
+type ErrorConstructorParameters<
+  AllTemplates extends Record<string, IErrorMessage>,
+  K extends keyof AllTemplates & string,
+> = {
+  errorTemplates: AllTemplates;
+  errorCode: K;
+} & ResolvePlaceholderArguments<GetAllPlaceholders<AllTemplates[K]>>;
+
 export class FrameworkError<
   T extends Record<string, IErrorMessage>,
+  K extends keyof T,
 > extends Error {
   constructor({
     errorTemplates,
     errorCode,
     args,
-  }: {
-    errorTemplates: T;
-    errorCode: keyof T & string;
-    args?: IErrorArgument;
-  }) {
+  }: ErrorConstructorParameters<T, K & string>) {
     const rawMessage = FrameworkError.resolveTemplates(
       errorTemplates,
       errorCode,
       args,
     );
-    const message = FrameworkError.createMessage(rawMessage, new.target.name);
+    const message = FrameworkError.createMessage(rawMessage);
 
     super(message);
 
@@ -78,6 +106,7 @@ export class FrameworkError<
         const regex = new RegExp(`{${escapedKey}}`, "gi");
 
         // Callback function ensures it doesn't get interpreted as regex command.
+
         result = result.replace(regex, () => value);
       }
     }
@@ -85,19 +114,8 @@ export class FrameworkError<
     return result;
   }
 
-  private static createMessage(
-    rawMessage: IErrorMessage,
-    errorName: string,
-  ): string {
-    const errorPrefix = `[${new Date().toISOString()} | ${errorName}]`;
-
-    const message = [
-      errorPrefix,
-      " - ",
-      rawMessage.headline,
-      "\n",
-      `Cause: ${rawMessage.details}`,
-    ];
+  private static createMessage(rawMessage: IErrorMessage): string {
+    const message = [rawMessage.headline, "\n", `Cause: ${rawMessage.details}`];
 
     if (rawMessage.fix) message.push(`\nPotential fix: ${rawMessage.fix}`);
 

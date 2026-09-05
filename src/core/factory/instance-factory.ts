@@ -45,11 +45,11 @@ export class InstanceFactory {
           `Missing metadata for blueprint "${Blueprint.name}". Please ensure that the blueprint is properly decorated.`,
         );
 
-      const constructorArguments = resolveArguments({
-        registryResolver: this.registryResolver,
-        target: Blueprint,
+      const constructorArguments = resolveArguments(
+        this.registryResolver,
+        Blueprint,
         config,
-      });
+      );
       const value = new Blueprint(...constructorArguments);
 
       return { metadata, value };
