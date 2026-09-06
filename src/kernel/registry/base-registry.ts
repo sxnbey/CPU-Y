@@ -2,6 +2,8 @@ import { EventEmitter } from "node:events";
 
 import type { IRegistryMap, IRegistryEntry } from "#kernel/contract/index";
 
+import { RegistryError } from "#kernel/error/registry-error";
+
 export abstract class BaseRegistry<
   N extends keyof IRegistryMap,
   V extends IRegistryEntry<unknown> = IRegistryEntry<unknown>,
@@ -20,18 +22,26 @@ export abstract class BaseRegistry<
     return Array.from(this.storage.values());
   }
 
-  public get(id: string): V["value"] | undefined {
+  public get(id: string): V["value"] {
     const target = this.storage.get(id);
 
-    if (!target) return undefined;
+    if (!target)
+      throw new RegistryError({
+        errorCode: "ERR_ENTRY_NOT_FOUND",
+        args: { name: id, origin: this.constructor.name },
+      });
 
     return target.value;
   }
 
-  public getWrapped(id: string): V | undefined {
+  public getWrapped(id: string): V {
     const target = this.storage.get(id);
 
-    if (!target) return undefined;
+    if (!target)
+      throw new RegistryError({
+        errorCode: "ERR_ENTRY_NOT_FOUND",
+        args: { name: id, origin: this.constructor.name },
+      });
 
     return target;
   }
@@ -46,7 +56,10 @@ export abstract class BaseRegistry<
     optionalMetadata?: Record<string, unknown>,
   ): V {
     if (this.storage.has(id))
-      throw new Error(`Entry with id "${id}" is already registered.`);
+      throw new RegistryError({
+        errorCode: "ERR_ENTRY_ALREADY_REGISTERED",
+        args: { name: id, origin: this.constructor.name },
+      });
 
     const entry = {
       value,
@@ -64,7 +77,10 @@ export abstract class BaseRegistry<
     const id = value.metadata.id;
 
     if (this.storage.has(id))
-      throw new Error(`Entry with id "${id}" is already registered.`);
+      throw new RegistryError({
+        errorCode: "ERR_ENTRY_ALREADY_REGISTERED",
+        args: { name: id, origin: this.constructor.name },
+      });
 
     this.storage.set(id, value);
 

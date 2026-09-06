@@ -1,5 +1,7 @@
 import type { IRegistryMap } from "#kernel/contract/index";
 
+import { RegistryError } from "#kernel/error/registry-error";
+
 export class MainRegistry {
   private registries: Partial<IRegistryMap> = {};
 
@@ -8,7 +10,10 @@ export class MainRegistry {
     registry: IRegistryMap[K],
   ): void {
     if (this.registries[key])
-      throw new Error(`Registry "${key}" is already registered.`);
+      throw new RegistryError({
+        errorCode: "ERR_REGISTRY_ALREADY_REGISTERED",
+        args: { name: key, origin: this.constructor.name },
+      });
 
     this.registries[key] = registry;
   }
@@ -16,7 +21,11 @@ export class MainRegistry {
   public get<R extends keyof IRegistryMap>(registry: R): IRegistryMap[R] {
     const value = this.registries[registry];
 
-    if (!value) throw new Error(`Registry "${registry}" does not exist.`);
+    if (!value)
+      throw new RegistryError({
+        errorCode: "ERR_REGISTRY_NOT_FOUND",
+        args: { name: registry, origin: this.constructor.name },
+      });
 
     return value;
   }
