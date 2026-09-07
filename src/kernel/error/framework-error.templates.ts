@@ -1,4 +1,4 @@
-import type { IErrorMessage } from "#kernel/contract/index";
+import type { IErrorMessage } from "#contract";
 
 export const frameworkErrors = {
   ERR_ERRORCODE_NOT_FOUND: {

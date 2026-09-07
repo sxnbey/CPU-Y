@@ -1,11 +1,10 @@
-import type { IErrorMessage } from "#kernel/contract/index";
+import type { IErrorMessage } from "#contract";
 
 import {
   FrameworkError,
-  type ErrorTemplateArguments,
+  type ErrorTemplateArgs,
 } from "#kernel/error/framework-error";
 
-const sourceString = "Source: {SOURCE}";
 const factoryErrors = {
   ERR_MISSING_METADATA: {
     headline: "Missing metadata",
@@ -14,12 +13,12 @@ const factoryErrors = {
   },
   ERR_INVALID_SOURCE: {
     headline: "Invalid source",
-    details: `The source provided to InstanceFactory is invalid. InstanceFactory expected a class extending BaseBlueprint or a raw blueprint configuration object matching the base metadata.\n${sourceString}`,
+    details: `The source provided to InstanceFactory is invalid. InstanceFactory expected a class extending BaseBlueprint or a raw blueprint configuration object matching the base metadata.\nSource: {SOURCE}`,
     fix: 'Please ensure the provided source "{SOURCE}" is a child of BaseBlueprint or satisfies the IBaseMetadata interface.',
   },
   ERR_UNEXPECTED_CONFIG: {
     headline: "Unexpected configuration",
-    details: `The configuration object provided to InstanceFactory was unexpected.\n${sourceString}`,
+    details: `The configuration object for blueprint "{NAME}" provided to InstanceFactory was unexpected.`,
     fix: "Please ensure the passed to configuration object is needed by blueprint {NAME}.",
   },
   ERR_MISSING_CONFIG: {
@@ -42,7 +41,7 @@ const factoryErrors = {
   },
 } as const satisfies Record<string, IErrorMessage>;
 
-export class RegistryError<
+export class FactoryError<
   K extends keyof typeof factoryErrors,
 > extends FrameworkError<typeof factoryErrors, K> {
   constructor({
@@ -50,7 +49,7 @@ export class RegistryError<
     args,
   }: {
     errorCode: K;
-    args: ErrorTemplateArguments<typeof factoryErrors, K>;
+    args: ErrorTemplateArgs<typeof factoryErrors, K>;
   }) {
     super({
       errorTemplates: factoryErrors,

@@ -1,5 +1,4 @@
-import type { IRegistryEntry } from "#kernel/contract/index";
-import type { IServiceMetadata } from "#core/contract/index";
+import type { IServiceMetadata, IRegistryEntry } from "#contract";
 
 import { BaseRegistry } from "#kernel/registry/base-registry";
 

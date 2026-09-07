@@ -1,11 +1,11 @@
-import type { IErrorMessage, IErrorArgument } from "#kernel/contract/index";
+import type { IErrorMessage, IErrorArgument } from "#contract";
 
 import { frameworkErrors } from "./framework-error.templates.js";
 
-export type ErrorTemplateArguments<
+export type ErrorTemplateArgs<
   AllTemplates extends Record<string, IErrorMessage>,
   K extends keyof AllTemplates & string,
-> = ResolvePlaceholderArguments<GetAllPlaceholders<AllTemplates[K]>>["args"];
+> = ResolvePlaceholderArgs<GetAllPlaceholders<AllTemplates[K]>>["args"];
 
 type ExtractPlaceholders<T extends string> =
   T extends `${string}{${infer Placeholder}}${infer Rest}`
@@ -21,7 +21,7 @@ type GetAllPlaceholders<Template extends IErrorMessage> = ExtractPlaceholders<
 // Since never is an empty union, it gets distributed, loops 0 times and evaluates to never.
 // Wrapping in a tuple disables distributing and ensures correct comparing.
 
-type ResolvePlaceholderArguments<P extends string> = [P] extends [never]
+type ResolvePlaceholderArgs<P extends string> = [P] extends [never]
   ? { args?: Record<string, string> }
   : { args: Record<P, string> };
 
@@ -31,7 +31,7 @@ type ErrorConstructorParameters<
 > = {
   errorTemplates: AllTemplates;
   errorCode: K;
-} & ResolvePlaceholderArguments<GetAllPlaceholders<AllTemplates[K]>>;
+} & ResolvePlaceholderArgs<GetAllPlaceholders<AllTemplates[K]>>;
 
 export class FrameworkError<
   T extends Record<string, IErrorMessage>,

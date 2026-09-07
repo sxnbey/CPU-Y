@@ -1,6 +1,6 @@
-import { MetadataKey } from "#core/contract/index";
+import { MetadataKey } from "#contract";
 
-import { getMetadata, setMetadata } from "#core/util/metadata";
+import { getMetadata, setMetadata } from "#kernel/metadata/accessor";
 
 export function Inject(id: string): ParameterDecorator {
   return (

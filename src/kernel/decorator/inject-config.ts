@@ -1,6 +1,6 @@
-import { MetadataKey } from "#core/contract/index";
+import { MetadataKey } from "#contract";
 
-import { setMetadata, getMetadata } from "#core/util/metadata";
+import { setMetadata, getMetadata } from "#kernel/metadata/accessor";
 
 export function Config(): ParameterDecorator {
   return (

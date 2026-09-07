@@ -1,9 +1,6 @@
-import type { IErrorMessage } from "#kernel/contract/index";
+import type { IErrorMessage } from "#contract";
 
-import {
-  FrameworkError,
-  type ErrorTemplateArguments,
-} from "./framework-error.js";
+import { FrameworkError, type ErrorTemplateArgs } from "./framework-error.js";
 
 const originString = "Origin: {ORIGIN}";
 const registryErrors = {
@@ -42,7 +39,7 @@ export class RegistryError<
     args,
   }: {
     errorCode: K;
-    args: ErrorTemplateArguments<typeof registryErrors, K>;
+    args: ErrorTemplateArgs<typeof registryErrors, K>;
   }) {
     super({
       errorTemplates: registryErrors,

@@ -25,6 +25,6 @@
   "type": "module",
   "imports": {
     "#kernel/*": "./dist/kernel/*.js",
-    "#core/*": "./dist/core/*.js"
+    "#contract": "./dist/contract/index.js"
   }
 }

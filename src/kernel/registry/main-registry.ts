@@ -1,4 +1,4 @@
-import type { IRegistryMap } from "#kernel/contract/index";
+import type { IRegistryMap } from "#contract";
 
 import { RegistryError } from "#kernel/error/registry-error";
 

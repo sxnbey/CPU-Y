@@ -1,11 +1,11 @@
-import type { IRegistryMap } from "#kernel/contract/index";
+import type { IRegistryMap } from "#contract";
 
 import { System } from "./system.js";
 
 import { BaseRegistry } from "#kernel/registry/base-registry";
 import { MainRegistry } from "#kernel/registry/main-registry";
 import { RegistryResolver } from "#kernel/registry/registry-resolver";
-import { ServiceRegistry } from "#core/registry/service-registry";
+import { ServiceRegistry } from "#kernel/registry/service-registry";
 
 export function bootstrap(): System {
   const mainRegistry = new MainRegistry();

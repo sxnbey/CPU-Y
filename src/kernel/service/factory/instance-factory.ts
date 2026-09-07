@@ -1,12 +1,17 @@
-import type { IBaseMetadata, IRegistryEntry } from "#kernel/contract/index";
-import { type BaseBlueprintChild, MetadataKey } from "#core/contract/index";
+import {
+  type IBaseMetadata,
+  type IRegistryEntry,
+  type BaseBlueprintChild,
+  MetadataKey,
+} from "#contract";
 
 import { BaseBlueprint } from "#kernel/blueprint/base-blueprint";
 import { DynamicBlueprint } from "#kernel/blueprint/dynamic-blueprint";
 import { RegistryResolver } from "#kernel/registry/registry-resolver";
-import { Inject } from "#core/decorator/index";
-import { getMetadata } from "#core/util/metadata";
-import { resolveArguments } from "./argument-resolver.js";
+import { Inject } from "#kernel/decorator/index";
+import { getMetadata } from "#kernel/metadata/accessor";
+import { resolveArgs } from "./argument-resolver.js";
+import { FactoryError } from "#kernel/error/factory-error";
 
 type Source = BaseBlueprintChild | IBaseMetadata;
 
@@ -41,16 +46,16 @@ export class InstanceFactory {
       );
 
       if (!metadata)
-        throw new Error(
-          `Missing metadata for blueprint "${Blueprint.name}". Please ensure that the blueprint is properly decorated.`,
-        );
-
-      const constructorArguments = resolveArguments(
+        throw new FactoryError({
+          errorCode: "ERR_MISSING_METADATA",
+          args: { name: Blueprint.name },
+        });
+      const constructorArgs = resolveArgs(
         this.registryResolver,
         Blueprint,
         config,
       );
-      const value = new Blueprint(...constructorArguments);
+      const value = new Blueprint(...constructorArgs);
 
       return { metadata, value };
     }
@@ -63,9 +68,10 @@ export class InstanceFactory {
       return { metadata, value };
     }
 
-    throw new Error(
-      `Invalid source provided to InstanceFactory. Expected a class extending BaseBlueprint or a raw blueprint configuration object.`,
-    );
+    throw new FactoryError({
+      errorCode: "ERR_INVALID_SOURCE",
+      args: { source },
+    });
   }
 
   private static isChildClassOfBlueprint(

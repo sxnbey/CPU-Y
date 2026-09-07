@@ -1,17 +1,23 @@
-import { EventEmitter } from "node:events";
-
-import type { IRegistryMap, IRegistryEntry } from "#kernel/contract/index";
+import type { IRegistryMap, IRegistryEntry, IRegistry } from "#contract";
 
 import { RegistryError } from "#kernel/error/registry-error";
+import { EventEmitter } from "node:events";
 
 export abstract class BaseRegistry<
   N extends keyof IRegistryMap,
   V extends IRegistryEntry<unknown> = IRegistryEntry<unknown>,
-> extends EventEmitter {
+>
+  extends EventEmitter
+  implements IRegistry<N, V>
+{
   protected storage: Map<string, V> = new Map();
 
   constructor(protected name: N) {
     super();
+  }
+
+  public getName(): N {
+    return this.name;
   }
 
   public listAll(): V["value"][] {
@@ -107,9 +113,5 @@ export abstract class BaseRegistry<
     this.emit("clear");
 
     return this;
-  }
-
-  public getName(): N {
-    return this.name;
   }
 }

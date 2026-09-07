@@ -1,6 +1,6 @@
-import type { IRegistryMap } from "#kernel/contract/index";
+import type { IRegistryMap } from "#contract";
+import type { MainRegistry } from "./main-registry.js";
 
-import { MainRegistry } from "./main-registry.js";
 import { RegistryError } from "#kernel/error/registry-error";
 
 export class RegistryResolver {
