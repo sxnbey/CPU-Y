@@ -8,6 +8,8 @@ export function Config(): ParameterDecorator {
     _propertyKey: string | symbol | undefined,
     parameterIndex: number,
   ) => {
+    //!
+
     if (_propertyKey !== undefined)
       throw new Error(
         `@Config decorator can only be used on constructor parameters, not on method parameters.`,
