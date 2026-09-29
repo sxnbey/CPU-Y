@@ -11,3 +11,5 @@ export * from "./metadata-keys.js";
 export type * from "./blueprint-child.js";
 
 export type * from "./metadata.js";
+
+export type * from "./log.js";

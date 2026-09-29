@@ -4,10 +4,10 @@ import {
   type BaseBlueprintChild,
   MetadataKey,
 } from "#contract";
+import type { RegistryResolver } from "#kernel/registry/registry-resolver";
 
 import { BaseBlueprint } from "#kernel/blueprint/base-blueprint";
 import { DynamicBlueprint } from "#kernel/blueprint/dynamic-blueprint";
-import { RegistryResolver } from "#kernel/registry/registry-resolver";
 import { Inject } from "#kernel/decorator/index";
 import { getMetadata } from "#kernel/metadata/accessor";
 import { resolveArgs } from "./argument-resolver.js";
@@ -21,10 +21,10 @@ export class InstanceFactory {
     private readonly registryResolver: RegistryResolver,
   ) {}
 
-  public create<C extends BaseBlueprintChild>(
-    source: C,
+  public create<Blueprint extends BaseBlueprintChild>(
+    source: Blueprint,
     config?: Record<string, unknown>,
-  ): IRegistryEntry<InstanceType<C>>;
+  ): IRegistryEntry<InstanceType<Blueprint>>;
 
   public create(source: IBaseMetadata): IRegistryEntry<DynamicBlueprint>;
 

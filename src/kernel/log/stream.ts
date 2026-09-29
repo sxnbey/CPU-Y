@@ -1,12 +1,10 @@
 import { Writable, type WritableOptions } from "node:stream";
 
-interface OutputPayload {
-  severity: "info" | "warn" | "error" | "fatal";
-  message: string;
-  formattedMessage?: string;
-}
+import type { LogPayload } from "#contract";
 
-type Writer = (payload: OutputPayload) => void;
+import { formatToString, formatToError } from "#util";
+
+type Writer = (payload: LogPayload) => void | Promise<void>;
 
 export class LogStream extends Writable {
   private writer: Writer;
@@ -24,18 +22,20 @@ export class LogStream extends Writable {
   }
 
   override _write(
-    chunk: OutputPayload,
+    chunk: LogPayload,
     _: unknown,
     callback: (error?: Error) => void,
   ): void {
     try {
-      this.writer(chunk);
+      const result = this.writer(chunk);
 
-      callback();
+      if (typeof result?.then === "function")
+        result
+          .then(() => callback())
+          .catch((err) => callback(formatToError(err)));
+      else callback();
     } catch (err) {
-      callback(
-        err instanceof Error ? err : new Error(LogStream.formatToString(err)),
-      );
+      callback(formatToError(err));
     }
   }
 
@@ -43,20 +43,9 @@ export class LogStream extends Writable {
     this.writer = writer;
   }
 
-  private static formatToString(target: unknown): string {
-    if (typeof target === "string") return target;
+  private static defaultWriter(payload: LogPayload): void {
+    let message = formatToString(payload.message);
 
-    // Since JSON.stringify(undefined) returns undefined, it has to be caught.
-
-    if (typeof target === "undefined") return "undefined";
-
-    return JSON.stringify(target);
-  }
-
-  private static defaultWriter(payload: OutputPayload): void {
-    let message = LogStream.formatToString(
-      payload.formattedMessage ?? payload.message,
-    );
     message = /\n$/.test(message) ? message : message + "\n";
 
     if (payload.severity === "info") process.stdout.write(message);

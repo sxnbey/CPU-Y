@@ -2,7 +2,7 @@ import type { IErrorMessage } from "#contract";
 
 import {
   FrameworkError,
-  type ErrorTemplateArgs,
+  type ErrorParameter,
 } from "#kernel/error/framework-error";
 
 const factoryErrors = {
@@ -41,20 +41,8 @@ const factoryErrors = {
   },
 } as const satisfies Record<string, IErrorMessage>;
 
-export class FactoryError<
-  K extends keyof typeof factoryErrors,
-> extends FrameworkError<typeof factoryErrors, K> {
-  constructor({
-    errorCode,
-    args,
-  }: {
-    errorCode: K;
-    args: ErrorTemplateArgs<typeof factoryErrors, K>;
-  }) {
-    super({
-      errorTemplates: factoryErrors,
-      errorCode: errorCode,
-      ...(args && { args }),
-    });
+export class FactoryError extends FrameworkError<typeof factoryErrors> {
+  constructor(params: ErrorParameter<typeof factoryErrors>) {
+    super({ errorTemplates: factoryErrors, ...params });
   }
 }

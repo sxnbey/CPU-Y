@@ -1,5 +1,5 @@
-import { MainRegistry } from "#kernel/registry/main-registry";
-import { RegistryResolver } from "#kernel/registry/registry-resolver";
+import type { MainRegistry } from "#kernel/registry/main-registry";
+import type { RegistryResolver } from "#kernel/registry/registry-resolver";
 
 import { RegistryError } from "#kernel/error/registry-error";
 
