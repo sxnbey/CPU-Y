@@ -1,5 +1,5 @@
 export class DynamicBlueprint<
-  P extends Record<string, unknown> = Record<string, unknown>,
+  P extends Record<string, unknown> | undefined = undefined,
 > {
-  constructor(readonly payload: P = {} as P) {}
+  constructor(readonly payload?: P) {}
 }

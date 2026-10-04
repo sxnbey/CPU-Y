@@ -1,12 +1,12 @@
-import type { IRegistryMap } from "#contract";
+import type { RegistryMap } from "#contract";
 import type { MainRegistry } from "./main-registry.js";
 
-import { RegistryError } from "#kernel/error/registry-error";
+import { RegistryError } from "#kernel/error/errors";
 
 export class RegistryResolver {
   constructor(private readonly mainRegistry: MainRegistry) {}
 
-  public get<K extends keyof IRegistryMap>(target: K): IRegistryMap[K];
+  public get<K extends keyof RegistryMap>(target: K): RegistryMap[K];
 
   public get<T>(target: string): T;
 
@@ -20,7 +20,7 @@ export class RegistryResolver {
     return this.find(target);
   }
 
-  public find<K extends keyof IRegistryMap>(target: K): IRegistryMap[K];
+  public find<K extends keyof RegistryMap>(target: K): RegistryMap[K];
 
   public find<T>(target: string): T | undefined;
 
@@ -32,6 +32,15 @@ export class RegistryResolver {
     }
 
     return undefined;
+  }
+
+  public listAll(): string[] {
+    const allIds = [];
+
+    for (const registry of this.mainRegistry.getAllRegistries())
+      allIds.push(...(registry.listAll() as string[]));
+
+    return allIds;
   }
 
   public has(target: string): boolean {

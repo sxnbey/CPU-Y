@@ -1,6 +1,6 @@
 import { MetadataKey } from "#contract";
 
-import { setMetadata, getMetadata } from "#kernel/metadata/accessor";
+import { setMetadata, getMetadata } from "../metadata-accessor.js";
 import { FrameworkError } from "#kernel/error/framework-error";
 
 export function Config(): ParameterDecorator {

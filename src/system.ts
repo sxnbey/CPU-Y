@@ -1,20 +1,15 @@
+import type { Logger } from "#kernel/log/logger";
 import type { MainRegistry } from "#kernel/registry/main-registry";
 import type { RegistryResolver } from "#kernel/registry/registry-resolver";
 
-import { RegistryError } from "#kernel/error/registry-error";
-
 export class System {
   constructor(
-    private readonly mainRegistry: MainRegistry,
-    private readonly registryResolver: RegistryResolver,
+    readonly mainRegistry: MainRegistry,
+    readonly registryResolver: RegistryResolver,
+    readonly logger: Logger,
   ) {}
 
   public boot(): void {
-    console.log("Hallo Welt!");
-
-    throw new RegistryError({
-      errorCode: "ERR_ENTRY_NOT_FOUND",
-      args: { name: "test", origin: "system test" },
-    });
+    this.logger.info("\n[CPU-Y] - system online fr");
   }
 }

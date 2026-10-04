@@ -1,14 +1,14 @@
-import type { IRegistryMap, IRegistryEntry, IRegistry } from "#contract";
+import type { RegistryMap, RegistryEntry, Registry } from "#contract";
 
-import { RegistryError } from "#kernel/error/registry-error";
+import { RegistryError } from "#kernel/error/errors";
 import { EventEmitter } from "node:events";
 
 export abstract class BaseRegistry<
-  N extends keyof IRegistryMap,
-  V extends IRegistryEntry<unknown> = IRegistryEntry<unknown>,
+  N extends keyof RegistryMap,
+  V extends RegistryEntry<unknown>,
 >
   extends EventEmitter
-  implements IRegistry<N, V>
+  implements Registry<N, V>
 {
   protected storage: Map<string, V> = new Map();
 
@@ -56,11 +56,15 @@ export abstract class BaseRegistry<
     return this.storage.has(id);
   }
 
-  public register(
-    id: string,
-    value: V["value"],
-    optionalMetadata?: Record<string, unknown>,
-  ): V {
+  public register({
+    id,
+    value,
+    metadata,
+  }: {
+    id: string;
+    value: V["value"];
+    metadata?: Record<string, unknown>;
+  }): V {
     if (this.storage.has(id))
       throw new RegistryError({
         errorCode: "ERR_ENTRY_ALREADY_REGISTERED",
@@ -69,7 +73,7 @@ export abstract class BaseRegistry<
 
     const entry = {
       value,
-      metadata: { ...optionalMetadata, id, targetRegistry: this.getName() },
+      metadata: { ...metadata, id, targetRegistry: this.getName() },
     } as unknown as V;
 
     this.storage.set(id, entry);

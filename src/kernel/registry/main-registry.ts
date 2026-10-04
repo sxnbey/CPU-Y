@@ -1,13 +1,14 @@
-import type { IRegistryMap } from "#contract";
+import type { RegistryMap, Registry } from "#contract";
 
-import { RegistryError } from "#kernel/error/registry-error";
+import { EventEmitter } from "node:events";
+import { RegistryError } from "#kernel/error/errors";
 
-export class MainRegistry {
-  private registries: Partial<IRegistryMap> = {};
+export class MainRegistry extends EventEmitter {
+  private registries: Partial<RegistryMap> = {};
 
-  public register<K extends keyof IRegistryMap>(
+  public register<K extends keyof RegistryMap>(
     key: K,
-    registry: IRegistryMap[K],
+    registry: RegistryMap[K],
   ): void {
     if (this.registries[key])
       throw new RegistryError({
@@ -16,9 +17,13 @@ export class MainRegistry {
       });
 
     this.registries[key] = registry;
+
+    registry.addListener("register", (id, entry) =>
+      this.emit("register", key, id, entry),
+    );
   }
 
-  public get<R extends keyof IRegistryMap>(registry: R): IRegistryMap[R] {
+  public get<R extends keyof RegistryMap>(registry: R): RegistryMap[R] {
     const value = this.registries[registry];
 
     if (!value)
@@ -30,13 +35,13 @@ export class MainRegistry {
     return value;
   }
 
-  public has<R extends keyof IRegistryMap>(
+  public has<R extends keyof RegistryMap>(
     registry: R | string,
-  ): registry is keyof IRegistryMap {
+  ): registry is keyof RegistryMap {
     return registry in this.registries;
   }
 
-  public getAllRegistries<K extends keyof IRegistryMap>(): IRegistryMap[K][] {
+  public getAllRegistries(): Registry<keyof RegistryMap>[] {
     return Object.values(this.registries);
   }
 }

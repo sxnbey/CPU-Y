@@ -1,12 +1,13 @@
-import { type BaseBlueprintChild, MetadataKey } from "#contract";
+import { MetadataKey } from "#contract";
 
-import { RegistryResolver } from "#kernel/registry/registry-resolver";
-import { getMetadata } from "#kernel/metadata/accessor";
-import { FactoryError } from "#kernel/error/factory-error";
+import { getMetadata } from "./metadata-accessor.js";
+import { FactoryError } from "#kernel/error/errors";
 
-export function resolveArgs(
-  registryResolver: RegistryResolver,
-  target: BaseBlueprintChild,
+type GetDependency = (dependencyId: string) => unknown;
+
+export function resolveDependencies(
+  getDependency: GetDependency,
+  target: new (...args: any[]) => unknown,
   config?: Record<string, unknown>,
 ): unknown[] {
   const { configIndex, injectableParameters } = getParameterIndexes(target);
@@ -41,7 +42,7 @@ export function resolveArgs(
         args: { index: index.toString(), name: target.name },
       });
 
-    const dependency = registryResolver.find(dependencyId);
+    const dependency = getDependency(dependencyId);
 
     if (!dependency)
       throw new FactoryError({
@@ -55,12 +56,12 @@ export function resolveArgs(
   return argsArray;
 }
 
-function getParameterIndexes(target: BaseBlueprintChild): {
+function getParameterIndexes(target: new (...args: any[]) => unknown): {
   configIndex: number | undefined;
   injectableParameters: Record<number, string>;
 } {
   const configIndex = getMetadata<number>(MetadataKey.CONFIG, target);
-  const injectableParameters: Record<number, string> =
+  const injectableParameters =
     getMetadata<Record<number, string>>(MetadataKey.DEPENDENCIES, target) || {};
 
   return { configIndex, injectableParameters };

@@ -1,5 +1,5 @@
 export abstract class BaseBlueprint<
-  C extends Record<string, unknown> = Record<string, unknown>,
+  C extends Record<string, unknown> | undefined = undefined,
 > {
   constructor(readonly config?: C) {}
 }
