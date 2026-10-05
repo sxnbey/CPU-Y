@@ -1,11 +1,15 @@
-import type { Registry, RegistryMap } from "./registry.js";
+import type { Registry, RegistryMap } from "#contract";
 
 import { MainRegistry } from "#kernel/registry/main-registry";
 import { RegistryResolver } from "#kernel/registry/registry-resolver";
 import { Logger } from "#kernel/log/logger";
 import { create } from "#kernel/di/instance-factory";
-import { InstanceRegistry } from "#kernel/registry/registries";
+import {
+  InstanceRegistry,
+  FunctionRegistry,
+} from "#kernel/registry/registries";
 import { LogStream } from "#kernel/log/stream";
+import { load } from "#kernel/loader";
 
 export const CORE_SERVICES_PRESET = {
   mainRegistry: MainRegistry,
@@ -13,11 +17,14 @@ export const CORE_SERVICES_PRESET = {
   logger: Logger,
   logStream: LogStream,
   factoryCreate: create,
-  registries: [InstanceRegistry],
+  loader: load,
+  registries: [InstanceRegistry, FunctionRegistry],
 } as const;
 
 export type CorePreset = Omit<typeof CORE_SERVICES_PRESET, "registries"> & {
-  readonly registries: (new (...args: any[]) => Registry<keyof RegistryMap>)[];
+  readonly registries: readonly (new (
+    ...args: any[]
+  ) => Registry<keyof RegistryMap>)[];
 };
 
 export type CoreOverrides = Partial<CorePreset>;

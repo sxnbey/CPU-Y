@@ -7,7 +7,7 @@ export function formatToString(target: unknown): string {
 
   try {
     if (typeof target === "object") return JSON.stringify(target);
-  } catch (err) {}
+  } catch {}
 
   return String(target);
 }

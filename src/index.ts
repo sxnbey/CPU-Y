@@ -1,5 +1,5 @@
 import { bootstrap } from "./bootstrap.js";
 
-const system = bootstrap();
+const system = await bootstrap();
 
 system.boot();

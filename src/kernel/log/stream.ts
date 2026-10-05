@@ -11,7 +11,7 @@ export class LogStream extends Writable {
 
   constructor({
     options = {},
-    writer = LogStream.defaultWriter,
+    writer = defaultWriter,
   }: {
     options?: WritableOptions;
     writer?: Writer;
@@ -42,13 +42,13 @@ export class LogStream extends Writable {
   public setWriter(writer: Writer): void {
     this.writer = writer;
   }
+}
 
-  private static defaultWriter(payload: LogPayload): void {
-    let message = formatToString(payload.message);
+function defaultWriter(payload: LogPayload): void {
+  let message = formatToString(payload.message);
 
-    message = /\n$/.test(message) ? message : message + "\n";
+  message = /\n$/.test(message) ? message : message + "\n";
 
-    if (payload.severity === "info") process.stdout.write(message);
-    else process.stderr.write(message);
-  }
+  if (payload.severity === "info") process.stdout.write(message);
+  else process.stderr.write(message);
 }

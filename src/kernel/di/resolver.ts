@@ -3,11 +3,11 @@ import { MetadataKey } from "#contract";
 import { getMetadata } from "./metadata-accessor.js";
 import { FactoryError } from "#kernel/error/errors";
 
-type GetDependency = (dependencyId: string) => unknown;
+type Lookup = (args0: string) => unknown;
 
 export function resolveDependencies(
-  getDependency: GetDependency,
   target: new (...args: any[]) => unknown,
+  lookup: Lookup,
   config?: Record<string, unknown>,
 ): unknown[] {
   const { configIndex, injectableParameters } = getParameterIndexes(target);
@@ -42,7 +42,7 @@ export function resolveDependencies(
         args: { index: index.toString(), name: target.name },
       });
 
-    const dependency = getDependency(dependencyId);
+    const dependency = lookup(dependencyId);
 
     if (!dependency)
       throw new FactoryError({

@@ -4,6 +4,8 @@ import type { LogPayload } from "#contract";
 import { Inject } from "#kernel/di/decorator/inject-parameter";
 import { formatToString } from "#kernel/util/formatter";
 
+const prefix = "CPU-Y";
+
 export class Logger {
   constructor(@Inject("logStream") private readonly stream: LogStream) {}
 
@@ -28,6 +30,8 @@ export class Logger {
   }
 
   private log(payload: LogPayload): void {
+    payload.message = `[${payload.severity} \\ ${prefix} / ${new Date().toISOString()}] - ${payload.message}`;
+
     this.stream.write(payload);
   }
 
