@@ -26,6 +26,8 @@ const corePreset: CorePreset = {
   registries: [InstanceRegistry, FunctionRegistry],
 };
 
+import { load } from "#kernel/loader";
+
 export function bootstrap(overrides: CoreOverrides = {}): System {
   const preset: CorePreset = { ...corePreset, ...overrides };
   const {
@@ -38,9 +40,7 @@ export function bootstrap(overrides: CoreOverrides = {}): System {
   const registryResolver = new RegistryResolverClass(mainRegistry);
 
   mainRegistry.addListener("register", (registry, id) =>
-    console.log(
-      `entry with id "${id}" just registered in registry "${registry}"`,
-    ),
+    console.log(`[+] entry "${id}" just registered in "${registry}"`),
   );
 
   registries.forEach((Registry) => {
@@ -73,6 +73,10 @@ export function bootstrap(overrides: CoreOverrides = {}): System {
   }
 
   const logger = registryResolver.get<Logger>("logger");
+
+  //
+
+  load("dist/kernel/test");
 
   return new System(mainRegistry, registryResolver, logger);
 }

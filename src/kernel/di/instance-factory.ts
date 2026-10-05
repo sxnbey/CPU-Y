@@ -1,7 +1,6 @@
 import { type BaseMetadata, type RegistryEntry, MetadataKey } from "#contract";
 
 import { isClass, isMetadata } from "#kernel/util/type-guards";
-import { DynamicBlueprint } from "#kernel/blueprint/dynamic-blueprint";
 import { getMetadata } from "./metadata-accessor.js";
 import { FactoryError } from "#kernel/error/errors";
 
@@ -16,7 +15,7 @@ export function create<
   resolve: Resolver,
   source: RawInstanceConfig,
   payload?: Payload,
-): RegistryEntry<DynamicBlueprint<Payload>>;
+): RegistryEntry<DynamicClass<Payload>>;
 
 export function create<SourceClass extends Class>(
   resolve: Resolver,
@@ -30,18 +29,18 @@ export function create(
   input?: Record<string, unknown>,
 ): RegistryEntry<unknown> {
   if (isClass(source)) {
-    const Blueprint = source;
+    const Class = source;
     const config = input;
-    const metadata = getMetadata<BaseMetadata>(MetadataKey.METADATA, Blueprint);
+    const metadata = getMetadata<BaseMetadata>(MetadataKey.METADATA, Class);
 
     if (!metadata)
       throw new FactoryError({
         errorCode: "ERR_MISSING_METADATA",
-        args: { name: Blueprint.name },
+        args: { name: Class.name },
       });
 
-    const constructorArgs = resolve(Blueprint, config);
-    const value = new Blueprint(...constructorArgs);
+    const constructorArgs = resolve(Class, config);
+    const value = new Class(...constructorArgs);
 
     return { metadata, value };
   }
@@ -49,7 +48,7 @@ export function create(
   if (isMetadata(source)) {
     const payload = input;
     const metadata = source;
-    const value = new DynamicBlueprint(payload);
+    const value = new DynamicClass(payload);
 
     return { metadata, value };
   }
@@ -58,4 +57,8 @@ export function create(
     errorCode: "ERR_INVALID_SOURCE",
     args: { source },
   });
+}
+
+class DynamicClass<P extends Record<string, unknown> | undefined = undefined> {
+  constructor(readonly payload?: P) {}
 }

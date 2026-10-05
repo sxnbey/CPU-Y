@@ -21,6 +21,8 @@ export class MainRegistry extends EventEmitter {
     registry.addListener("register", (id, entry) =>
       this.emit("register", key, id, entry),
     );
+
+    this.emit("register", "MainRegistry", key, registry);
   }
 
   public get<R extends keyof RegistryMap>(registry: R): RegistryMap[R] {
