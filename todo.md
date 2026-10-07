@@ -1,7 +1,1 @@
-- custom errors
-- logger
-- loader
-- runtime validation
-- nach deps sortieren in boot()
-- eine config WOWZERS
-- dann endlich application (phase 2)
+- lowkey

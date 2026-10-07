@@ -1,6 +1,6 @@
 import { MetadataKey } from "#contract";
 
-import { getMetadata } from "./metadata-accessor.js";
+import { getMetadata } from "#kernel/metadata/metadata-accessor";
 import { FactoryError } from "#kernel/error/errors";
 
 type Lookup = (args0: string) => unknown;

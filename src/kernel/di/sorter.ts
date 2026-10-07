@@ -1,6 +1,6 @@
 import { MetadataKey } from "#contract";
 import { isClass } from "#util";
-import { getMetadata } from "./metadata-accessor.js";
+import { getMetadata } from "#kernel/metadata/metadata-accessor";
 
 type Lookup = (args0: string) => boolean;
 
@@ -9,7 +9,7 @@ export function sort(
   lookup?: Lookup,
 ): string[] {
   const dependencyMap = buildDependencyMap(services);
-  const sorted = topoSort(dependencyMap, lookup);
+  const sorted = topologicalSort(dependencyMap, lookup);
 
   return sorted;
 }
@@ -35,7 +35,7 @@ function buildDependencyMap(services: Record<string, unknown>): {
   return dependencyMap;
 }
 
-function topoSort(
+function topologicalSort(
   dependencyMap: { [key: string]: string[] },
   lookup?: Lookup,
 ): string[] {
@@ -45,6 +45,8 @@ function topoSort(
   for (const key of Object.keys(dependencyMap)) if (!state[key]) visit(key, []);
 
   return sorted;
+
+  //
 
   function visit(current: string, path: string[]) {
     const currentState = state[current] || "unvisited";
@@ -59,7 +61,7 @@ function topoSort(
 
       const dependencies = dependencyMap[current];
 
-      if (!dependencies) {
+      if (dependencies === undefined) {
         if (lookup?.(current)) {
           state[current] = "visited";
 

@@ -1,7 +1,7 @@
 import type { LogStream } from "./stream.js";
 import type { LogPayload } from "#contract";
 
-import { Inject } from "#kernel/di/decorator/inject-parameter";
+import { Inject } from "#kernel/metadata/decorator/index";
 import { formatToString } from "#kernel/util/formatter";
 
 const prefix = "CPU-Y";

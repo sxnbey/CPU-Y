@@ -1,5 +1,5 @@
 import type EventEmitter from "events";
-import type { BaseMetadata, InstanceMetadata } from "./metadata.js";
+import type { BaseMetadata } from "./metadata.js";
 
 export interface Registry<
   N extends keyof RegistryMap,
@@ -31,7 +31,7 @@ export interface Registry<
 }
 
 export interface RegistryPayloadMap {
-  instanceRegistry: RegistryEntry<unknown, InstanceMetadata>;
+  instanceRegistry: RegistryEntry<unknown, BaseMetadata>;
   functionRegistry: RegistryEntry<(...args: any[]) => any>;
 }
 

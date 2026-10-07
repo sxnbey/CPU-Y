@@ -1,10 +1,10 @@
-import type { InstanceMetadata, RegistryEntry } from "#contract";
+import type { BaseMetadata, RegistryEntry } from "#contract";
 
 import { BaseRegistry } from "#kernel/registry/base-registry";
 
 export class InstanceRegistry extends BaseRegistry<
   "instanceRegistry",
-  RegistryEntry<unknown, InstanceMetadata>
+  RegistryEntry<unknown, BaseMetadata>
 > {
   constructor() {
     super("instanceRegistry");

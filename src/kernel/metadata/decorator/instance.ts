@@ -1,16 +1,10 @@
-import {
-  type RegistryMap,
-  type InstanceMetadata,
-  MetadataKey,
-} from "#contract";
+import { MetadataKey, type BaseMetadata, type RegistryMap } from "#contract";
 
 import { setMetadata } from "../metadata-accessor.js";
 
-type MetadataInput = Pick<InstanceMetadata, "id">;
-
 const registryName = "instanceRegistry" satisfies keyof RegistryMap;
 
-export function Instance(input: MetadataInput): ClassDecorator {
+export function Instance(input: Pick<BaseMetadata, "id">): ClassDecorator {
   return (target) => {
     setMetadata(
       MetadataKey.METADATA,

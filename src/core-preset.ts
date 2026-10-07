@@ -3,7 +3,6 @@ import type { Registry, RegistryMap } from "#contract";
 import { MainRegistry } from "#kernel/registry/main-registry";
 import { RegistryResolver } from "#kernel/registry/registry-resolver";
 import { Logger } from "#kernel/log/logger";
-import { create } from "#kernel/di/instance-factory";
 import {
   InstanceRegistry,
   FunctionRegistry,
@@ -16,7 +15,6 @@ export const CORE_SERVICES_PRESET = {
   registryResolver: RegistryResolver,
   logger: Logger,
   logStream: LogStream,
-  factoryCreate: create,
   loader: load,
   registries: [InstanceRegistry, FunctionRegistry],
 } as const;

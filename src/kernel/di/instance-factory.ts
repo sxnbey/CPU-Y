@@ -1,7 +1,7 @@
 import { type BaseMetadata, type RegistryEntry, MetadataKey } from "#contract";
 
-import { isClass, isMetadata } from "#kernel/util/type-guards";
-import { getMetadata } from "./metadata-accessor.js";
+import { isClass, isMetadata } from "#util";
+import { getMetadata } from "#kernel/metadata/metadata-accessor";
 import { FactoryError } from "#kernel/error/errors";
 
 type Class = new (...args: any[]) => unknown;

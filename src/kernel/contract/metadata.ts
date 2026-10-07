@@ -10,5 +10,3 @@ export interface BaseMetadata {
   id: string;
   targetRegistry: keyof RegistryMap;
 }
-
-export interface InstanceMetadata extends BaseMetadata {}

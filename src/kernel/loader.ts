@@ -15,29 +15,20 @@ export async function load(loadPath: string): Promise<unknown[]> {
 
   if (!pathExists) throw new Error(`path "${loadPath}" does not exist`);
 
-  const rawFiles = await scan(loadPath);
-  const loadedFiles = await resolvePath(rawFiles);
+  const rawAddresses = await scan(loadPath);
+  const loadedFiles = await resolveAndImport(rawAddresses);
 
   return loadedFiles;
 }
 
-async function resolvePath(addresses: FileAddress[]): Promise<unknown[]> {
-  const loaded = [];
+async function doesPathExist(path: string): Promise<boolean> {
+  try {
+    await access(path, constants.F_OK);
 
-  for (const entry of addresses) {
-    const absolutePath = path.resolve(entry.parentPath, entry.fileName);
-    const jsPath = absolutePath.endsWith(".ts")
-      ? absolutePath.slice(0, -3) + ".js"
-      : absolutePath;
-
-    const fileUrl = pathToFileURL(jsPath).href;
-    const imported = await import(fileUrl);
-
-    for (const importedFile of Object.values(imported))
-      loaded.push(importedFile);
+    return true;
+  } catch {
+    return false;
   }
-
-  return loaded;
 }
 
 async function scan(scanPath: string): Promise<FileAddress[]> {
@@ -56,12 +47,26 @@ async function scan(scanPath: string): Promise<FileAddress[]> {
   return addresses;
 }
 
-async function doesPathExist(path: string): Promise<boolean> {
-  try {
-    await access(path, constants.F_OK);
+async function resolveAndImport(addresses: FileAddress[]): Promise<unknown[]> {
+  const loaded = [];
 
-    return true;
-  } catch {
-    return false;
+  for (const entry of addresses) {
+    const fileUrl = toImportUrl(entry.parentPath, entry.fileName);
+
+    const imported = await import(fileUrl);
+
+    for (const importedFile of Object.values(imported))
+      loaded.push(importedFile);
   }
+
+  return loaded;
+}
+
+function toImportUrl(parentPath: string, fileName: string): string {
+  const absolutePath = path.resolve(parentPath, fileName);
+  const jsPath = absolutePath.endsWith(".ts")
+    ? absolutePath.slice(0, -3) + ".js"
+    : absolutePath;
+
+  return pathToFileURL(jsPath).href;
 }
