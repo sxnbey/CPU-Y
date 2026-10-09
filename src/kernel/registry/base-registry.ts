@@ -1,10 +1,10 @@
-import type { RegistryMap, RegistryEntry, Registry } from "#contract";
+import type { KnownRegistries, RegistryEntry, Registry } from "#contract";
 
 import { RegistryError } from "#kernel/error/errors";
 import { EventEmitter } from "node:events";
 
 export abstract class BaseRegistry<
-  N extends keyof RegistryMap,
+  N extends keyof KnownRegistries,
   V extends RegistryEntry<unknown>,
 >
   extends EventEmitter

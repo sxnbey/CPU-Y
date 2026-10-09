@@ -1,8 +1,12 @@
-import { MetadataKey, type BaseMetadata, type RegistryMap } from "#contract";
+import {
+  MetadataKey,
+  type BaseMetadata,
+  type KnownRegistries,
+} from "#contract";
 
 import { setMetadata } from "../metadata-accessor.js";
 
-const registryName = "functionRegistry" satisfies keyof RegistryMap;
+const registryName = "functionRegistry" satisfies keyof KnownRegistries;
 
 export function decorateFunction<Function extends (...args: any[]) => unknown>(
   input: Pick<BaseMetadata, "id">,

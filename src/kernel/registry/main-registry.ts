@@ -1,12 +1,12 @@
-import type { RegistryMap, Registry } from "#contract";
+import type { RegistryMap } from "#contract";
 
 import { EventEmitter } from "node:events";
 import { RegistryError } from "#kernel/error/errors";
 
 export class MainRegistry extends EventEmitter {
-  private registries: Partial<RegistryMap> = {};
+  private registries: RegistryMap = {} as RegistryMap;
 
-  public register<K extends keyof RegistryMap>(
+  public register<K extends keyof RegistryMap & string>(
     key: K,
     registry: RegistryMap[K],
   ): void {
@@ -25,7 +25,9 @@ export class MainRegistry extends EventEmitter {
     this.emit("register", "MainRegistry", key, registry);
   }
 
-  public get<R extends keyof RegistryMap>(registry: R): RegistryMap[R] {
+  public get<R extends keyof RegistryMap & string>(
+    registry: R,
+  ): RegistryMap[R] {
     const value = this.registries[registry];
 
     if (!value)
@@ -37,13 +39,13 @@ export class MainRegistry extends EventEmitter {
     return value;
   }
 
-  public has<R extends keyof RegistryMap>(
+  public has<R extends keyof RegistryMap & string>(
     registry: R | string,
-  ): registry is keyof RegistryMap {
+  ): registry is keyof RegistryMap & string {
     return registry in this.registries;
   }
 
-  public getAllRegistries(): Registry<keyof RegistryMap>[] {
+  public getAllRegistries(): RegistryMap[keyof RegistryMap][] {
     return Object.values(this.registries);
   }
 }

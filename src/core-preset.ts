@@ -1,4 +1,4 @@
-import type { Registry, RegistryMap } from "#contract";
+import type { RegistryMap } from "#contract";
 
 import { MainRegistry } from "#kernel/registry/main-registry";
 import { RegistryResolver } from "#kernel/registry/registry-resolver";
@@ -10,19 +10,24 @@ import {
 import { LogStream } from "#kernel/log/stream";
 import { load } from "#kernel/loader";
 
-export const CORE_SERVICES_PRESET = {
+type Constructor<T> = new (...args: any[]) => T;
+
+export interface CorePreset {
+  mainRegistry: Constructor<MainRegistry>;
+  registryResolver: Constructor<RegistryResolver>;
+  logStream: Constructor<LogStream>;
+  logger: Constructor<Logger>;
+  loader: typeof load;
+  registries: (new (...args: any[]) => RegistryMap[keyof RegistryMap])[];
+}
+
+export const CORE_SERVICES_PRESET: CorePreset = {
   mainRegistry: MainRegistry,
   registryResolver: RegistryResolver,
-  logger: Logger,
   logStream: LogStream,
+  logger: Logger,
   loader: load,
   registries: [InstanceRegistry, FunctionRegistry],
-} as const;
-
-export type CorePreset = Omit<typeof CORE_SERVICES_PRESET, "registries"> & {
-  readonly registries: readonly (new (
-    ...args: any[]
-  ) => Registry<keyof RegistryMap>)[];
 };
 
 export type CoreOverrides = Partial<CorePreset>;

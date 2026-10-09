@@ -1,4 +1,4 @@
-import type { RegistryMap } from "./registry.js";
+import type { KnownRegistries } from "./registry.js";
 
 export enum MetadataKey {
   CONFIG = "system:config",
@@ -8,5 +8,5 @@ export enum MetadataKey {
 
 export interface BaseMetadata {
   id: string;
-  targetRegistry: keyof RegistryMap;
+  targetRegistry: keyof KnownRegistries;
 }

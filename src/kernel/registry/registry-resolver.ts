@@ -1,4 +1,4 @@
-import type { RegistryMap } from "#contract";
+import type { KnownRegistries } from "#contract";
 import type { MainRegistry } from "./main-registry.js";
 
 import { RegistryError } from "#kernel/error/errors";
@@ -6,7 +6,17 @@ import { RegistryError } from "#kernel/error/errors";
 export class RegistryResolver {
   constructor(private readonly mainRegistry: MainRegistry) {}
 
-  public get<K extends keyof RegistryMap>(target: K): RegistryMap[K];
+  public getRegistry<K extends keyof KnownRegistries>(
+    target: K,
+  ): KnownRegistries[K] {
+    if (!this.mainRegistry.has(target))
+      throw new RegistryError({
+        errorCode: "ERR_ENTRY_NOT_FOUND",
+        args: { name: target, origin: this.constructor.name },
+      });
+
+    return this.mainRegistry.get(target);
+  }
 
   public get<T>(target: string): T;
 
@@ -20,16 +30,9 @@ export class RegistryResolver {
     return this.find(target);
   }
 
-  public find<K extends keyof RegistryMap>(target: K): RegistryMap[K];
-
-  public find<T>(target: string): T | undefined;
-
-  public find(target: string): unknown {
-    if (this.mainRegistry.has(target)) return this.mainRegistry.get(target);
-
-    for (const registry of this.mainRegistry.getAllRegistries()) {
-      if (registry.has(target)) return registry.get(target);
-    }
+  public find<T>(target: string): T | undefined {
+    for (const registry of this.mainRegistry.getAllRegistries())
+      if (registry.has(target)) return registry.get(target) as T;
 
     return undefined;
   }
@@ -38,7 +41,7 @@ export class RegistryResolver {
     const allIds = [];
 
     for (const registry of this.mainRegistry.getAllRegistries())
-      allIds.push(...(registry.listAll() as string[]));
+      allIds.push(...registry.listAll());
 
     return allIds;
   }
