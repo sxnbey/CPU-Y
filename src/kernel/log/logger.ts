@@ -1,13 +1,12 @@
 import type { LogStream } from "./stream.js";
 import type { LogPayload } from "#contract";
 
-import { Inject } from "#kernel/metadata/decorator/index";
 import { formatToString } from "#kernel/util/formatter";
 
 const prefix = "CPU-Y";
 
 export class Logger {
-  constructor(@Inject("logStream") private readonly stream: LogStream) {}
+  constructor(private readonly stream: LogStream) {}
 
   public info(message: string): void {
     this.log({ message, severity: "info" });

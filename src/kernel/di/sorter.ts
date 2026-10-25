@@ -15,14 +15,14 @@ export function sort(
 }
 
 function buildDependencyMap(services: Record<string, unknown>): {
-  [key: string]: string[];
+  [serviceName: string]: string[];
 } {
-  const dependencyMap: { [key: string]: string[] } = {};
+  const dependencyMap: { [serviceName: string]: string[] } = {};
 
-  for (const [key, service] of Object.entries(services)) {
-    dependencyMap[key] ??= [];
+  for (const [serviceName, service] of Object.entries(services)) {
+    dependencyMap[serviceName] ??= [];
 
-    const currentDeps = dependencyMap[key];
+    const currentDeps = dependencyMap[serviceName];
 
     if (!isClass(service)) continue;
 
@@ -36,13 +36,15 @@ function buildDependencyMap(services: Record<string, unknown>): {
 }
 
 function topologicalSort(
-  dependencyMap: { [key: string]: string[] },
+  dependencyMap: { [serviceName: string]: string[] },
   lookup?: Lookup,
 ): string[] {
-  const state: { [key: string]: "unvisited" | "visiting" | "visited" } = {};
+  const state: { [serviceName: string]: "unvisited" | "visiting" | "visited" } =
+    {};
   const sorted: string[] = [];
 
-  for (const key of Object.keys(dependencyMap)) if (!state[key]) visit(key, []);
+  for (const serviceName of Object.keys(dependencyMap))
+    if (!state[serviceName]) visit(serviceName, []);
 
   return sorted;
 

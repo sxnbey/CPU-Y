@@ -8,5 +8,5 @@ export enum MetadataKey {
 
 export interface BaseMetadata {
   id: string;
-  targetRegistry: keyof RegistryMap;
+  targetRegistry: keyof RegistryMap & string;
 }

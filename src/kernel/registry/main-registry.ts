@@ -6,23 +6,23 @@ import { RegistryError } from "#kernel/error/errors";
 export class MainRegistry extends EventEmitter {
   private registries: RegistryMap = {} as RegistryMap;
 
-  public register<K extends keyof RegistryMap & string>(
-    key: K,
-    registry: RegistryMap[K],
+  public register<N extends keyof RegistryMap & string>(
+    registryName: N,
+    registry: RegistryMap[N],
   ): void {
-    if (this.registries[key])
+    if (this.registries[registryName])
       throw new RegistryError({
         errorCode: "ERR_REGISTRY_ALREADY_REGISTERED",
-        args: { name: key, origin: this.constructor.name },
+        args: { name: registryName, origin: this.constructor.name },
       });
 
-    this.registries[key] = registry;
+    this.registries[registryName] = registry;
 
     registry.addListener("register", (id, entry) =>
-      this.emit("register", key, id, entry),
+      this.emit("register", registryName, id, entry),
     );
 
-    this.emit("register", "MainRegistry", key, registry);
+    this.emit("register", "MainRegistry", registryName, registry);
   }
 
   public get<R extends keyof RegistryMap & string>(

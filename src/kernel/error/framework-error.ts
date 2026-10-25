@@ -113,7 +113,7 @@ function replacePlaceholders(
 
   return target.replace(
     /\{([^}]+)\}/g,
-    (match, key) => args[key.toLowerCase()] ?? match,
+    (match, placeholder) => args[placeholder.toLowerCase()] ?? match,
   );
 }
 

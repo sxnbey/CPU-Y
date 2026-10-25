@@ -1,6 +1,6 @@
 import "reflect-metadata";
 
-export function getMetadata<T>(
+export function getMetadata<T = unknown>(
   metadataKey: string,
   target: object,
 ): T | undefined {

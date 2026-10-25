@@ -56,9 +56,7 @@ const originString = "Origin: {ORIGIN}";
 const registryErrors = {
   ERR_REGISTRY_ALREADY_REGISTERED: {
     headline: "Registry already registered",
-    details:
-      'The registry with name "{NAME}" has already been registered.' +
-      originString,
+    details: `The registry with name "{NAME}" has already been registered.\n${originString}`,
     fix: "Please ensure that the registry is not registered already with .has().",
   },
   ERR_REGISTRY_NOT_FOUND: {
