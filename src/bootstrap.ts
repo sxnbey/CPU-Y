@@ -25,7 +25,7 @@ export function bootstrap(overrides?: CoreOverrides) {
     console.log(`${logPrefix} entry "${id}" just registered in "${registry}"`),
   );
 
-  console.log(`${logPrefix} registering registries`);
+  console.log(`${logPrefix} registering registries...`);
 
   registries.forEach((Registry) => {
     const registryInstance = new Registry();
@@ -36,7 +36,7 @@ export function bootstrap(overrides?: CoreOverrides) {
   const instanceRegistry = registryResolver.getRegistry("instanceRegistry");
   const functionRegistry = registryResolver.getRegistry("functionRegistry");
 
-  console.log(`${logPrefix} registering instances`);
+  console.log(`${logPrefix} registering instances...`);
 
   const logStream = new LogStreamClass();
 
@@ -46,9 +46,13 @@ export function bootstrap(overrides?: CoreOverrides) {
 
   instanceRegistry.register({ id: "logger", value: logger });
 
-  console.log(`${logPrefix} registering functions`);
+  console.log(`${logPrefix} registering functions...`);
 
   functionRegistry.register({ id: "loader", value: loader });
+
+  console.log(`${logPrefix} finishing up...`);
+
+  mainRegistry.removeAllListeners();
 
   console.log(`${logPrefix} done 😋`);
   console.log();

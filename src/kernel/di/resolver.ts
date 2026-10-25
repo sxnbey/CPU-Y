@@ -44,7 +44,7 @@ export function resolveDependencies(
 
     const dependency = lookup(dependencyId);
 
-    if (!dependency)
+    if (dependency === undefined)
       throw new FactoryError({
         errorCode: "ERR_DEPENDENCY_NOT_FOUND",
         args: { id: dependencyId, index: index.toString(), name: target.name },
