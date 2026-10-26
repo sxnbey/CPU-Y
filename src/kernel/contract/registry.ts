@@ -31,11 +31,8 @@ export interface Registry<
 }
 
 export interface RegistryPayloadMap {
-  instanceRegistry: RegistryEntry<
-    InstanceType<new (...args: any[]) => any>,
-    BaseMetadata
-  >;
-  functionRegistry: RegistryEntry<(...args: any[]) => any>;
+  instanceRegistry: RegistryEntry<object, BaseMetadata>;
+  functionRegistry: RegistryEntry<(...args: any[]) => unknown>;
 }
 
 export type KnownRegistries = {
@@ -47,6 +44,10 @@ export type CustomRegistries = {
 };
 
 export type RegistryMap = KnownRegistries & CustomRegistries;
+
+// & {} ensures this type doesn't get reduced to string.
+
+export type RegistryName = keyof KnownRegistries | (string & {});
 
 export interface RegistryEntry<V, M extends BaseMetadata = BaseMetadata> {
   value: V;

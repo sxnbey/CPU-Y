@@ -1,4 +1,4 @@
-import type { RegistryEntry, RegistryMap } from "#contract";
+import type { RegistryEntry, RegistryMap, RegistryName } from "#contract";
 import type { MainRegistry } from "./main-registry.js";
 
 import { RegistryError } from "#kernel/error/errors";
@@ -6,9 +6,7 @@ import { RegistryError } from "#kernel/error/errors";
 export class RegistryResolver {
   constructor(private readonly mainRegistry: MainRegistry) {}
 
-  public getRegistry<K extends keyof RegistryMap & string>(
-    target: K,
-  ): RegistryMap[K] {
+  public getRegistry<K extends RegistryName>(target: K): RegistryMap[K] {
     if (!this.mainRegistry.has(target))
       throw new RegistryError({
         errorCode: "ERR_REGISTRY_NOT_FOUND",
