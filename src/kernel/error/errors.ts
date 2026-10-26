@@ -2,44 +2,46 @@ import type { ErrorMessage } from "#contract";
 
 import { FrameworkError, type ErrorParameter } from "./framework-error.js";
 
-export class FactoryError extends FrameworkError<typeof factoryErrors> {
-  constructor(params: ErrorParameter<typeof factoryErrors>) {
-    super({ errorTemplates: factoryErrors, ...params });
+export class DependencyInjectionError extends FrameworkError<
+  typeof dependencyInjectionErrors
+> {
+  constructor(params: ErrorParameter<typeof dependencyInjectionErrors>) {
+    super({ errorTemplates: dependencyInjectionErrors, ...params });
   }
 }
 
-const factoryErrors = {
+const dependencyInjectionErrors = {
   ERR_MISSING_METADATA: {
     headline: "Missing metadata",
-    details: 'The metadata is missing for blueprint with name "{NAME}".',
-    fix: 'Please ensure blueprint "{NAME}" is properly decorated with @Decorators.',
+    details: 'The metadata is missing for class with name "{NAME}".',
+    fix: 'Please ensure class "{NAME}" is properly decorated with @Decorators.',
   },
   ERR_INVALID_SOURCE: {
     headline: "Invalid source",
-    details: `The source provided to InstanceFactory is invalid. InstanceFactory expected a class or a raw blueprint configuration object matching the base metadata.\nSource: {SOURCE}`,
+    details: `The source provided to InstanceFactory is invalid. InstanceFactory expected a class or a raw class configuration object matching the base metadata.\nSource: {SOURCE}`,
     fix: 'Please ensure the provided source "{SOURCE}" is a Class or satisfies the BaseMetadata interface.',
   },
   ERR_UNEXPECTED_CONFIG: {
     headline: "Unexpected configuration",
-    details: `The configuration object for blueprint "{NAME}" provided to InstanceFactory was unexpected.`,
-    fix: "Please ensure the passed to configuration object is needed by blueprint {NAME}.",
+    details: `The configuration object for class "{NAME}" provided to DependencyResolver was unexpected.`,
+    fix: "Please ensure the provided configuration object is needed by class {NAME}.",
   },
   ERR_MISSING_CONFIG: {
     headline: "Missing configuration",
     details:
-      'InstanceFactory expected a configuration object for parameter at index "{INDEX}" for blueprint {NAME}.',
-    fix: 'Please ensure a configuration object at index "{INDEX}" for blueprint "{NAME}" has been passed to the InstanceFactory.',
+      "DependencyResolver expected a configuration object for class {NAME}.",
+    fix: 'Please ensure a configuration object for class "{NAME}" has been passed to the DependencyResolver.',
   },
   ERR_MISSING_DEPENDENCY_DECORATOR: {
     headline: "Missing dependency decorator",
     details:
-      'The blueprint "{NAME}" expected a dependency at index "{INDEX}", but none was decorated.',
-    fix: 'Please ensure the dependency at index "{INDEX}" for blueprint "{NAME}" has been decorated with @Inject.',
+      'The class "{NAME}" expected a dependency at index "{INDEX}", but none was decorated.',
+    fix: 'Please ensure the dependency at index "{INDEX}" for class "{NAME}" has been decorated with @Inject.',
   },
   ERR_DEPENDENCY_NOT_FOUND: {
     headline: "Missing dependencies",
     details:
-      'InstanceFactory could not resolve dependency "{ID}" at index "{INDEX}" for blueprint "{NAME}".',
+      'DependencyResolver could not resolve dependency "{ID}" for class "{NAME}".',
     fix: 'Please ensure that the dependency "{ID}" is registered in the registry.',
   },
 } as const satisfies Record<string, ErrorMessage>;

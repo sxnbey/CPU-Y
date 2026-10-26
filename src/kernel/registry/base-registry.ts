@@ -20,8 +20,8 @@ export abstract class BaseRegistry<
     return this.name;
   }
 
-  public listAll(): V["value"][] {
-    return Array.from(this.storage.values()).map((entry) => entry.value);
+  public listAllIds(): string[] {
+    return Array.from(this.storage.values()).map((entry) => entry.metadata.id);
   }
 
   public listAllWrapped(): V[] {
@@ -99,14 +99,12 @@ export abstract class BaseRegistry<
     return value;
   }
 
-  public delete(id: string): true {
+  public delete(id: string): void {
     const entry = this.getWrapped(id);
 
     this.storage.delete(id);
 
     this.emit("delete", id, entry);
-
-    return true;
   }
 
   public clear(): this {

@@ -1,33 +1,31 @@
-import type { RegistryMap } from "#contract";
+import type { EntryBuilder, Loader, Registry } from "#contract";
 
-import { MainRegistry } from "#kernel/registry/main-registry";
-import { RegistryResolver } from "#kernel/registry/registry-resolver";
 import { Logger } from "#kernel/log/logger";
 import {
   InstanceRegistry,
   FunctionRegistry,
 } from "#kernel/registry/registries";
 import { LogStream } from "#kernel/log/stream";
-import { load } from "#kernel/loader";
+import { createLoader } from "#kernel/load/loader";
+import { buildFunction, buildInstance } from "#kernel/install/entry-builders";
 
 type Constructor<T> = new (...args: any[]) => T;
 
 export interface CorePreset {
-  mainRegistry: Constructor<MainRegistry>;
-  registryResolver: Constructor<RegistryResolver>;
   logStream: Constructor<LogStream>;
   logger: Constructor<Logger>;
-  loader: typeof load;
-  registries: (new (...args: any[]) => RegistryMap[keyof RegistryMap])[];
+  loader: Loader;
+  registries: { registry: Constructor<Registry>; build: EntryBuilder }[];
 }
 
 export const CORE_SERVICES_PRESET: CorePreset = {
-  mainRegistry: MainRegistry,
-  registryResolver: RegistryResolver,
   logStream: LogStream,
   logger: Logger,
-  loader: load,
-  registries: [InstanceRegistry, FunctionRegistry],
+  loader: createLoader(),
+  registries: [
+    { registry: InstanceRegistry, build: buildInstance },
+    { registry: FunctionRegistry, build: buildFunction },
+  ],
 };
 
 export type CoreOverrides = Partial<CorePreset>;

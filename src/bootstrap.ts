@@ -3,34 +3,47 @@ import {
   type CoreOverrides,
   CORE_SERVICES_PRESET,
 } from "./core-preset.js";
+import type { Config } from "#contract";
 
 import { System } from "./system.js";
 
-export function bootstrap(overrides?: CoreOverrides) {
+import { MainRegistry } from "#kernel/registry/main-registry";
+import { RegistryResolver } from "#kernel/registry/registry-resolver";
+import { Installer } from "#kernel/install/installer";
+
+type BootstrapOptions = {
+  path: string;
+  configs?: Record<string, Config>;
+  overrides?: CoreOverrides;
+};
+
+export function bootstrap(options: BootstrapOptions) {
   console.log(`${logPrefix} starting...`);
 
-  const preset: CorePreset = { ...CORE_SERVICES_PRESET, ...overrides };
+  const preset: CorePreset = { ...CORE_SERVICES_PRESET, ...options.overrides };
   const {
-    mainRegistry: MainRegistryClass,
-    registryResolver: RegistryResolverClass,
     logStream: LogStreamClass,
     logger: LoggerClass,
-    loader: loader,
+    loader,
     registries,
   } = preset;
-  const mainRegistry = new MainRegistryClass();
-  const registryResolver = new RegistryResolverClass(mainRegistry);
+  const mainRegistry = new MainRegistry();
+  const registryResolver = new RegistryResolver(mainRegistry);
+  const installer = new Installer(registryResolver);
 
-  mainRegistry.addListener("register", (registry, id) =>
-    console.log(`${logPrefix} entry "${id}" just registered in "${registry}"`),
-  );
+  const registrationLog = (registry: string, id: string) =>
+    console.log(`${logPrefix} entry "${id}" just registered in "${registry}"`);
+
+  mainRegistry.addListener("register", registrationLog);
 
   console.log(`${logPrefix} registering registries...`);
 
-  registries.forEach((Registry) => {
-    const registryInstance = new Registry();
+  registries.forEach((entry) => {
+    const registry = new entry.registry();
 
-    mainRegistry.register(registryInstance.getName(), registryInstance);
+    mainRegistry.register(registry.getName(), registry);
+
+    installer.addBuilder(registry.getName(), entry.build);
   });
 
   const instanceRegistry = registryResolver.getRegistry("instanceRegistry");
@@ -52,12 +65,15 @@ export function bootstrap(overrides?: CoreOverrides) {
 
   console.log(`${logPrefix} finishing up...`);
 
-  mainRegistry.removeAllListeners();
-
   console.log(`${logPrefix} done 😋`);
   console.log();
 
-  return new System(mainRegistry, registryResolver, logger);
+  mainRegistry.off("register", registrationLog);
+
+  return new System(
+    { logger, loader, installer, registryResolver },
+    { path: options.path, configs: options.configs ?? {} },
+  );
 }
 
 const logPrefix = "[bootstrap]";

@@ -1,17 +1,28 @@
 import type { Logger } from "#kernel/log/logger";
-import type { MainRegistry } from "#kernel/registry/main-registry";
+import type { Installer } from "#kernel/install/installer";
+import type { Config, Loader } from "#contract";
 import type { RegistryResolver } from "#kernel/registry/registry-resolver";
 
 export class System {
   constructor(
-    readonly mainRegistry: MainRegistry,
-    readonly registryResolver: RegistryResolver,
-    readonly logger: Logger,
+    private readonly dependencies: {
+      logger: Logger;
+      loader: Loader;
+      installer: Installer;
+      registryResolver: RegistryResolver;
+    },
+    private readonly options: {
+      path: string;
+      configs: Record<string, Config>;
+    },
   ) {}
 
-  public boot(): void {
-    this.logger.info("system online fr");
-    this.logger.info("ich logge sachen");
-    this.logger.info("ich logge sven 😋");
+  public async boot(): Promise<void> {
+    const exports = await this.dependencies.loader(this.options.path);
+    this.dependencies.installer.install(exports, this.options.configs);
+
+    this.dependencies.logger.info(
+      `registered: ${this.dependencies.registryResolver.listAllIds().join(", ")}`,
+    );
   }
 }

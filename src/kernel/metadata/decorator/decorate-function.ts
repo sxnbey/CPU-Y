@@ -8,10 +8,10 @@ import { setMetadata } from "../metadata-accessor.js";
 
 const registryName = "functionRegistry" satisfies keyof KnownRegistries;
 
-export function decorateFunction<Function extends (...args: any[]) => unknown>(
+export function decorateFunction<T extends (...args: any[]) => unknown>(
   input: Pick<BaseMetadata, "id">,
-  targetFunction: Function,
-): Function {
+  targetFunction: T,
+): T {
   setMetadata(
     MetadataKey.METADATA,
     { ...input, targetRegistry: registryName },

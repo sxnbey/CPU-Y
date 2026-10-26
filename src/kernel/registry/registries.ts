@@ -1,10 +1,10 @@
-import type { BaseMetadata, RegistryEntry } from "#contract";
+import type { RegistryPayloadMap } from "#contract";
 
 import { BaseRegistry } from "#kernel/registry/base-registry";
 
 export class InstanceRegistry extends BaseRegistry<
   "instanceRegistry",
-  RegistryEntry<unknown, BaseMetadata>
+  RegistryPayloadMap["instanceRegistry"]
 > {
   constructor() {
     super("instanceRegistry");
@@ -13,7 +13,7 @@ export class InstanceRegistry extends BaseRegistry<
 
 export class FunctionRegistry extends BaseRegistry<
   "functionRegistry",
-  RegistryEntry<(...args: any[]) => any>
+  RegistryPayloadMap["functionRegistry"]
 > {
   constructor() {
     super("functionRegistry");

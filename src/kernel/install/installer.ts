@@ -1,38 +1,147 @@
-import { MetadataKey, type BaseMetadata, type RegistryEntry } from "#contract";
+import {
+  MetadataKey,
+  type BaseMetadata,
+  type Config,
+  type EntryBuilder,
+  type LoadedExport,
+  type RegistryName,
+} from "#contract";
 import type { RegistryResolver } from "#kernel/registry/registry-resolver";
 
 import { getMetadata } from "#kernel/metadata/metadata-accessor";
+import { sort } from "#kernel/di/sorter";
+import { isClass } from "#util";
+import { readParameterSlots } from "#kernel/di/dependency-resolver";
 
-export type EntryBuilder = (importedFile: unknown) => RegistryEntry<unknown>;
+type Installable = {
+  source: unknown;
+  metadata: BaseMetadata;
+  builder: EntryBuilder;
+  origin: Pick<LoadedExport, "name" | "file">;
+  config: Config | undefined;
+};
 
-const allBuilder: Map<string, EntryBuilder> = new Map();
+export class Installer {
+  private builderMap: Map<RegistryName, EntryBuilder> = new Map();
 
-export function install(imports: unknown[], resolver: RegistryResolver): void {
-  for (const importedFile of imports) {
-    if (typeof importedFile !== "function") continue;
+  constructor(private readonly registryResolver: RegistryResolver) {}
 
-    const metadata = getMetadata<BaseMetadata>(
-      MetadataKey.METADATA,
-      importedFile,
-    );
-    const targetRegistry = metadata?.targetRegistry;
+  public install(
+    exports: LoadedExport[],
+    configs: Record<string, Config>,
+  ): void {
+    const installables = this.validate(exports, configs);
+    const sorted = this.order(installables);
 
-    if (!targetRegistry)
-      throw new Error("exported member does not have metadata");
+    this.build(sorted, installables);
+  }
 
-    const build = allBuilder.get(targetRegistry);
-
-    if (!build)
+  public addBuilder(registryName: RegistryName, builder: EntryBuilder): void {
+    if (this.builderMap.has(registryName))
       throw new Error(
-        `no entry builder for registry "${targetRegistry}" exists`,
+        `Builder for registry "${registryName}" has already been added.`,
       );
 
-    const entry = build(importedFile);
-
-    resolver.getRegistry(targetRegistry).registerWrapped(entry);
+    this.builderMap.set(registryName, builder);
   }
-}
 
-export function addBuilder(builder: EntryBuilder): void {
-  allBuilder.set(builder.name, builder);
+  private validate(
+    exports: LoadedExport[],
+    configs: Record<string, Config>,
+  ): Map<string, Installable> {
+    const installables: Map<string, Installable> = new Map();
+
+    for (const { value: source, name, file } of exports) {
+      if (typeof source !== "function") continue;
+
+      const metadata = getMetadata(MetadataKey.METADATA, source);
+
+      if (metadata === undefined) continue;
+
+      const { id, targetRegistry } = metadata;
+
+      const existing = installables.get(id);
+
+      if (existing !== undefined)
+        throw new Error(
+          `Duplicate id "${id}": exported as "${name}" in "${file}" and as "${existing.origin.name}" in "${existing.origin.file}". Ids must be unique.`,
+        );
+
+      if (this.registryResolver.has(id))
+        throw new Error(
+          `Id "${id}" as "${name}" in "${file}" is already registered. Ids must be unique.`,
+        );
+
+      const builder = this.builderMap.get(targetRegistry);
+
+      if (builder === undefined)
+        throw new Error(
+          `No builder exists for registry "${targetRegistry}". Used by "${name}" in "${file}".`,
+        );
+
+      const config = configs[id];
+      const expectsConfig =
+        isClass(source) &&
+        readParameterSlots(source).some((slot) => slot.kind === "config");
+
+      if (config === undefined && expectsConfig)
+        throw new Error(
+          `Export with id "${id}" as "${name}" in "${file}" requires a configuration. Pass it via bootstrap({ configs: { ${id}: { yourConfig } } }).`,
+        );
+
+      if (config !== undefined && !expectsConfig)
+        throw new Error(
+          `Export with id "${id}" as "${name}" in "${file}" has no @Config decorator, but a config was provided.`,
+        );
+
+      installables.set(id, {
+        source,
+        metadata,
+        builder,
+        config,
+        origin: { name, file },
+      });
+    }
+
+    for (const key of Object.keys(configs))
+      if (!installables.has(key))
+        throw new Error(
+          `Config for "${key}" was provided, but no matching export with id "${key}" is being installed.`,
+        );
+
+    return installables;
+  }
+
+  private order(installables: Map<string, Installable>): string[] {
+    const toSort: Record<string, unknown> = {};
+
+    installables.forEach((entry, key) => (toSort[key] = entry.source));
+
+    const sorted = sort(toSort, (id) => this.registryResolver.has(id));
+
+    return sorted;
+  }
+
+  private build(
+    sorted: string[],
+    installables: Map<string, Installable>,
+  ): void {
+    for (const id of sorted) {
+      const installable = installables.get(id);
+
+      if (installable === undefined)
+        throw new Error(`Sorter returned unknown id "${id}".`);
+
+      const entry = installable.builder({
+        source: installable.source,
+        metadata: installable.metadata,
+        config: installable.config,
+        lookup: (dependencyId) => this.registryResolver.find(dependencyId),
+      });
+
+      this.registryResolver
+        .getRegistry(installable.metadata.targetRegistry)
+        .registerWrapped(entry);
+    }
+  }
 }

@@ -1,16 +1,18 @@
 import "reflect-metadata";
 
-export function getMetadata<T = unknown>(
-  metadataKey: string,
+import type { MetadataKey, MetadataMap } from "#contract";
+
+export function getMetadata<K extends MetadataKey>(
+  metadataKey: K,
   target: object,
-): T | undefined {
+): MetadataMap[K] | undefined {
   return Reflect.getOwnMetadata(metadataKey, target);
 }
 
-export function setMetadata(
-  metadataKey: string,
-  value: unknown,
+export function setMetadata<K extends MetadataKey>(
+  metadataKey: K,
+  value: MetadataMap[K],
   target: object,
-) {
+): void {
   Reflect.defineMetadata(metadataKey, value, target);
 }

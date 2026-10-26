@@ -1,22 +1,22 @@
-import type { RegistryMap, RegistryName } from "#contract";
+import type { Registry, RegistryMap, RegistryName } from "#contract";
 
 import { EventEmitter } from "node:events";
 import { RegistryError } from "#kernel/error/errors";
 
 export class MainRegistry extends EventEmitter {
-  private registries: RegistryMap = {} as RegistryMap;
+  private registries: Map<RegistryName, Registry> = new Map();
 
   public register<N extends RegistryName>(
     registryName: N,
     registry: RegistryMap[N],
   ): void {
-    if (this.registries[registryName])
+    if (this.registries.has(registryName))
       throw new RegistryError({
         errorCode: "ERR_REGISTRY_ALREADY_REGISTERED",
         args: { name: registryName, origin: this.constructor.name },
       });
 
-    this.registries[registryName] = registry;
+    this.registries.set(registryName, registry);
 
     registry.addListener("register", (id, entry) =>
       this.emit("register", registryName, id, entry),
@@ -26,7 +26,7 @@ export class MainRegistry extends EventEmitter {
   }
 
   public get<R extends RegistryName>(registry: R): RegistryMap[R] {
-    const value = this.registries[registry];
+    const value = this.registries.get(registry);
 
     if (!value)
       throw new RegistryError({
@@ -34,16 +34,14 @@ export class MainRegistry extends EventEmitter {
         args: { name: registry, origin: this.constructor.name },
       });
 
-    return value;
+    return value as RegistryMap[R];
   }
 
-  public has<R extends RegistryName>(
-    registry: R | string,
-  ): registry is RegistryName {
-    return registry in this.registries;
+  public has(name: string): boolean {
+    return this.registries.has(name);
   }
 
-  public getAllRegistries(): RegistryMap[keyof RegistryMap][] {
-    return Object.values(this.registries);
+  public getAllRegistries(): Registry[] {
+    return [...this.registries.values()];
   }
 }

@@ -1,15 +1,14 @@
-import { MetadataKey } from "#contract";
 import { isClass } from "#util";
-import { getMetadata } from "#kernel/metadata/metadata-accessor";
+import { readParameterSlots } from "./dependency-resolver.js";
 
-type Lookup = (args0: string) => boolean;
+type DoesExist = (id: string) => boolean;
 
 export function sort(
   services: Record<string, unknown>,
-  lookup?: Lookup,
+  doesExist?: DoesExist,
 ): string[] {
   const dependencyMap = buildDependencyMap(services);
-  const sorted = topologicalSort(dependencyMap, lookup);
+  const sorted = topologicalSort(dependencyMap, doesExist);
 
   return sorted;
 }
@@ -26,10 +25,8 @@ function buildDependencyMap(services: Record<string, unknown>): {
 
     if (!isClass(service)) continue;
 
-    const metadata = getMetadata(MetadataKey.DEPENDENCIES, service);
-
-    if (metadata)
-      Object.values(metadata).forEach((dep) => currentDeps.push(dep));
+    for (const slot of readParameterSlots(service))
+      if (slot.kind === "dependency") currentDeps.push(slot.id);
   }
 
   return dependencyMap;
@@ -37,7 +34,7 @@ function buildDependencyMap(services: Record<string, unknown>): {
 
 function topologicalSort(
   dependencyMap: { [serviceName: string]: string[] },
-  lookup?: Lookup,
+  doesExist?: DoesExist,
 ): string[] {
   const state: { [serviceName: string]: "unvisited" | "visiting" | "visited" } =
     {};
@@ -64,7 +61,7 @@ function topologicalSort(
       const dependencies = dependencyMap[current];
 
       if (dependencies === undefined) {
-        if (lookup?.(current)) {
+        if (doesExist?.(current)) {
           state[current] = "visited";
 
           return;

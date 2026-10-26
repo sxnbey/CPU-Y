@@ -30,12 +30,10 @@ export class LogStream extends Writable {
       const result = this.writer(chunk);
 
       if (typeof result?.then === "function")
-        result
-          .then(() => callback())
-          .catch((err) => callback(formatToError(err)));
+        result.then(() => callback()).catch((e) => callback(formatToError(e)));
       else callback();
-    } catch (err) {
-      callback(formatToError(err));
+    } catch (e) {
+      callback(formatToError(e));
     }
   }
 

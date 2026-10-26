@@ -2,13 +2,12 @@ import type EventEmitter from "events";
 import type { BaseMetadata } from "./metadata.js";
 
 export interface Registry<
-  N extends (keyof KnownRegistries & string) | string,
+  N extends RegistryName = RegistryName,
   V extends RegistryEntry<unknown> = RegistryEntry<unknown>,
 > extends EventEmitter {
   getName(): N;
 
-  listAll(): V["value"][];
-  listAllWrapped(): V[];
+  listAllIds(): string[];
 
   get(id: string): V["value"];
   getWrapped(id: string): V;
@@ -26,7 +25,7 @@ export interface Registry<
   }): V;
   registerWrapped(value: V): V;
 
-  delete(id: string): boolean;
+  delete(id: string): void;
   clear(): this;
 }
 

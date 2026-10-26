@@ -1,4 +1,4 @@
-import type { BaseMetadata } from "#kernel/contract/metadata";
+import type { BaseMetadata } from "#contract";
 
 export function isClass(
   target: unknown,
