@@ -86,12 +86,12 @@ export class Installer {
 
       if (config === undefined && expectsConfig)
         throw new Error(
-          `Export with id "${id}" as "${name}" in "${file}" requires a configuration. Pass it via bootstrap({ configs: { ${id}: { yourConfig } } }).`,
+          `Export with id "${id}" as "${name}" in "${file}" requires a configuration, but none was provided. Pass it via bootstrap({ configs: { ${id}: { yourConfig } } }).`,
         );
 
       if (config !== undefined && !expectsConfig)
         throw new Error(
-          `Export with id "${id}" as "${name}" in "${file}" has no @Config decorator, but a config was provided.`,
+          `Export with id "${id}" as "${name}" in "${file}" has no @Config decorator, but a configuration was provided.`,
         );
 
       installables.set(id, {
@@ -117,7 +117,16 @@ export class Installer {
 
     installables.forEach((entry, key) => (toSort[key] = entry.source));
 
-    const sorted = sort(toSort, (id) => this.registryResolver.has(id));
+    const doesExist = (id: string) => this.registryResolver.has(id);
+    const infoById = (id: string) => {
+      const installable = installables.get(id);
+
+      return installable
+        ? `"${id}" as "${installable.origin.name}" in "${installable.origin.file}"`
+        : `"${id}"`;
+    };
+
+    const sorted = sort(toSort, { doesExist, infoById });
 
     return sorted;
   }

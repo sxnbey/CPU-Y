@@ -1,27 +1,30 @@
 import { isClass } from "#util";
 import { readParameterSlots } from "./dependency-resolver.js";
+import { DependencyInjectionError } from "#kernel/error/errors";
 
 type DoesExist = (id: string) => boolean;
 
+type InfoById = (id: string) => string;
+
 export function sort(
   services: Record<string, unknown>,
-  doesExist?: DoesExist,
+  { doesExist, infoById }: { doesExist?: DoesExist; infoById?: InfoById } = {},
 ): string[] {
   const dependencyMap = buildDependencyMap(services);
-  const sorted = topologicalSort(dependencyMap, doesExist);
+  const sorted = topologicalSort(dependencyMap, doesExist, infoById);
 
   return sorted;
 }
 
 function buildDependencyMap(services: Record<string, unknown>): {
-  [serviceName: string]: string[];
+  [serviceId: string]: string[];
 } {
-  const dependencyMap: { [serviceName: string]: string[] } = {};
+  const dependencyMap: { [serviceId: string]: string[] } = {};
 
-  for (const [serviceName, service] of Object.entries(services)) {
-    dependencyMap[serviceName] ??= [];
+  for (const [serviceId, service] of Object.entries(services)) {
+    dependencyMap[serviceId] ??= [];
 
-    const currentDeps = dependencyMap[serviceName];
+    const currentDeps = dependencyMap[serviceId];
 
     if (!isClass(service)) continue;
 
@@ -33,15 +36,16 @@ function buildDependencyMap(services: Record<string, unknown>): {
 }
 
 function topologicalSort(
-  dependencyMap: { [serviceName: string]: string[] },
+  dependencyMap: { [serviceId: string]: string[] },
   doesExist?: DoesExist,
+  infoById: InfoById = (id) => `"${id}"`,
 ): string[] {
-  const state: { [serviceName: string]: "unvisited" | "visiting" | "visited" } =
+  const state: { [serviceId: string]: "unvisited" | "visiting" | "visited" } =
     {};
   const sorted: string[] = [];
 
-  for (const serviceName of Object.keys(dependencyMap))
-    if (!state[serviceName]) visit(serviceName, []);
+  for (const serviceId of Object.keys(dependencyMap))
+    if (!state[serviceId]) visit(serviceId, []);
 
   return sorted;
 
@@ -50,10 +54,15 @@ function topologicalSort(
   function visit(current: string, path: string[]) {
     const currentState = state[current] || "unvisited";
 
-    if (currentState === "visiting")
-      throw new Error(
-        `Circular dependency detected for "${current}"\nPath: ${[...path, current].join(" -> ")}`,
-      );
+    if (currentState === "visiting") {
+      const start = path.indexOf(current);
+      const circle = [...path.slice(start), current];
+
+      throw new DependencyInjectionError({
+        errorCode: "ERR_CIRCULAR_DEPENDENCY_DETECTED",
+        args: { path: circle.map(infoById).join("\n-> "), service: current },
+      });
+    }
 
     if (currentState === "unvisited") {
       state[current] = "visiting";
@@ -67,9 +76,18 @@ function topologicalSort(
           return;
         }
 
-        throw new Error(
-          `Dependency "${current}" not found in the dependency map.\nPath: ${[...path, current].join(" -> ")}`,
-        );
+        // Cast is needed because path is never empty at this point.
+
+        const service = infoById(path.at(-1) as string);
+
+        throw new DependencyInjectionError({
+          errorCode: "ERR_UNKNOWN_DEPENDENCY",
+          args: {
+            dependency: current,
+            path: [...path, current].join(" -> "),
+            service,
+          },
+        });
       }
 
       dependencies.forEach((dep) => visit(dep, [...path, current]));

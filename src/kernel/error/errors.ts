@@ -18,19 +18,19 @@ const dependencyInjectionErrors = {
   },
   ERR_INVALID_SOURCE: {
     headline: "Invalid source",
-    details: `The source provided to InstanceFactory is invalid. InstanceFactory expected a class or a raw class configuration object matching the base metadata.\nSource: {SOURCE}`,
-    fix: 'Please ensure the provided source "{SOURCE}" is a Class or satisfies the BaseMetadata interface.',
+    details: `The source provided is not a class.\nSource: "{SOURCE}"`,
+    fix: 'Please ensure the provided source "{SOURCE}" is a Class.',
   },
   ERR_UNEXPECTED_CONFIG: {
     headline: "Unexpected configuration",
-    details: `The configuration object for class "{NAME}" provided to DependencyResolver was unexpected.`,
-    fix: "Please ensure the provided configuration object is needed by class {NAME}.",
+    details:
+      'Class "{NAME}" has no @Config decorator, but a configuration was provided.',
+    fix: 'Please ensure the provided configuration object is needed by class "{NAME}".',
   },
   ERR_MISSING_CONFIG: {
     headline: "Missing configuration",
-    details:
-      "DependencyResolver expected a configuration object for class {NAME}.",
-    fix: 'Please ensure a configuration object for class "{NAME}" has been passed to the DependencyResolver.',
+    details: 'Class "{NAME}" requires a config, but none was provided.',
+    fix: "Please ensure it has been passed to the bootstrap.",
   },
   ERR_MISSING_DEPENDENCY_DECORATOR: {
     headline: "Missing dependency decorator",
@@ -39,10 +39,20 @@ const dependencyInjectionErrors = {
     fix: 'Please ensure the dependency at index "{INDEX}" for class "{NAME}" has been decorated with @Inject.',
   },
   ERR_DEPENDENCY_NOT_FOUND: {
-    headline: "Missing dependencies",
-    details:
-      'DependencyResolver could not resolve dependency "{ID}" for class "{NAME}".',
+    headline: "Dependency not found",
+    details: 'Dependency "{ID}" for class "{NAME}" could not be resolved.',
     fix: 'Please ensure that the dependency "{ID}" is registered in the registry.',
+  },
+  ERR_CIRCULAR_DEPENDENCY_DETECTED: {
+    headline: "Circular dependency detected",
+    details: '"{SERVICE}" depends on itself through:\n{PATH}',
+    fix: "Please move the shared logic into a third service that both depend on.",
+  },
+  ERR_UNKNOWN_DEPENDENCY: {
+    headline: "Unknown dependency",
+    details:
+      'Dependency "{DEPENDENCY}" for {SERVICE} was not found.\nPath: {PATH}',
+    fix: "Please ensure the dependency id is correct or the dependency is in the load path.",
   },
 } as const satisfies Record<string, ErrorMessage>;
 
