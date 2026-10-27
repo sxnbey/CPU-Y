@@ -32,7 +32,7 @@ export class RegistryResolver {
     return this.locate(target)?.get(target);
   }
 
-  public listAllIds(): unknown[] {
+  public listAllIds(): string[] {
     return this.mainRegistry
       .getAllRegistries()
       .flatMap((registry) => registry.listAllIds());
