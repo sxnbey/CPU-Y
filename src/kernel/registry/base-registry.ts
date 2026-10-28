@@ -99,12 +99,12 @@ export abstract class BaseRegistry<
     return value;
   }
 
-  public delete(id: string): void {
+  public delete(id: string): boolean {
     const entry = this.getWrapped(id);
 
-    this.storage.delete(id);
-
     this.emit("delete", id, entry);
+
+    return this.storage.delete(id);
   }
 
   public clear(): this {

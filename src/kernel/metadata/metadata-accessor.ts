@@ -9,6 +9,13 @@ export function getMetadata<K extends MetadataKey>(
   return Reflect.getOwnMetadata(metadataKey, target);
 }
 
+export function getInheritedMetadata<K extends MetadataKey>(
+  metadataKey: K,
+  target: object,
+): MetadataMap[K] | undefined {
+  return Reflect.getMetadata(metadataKey, target);
+}
+
 export function setMetadata<K extends MetadataKey>(
   metadataKey: K,
   value: MetadataMap[K],

@@ -2,6 +2,8 @@ import { readdir } from "node:fs/promises";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import path from "path";
 
+import { LoadError } from "#kernel/error/errors";
+
 import type { LoadedExport, Loader } from "#contract";
 
 export function createLoader({ extensions = [".js", ".mjs"] } = {}): Loader {
@@ -17,9 +19,10 @@ function resolveRoot(loadPath: string | URL): string {
   if (loadPath instanceof URL) return fileURLToPath(loadPath);
 
   if (!path.isAbsolute(loadPath))
-    throw new Error(
-      `loadPath "${loadPath}" must be absolute. Use join(import.meta.dirname, "yourDir") or new URL("yourDir", import.meta.url).`,
-    );
+    throw new LoadError({
+      errorCode: "ERR_PATH_NOT_ABSOLUTE",
+      args: { path: loadPath },
+    });
 
   return loadPath;
 }
@@ -35,13 +38,25 @@ async function scan(loadPath: string, extensions: string[]): Promise<string[]> {
   } catch (e) {
     if (e instanceof Error && "code" in e) {
       if (e.code === "ENOENT")
-        throw new Error(`loadPath "${loadPath}" does not exist.`);
+        throw new LoadError({
+          errorCode: "ERR_PATH_NOT_FOUND",
+          args: { path: loadPath },
+          cause: e,
+        });
 
       if (e.code === "ENOTDIR")
-        throw new Error(`loadPath "${loadPath}" is not a directory.`);
+        throw new LoadError({
+          errorCode: "ERR_PATH_NOT_A_DIRECTORY",
+          args: { path: loadPath },
+          cause: e,
+        });
     }
 
-    throw new Error(`Failed to read loadPath "${loadPath}".`, { cause: e });
+    throw new LoadError({
+      errorCode: "ERR_DIRECTORY_READ_FAILED",
+      args: { path: loadPath },
+      cause: e,
+    });
   }
 
   const addresses = scanned
@@ -66,7 +81,11 @@ async function importAll(files: string[]): Promise<LoadedExport[]> {
     try {
       imported = await import(pathToFileURL(file).href);
     } catch (e) {
-      throw new Error(`Failed to import file "${file}"`, { cause: e });
+      throw new LoadError({
+        errorCode: "ERR_IMPORT_FAILED",
+        args: { file },
+        cause: e,
+      });
     }
 
     for (const [name, value] of Object.entries(imported))

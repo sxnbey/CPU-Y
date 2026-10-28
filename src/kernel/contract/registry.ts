@@ -25,7 +25,7 @@ export interface Registry<
   }): V;
   registerWrapped(value: V): V;
 
-  delete(id: string): void;
+  delete(id: string): boolean;
   clear(): this;
 }
 

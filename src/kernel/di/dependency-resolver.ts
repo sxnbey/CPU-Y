@@ -5,21 +5,27 @@ import { DependencyInjectionError } from "#kernel/error/errors";
 
 type ParameterSlot = { kind: "dependency"; id: string } | { kind: "config" };
 
+export function expectsConfig(
+  target: new (...args: any[]) => unknown,
+): boolean {
+  return readParameterSlots(target).some((slot) => slot.kind === "config");
+}
+
 export function resolveDependencies(
   target: new (...args: any[]) => unknown,
   lookup: Lookup,
   config?: Config,
 ): unknown[] {
   const slots = readParameterSlots(target);
-  const expectsConfig = slots.some((slot) => slot.kind === "config");
+  const targetExpectsConfig = slots.some((slot) => slot.kind === "config");
 
-  if (config !== undefined && !expectsConfig)
+  if (config !== undefined && !targetExpectsConfig)
     throw new DependencyInjectionError({
       errorCode: "ERR_UNEXPECTED_CONFIG",
       args: { name: target.name },
     });
 
-  if (config === undefined && expectsConfig)
+  if (config === undefined && targetExpectsConfig)
     throw new DependencyInjectionError({
       errorCode: "ERR_MISSING_CONFIG",
       args: { name: target.name },

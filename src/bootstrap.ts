@@ -47,7 +47,6 @@ export function bootstrap(options: BootstrapOptions) {
   });
 
   const instanceRegistry = registryResolver.getRegistry("instanceRegistry");
-  const functionRegistry = registryResolver.getRegistry("functionRegistry");
 
   console.log(`${logPrefix} registering instances...`);
 
@@ -60,8 +59,6 @@ export function bootstrap(options: BootstrapOptions) {
   instanceRegistry.register({ id: "logger", value: logger });
 
   console.log(`${logPrefix} registering functions...`);
-
-  functionRegistry.register({ id: "loader", value: loader });
 
   console.log(`${logPrefix} finishing up...`);
 

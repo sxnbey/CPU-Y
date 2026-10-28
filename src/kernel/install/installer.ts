@@ -11,7 +11,8 @@ import type { RegistryResolver } from "#kernel/registry/registry-resolver";
 import { getMetadata } from "#kernel/metadata/metadata-accessor";
 import { sort } from "#kernel/di/sorter";
 import { isClass } from "#util";
-import { readParameterSlots } from "#kernel/di/dependency-resolver";
+import { expectsConfig } from "#kernel/di/dependency-resolver";
+import { InstallError } from "#kernel/error/errors";
 
 type Installable = {
   source: unknown;
@@ -38,9 +39,10 @@ export class Installer {
 
   public addBuilder(registryName: RegistryName, builder: EntryBuilder): void {
     if (this.builderMap.has(registryName))
-      throw new Error(
-        `Builder for registry "${registryName}" has already been added.`,
-      );
+      throw new InstallError({
+        errorCode: "ERR_BUILDER_ALREADY_REGISTERED",
+        args: { name: registryName },
+      });
 
     this.builderMap.set(registryName, builder);
   }
@@ -63,36 +65,57 @@ export class Installer {
       const existing = installables.get(id);
 
       if (existing !== undefined)
-        throw new Error(
-          `Duplicate id "${id}": exported as "${name}" in "${file}" and as "${existing.origin.name}" in "${existing.origin.file}". Ids must be unique.`,
-        );
+        throw new InstallError({
+          errorCode: "ERR_DUPLICATE_ID",
+          args: {
+            id,
+            name,
+            file,
+            existingname: existing.origin.name,
+            existingfile: existing.origin.file,
+          },
+        });
 
       if (this.registryResolver.has(id))
-        throw new Error(
-          `Id "${id}" as "${name}" in "${file}" is already registered. Ids must be unique.`,
-        );
+        throw new InstallError({
+          errorCode: "ERR_ID_ALREADY_REGISTERED",
+          args: {
+            id,
+            name,
+            file,
+          },
+        });
 
       const builder = this.builderMap.get(targetRegistry);
 
       if (builder === undefined)
-        throw new Error(
-          `No builder exists for registry "${targetRegistry}". Used by "${name}" in "${file}".`,
-        );
+        throw new InstallError({
+          errorCode: "ERR_MISSING_BUILDER",
+          args: { registryname: targetRegistry, name, file },
+        });
 
       const config = configs[id];
-      const expectsConfig =
-        isClass(source) &&
-        readParameterSlots(source).some((slot) => slot.kind === "config");
+      const targetExpectsConfig = isClass(source) && expectsConfig(source);
 
-      if (config === undefined && expectsConfig)
-        throw new Error(
-          `Export with id "${id}" as "${name}" in "${file}" requires a configuration, but none was provided. Pass it via bootstrap({ configs: { ${id}: { yourConfig } } }).`,
-        );
+      if (config === undefined && targetExpectsConfig)
+        throw new InstallError({
+          errorCode: "ERR_MISSING_CONFIG",
+          args: {
+            id,
+            name,
+            file,
+          },
+        });
 
-      if (config !== undefined && !expectsConfig)
-        throw new Error(
-          `Export with id "${id}" as "${name}" in "${file}" has no @Config decorator, but a configuration was provided.`,
-        );
+      if (config !== undefined && !targetExpectsConfig)
+        throw new InstallError({
+          errorCode: "ERR_UNEXPECTED_CONFIG",
+          args: {
+            id,
+            name,
+            file,
+          },
+        });
 
       installables.set(id, {
         source,
@@ -105,9 +128,12 @@ export class Installer {
 
     for (const key of Object.keys(configs))
       if (!installables.has(key))
-        throw new Error(
-          `Config for "${key}" was provided, but no matching export with id "${key}" is being installed.`,
-        );
+        throw new InstallError({
+          errorCode: "ERR_UNRESOLVABLE_CONFIG",
+          args: {
+            id: key,
+          },
+        });
 
     return installables;
   }
@@ -135,22 +161,48 @@ export class Installer {
     sorted: string[],
     installables: Map<string, Installable>,
   ): void {
+    const installedIds: string[] = [];
+
     for (const id of sorted) {
       const installable = installables.get(id);
 
       if (installable === undefined)
-        throw new Error(`Sorter returned unknown id "${id}".`);
+        throw new InstallError({
+          errorCode: "ERR_UNKNOWN_ID",
+          args: {
+            id,
+          },
+        });
 
-      const entry = installable.builder({
-        source: installable.source,
-        metadata: installable.metadata,
-        config: installable.config,
-        lookup: (dependencyId) => this.registryResolver.find(dependencyId),
-      });
+      try {
+        const entry = installable.builder({
+          source: installable.source,
+          metadata: installable.metadata,
+          config: installable.config,
+          lookup: (dependencyId) => this.registryResolver.find(dependencyId),
+        });
 
-      this.registryResolver
-        .getRegistry(installable.metadata.targetRegistry)
-        .registerWrapped(entry);
+        this.registryResolver
+          .getRegistry(installable.metadata.targetRegistry)
+          .registerWrapped(entry);
+
+        installedIds.push(id);
+      } catch (e) {
+        for (const installedId of [...installedIds].reverse())
+          this.registryResolver.delete(installedId);
+
+        throw new InstallError({
+          errorCode: "ERR_BUILD_FAILED",
+          args: {
+            id,
+            name: installable.origin.name,
+            file: installable.origin.file,
+            rolledback:
+              installedIds.length > 0 ? installedIds.join(", ") : "none",
+          },
+          cause: e,
+        });
+      }
     }
   }
 }

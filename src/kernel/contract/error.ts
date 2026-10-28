@@ -3,3 +3,5 @@ export interface ErrorMessage {
   details: string;
   fix?: string | undefined;
 }
+
+export type ErrorTemplates = Record<string, ErrorMessage>;

@@ -7,29 +7,29 @@ export class RegistryResolver {
   constructor(private readonly mainRegistry: MainRegistry) {}
 
   public getRegistry<K extends keyof KnownRegistries>(
-    target: K,
+    registryName: K,
   ): KnownRegistries[K];
 
-  public getRegistry(target: string): Registry;
+  public getRegistry(registryName: string): Registry;
 
-  public getRegistry(target: string): Registry {
-    return this.mainRegistry.get(target);
+  public getRegistry(registryName: string): Registry {
+    return this.mainRegistry.get(registryName);
   }
 
-  public get(target: string): unknown {
-    const registry = this.locate(target);
+  public get(id: string): unknown {
+    const registry = this.locate(id);
 
     if (!registry)
       throw new RegistryError({
         errorCode: "ERR_ENTRY_NOT_FOUND",
-        args: { name: target, origin: this.constructor.name },
+        args: { name: id, origin: this.constructor.name },
       });
 
-    return registry.get(target);
+    return registry.get(id);
   }
 
-  public find(target: string): unknown {
-    return this.locate(target)?.get(target);
+  public find(id: string): unknown {
+    return this.locate(id)?.get(id);
   }
 
   public listAllIds(): string[] {
@@ -38,12 +38,20 @@ export class RegistryResolver {
       .flatMap((registry) => registry.listAllIds());
   }
 
-  public has(target: string): boolean {
-    return this.locate(target) !== undefined;
+  public delete(id: string): boolean {
+    const registry = this.locate(id);
+
+    if (registry === undefined) return false;
+
+    return registry.delete(id);
   }
 
-  private locate(target: string): Registry | undefined {
+  public has(id: string): boolean {
+    return this.locate(id) !== undefined;
+  }
+
+  private locate(id: string): Registry | undefined {
     for (const registry of this.mainRegistry.getAllRegistries())
-      if (registry.has(target)) return registry;
+      if (registry.has(id)) return registry;
   }
 }

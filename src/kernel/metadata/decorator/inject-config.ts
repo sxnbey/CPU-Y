@@ -1,7 +1,8 @@
 import { MetadataKey } from "#contract";
 
-import { setMetadata, getMetadata } from "../metadata-accessor.js";
-import { FrameworkError } from "#kernel/error/framework-error";
+import { setMetadata, getInheritedMetadata } from "../metadata-accessor.js";
+import { DecoratorError } from "#kernel/error/errors";
+import { formatDecoratorTarget } from "#kernel/util/formatter";
 
 export function Config(): ParameterDecorator {
   return (
@@ -10,15 +11,27 @@ export function Config(): ParameterDecorator {
     parameterIndex: number,
   ) => {
     if (_propertyKey !== undefined)
-      throw new FrameworkError({
+      throw new DecoratorError({
         errorCode: "ERR_INVALID_DECORATOR_TARGET",
         args: { decorator: "Config" },
       });
 
-    if (getMetadata(MetadataKey.CONFIG, target) !== undefined)
-      throw new FrameworkError({
+    if (getInheritedMetadata(MetadataKey.CONFIG, target) !== undefined)
+      throw new DecoratorError({
         errorCode: "ERR_DECORATOR_CAN_ONLY_BE_USED_ONCE",
         args: { decorator: "Config" },
+      });
+
+    const dependencies = getInheritedMetadata(MetadataKey.DEPENDENCIES, target);
+
+    if (dependencies?.[parameterIndex] !== undefined)
+      throw new DecoratorError({
+        errorCode: "ERR_PARAMETER_INDEX_ALREADY_USED",
+        args: {
+          index: parameterIndex.toString(),
+          target: formatDecoratorTarget(target),
+          decorator: "Config",
+        },
       });
 
     setMetadata(MetadataKey.CONFIG, parameterIndex, target);

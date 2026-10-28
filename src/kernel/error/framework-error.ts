@@ -1,10 +1,11 @@
-import type { ErrorMessage } from "#contract";
+import type { ErrorMessage, ErrorTemplates } from "#contract";
 
 // Since TypeScript thinks a keyof Templates could be string | number | symbol, & string is needed to ensure it's a string.
 
-export type ErrorParameter<Templates extends Record<string, ErrorMessage>> = {
+export type ErrorParameter<Templates extends ErrorTemplates> = {
   [ErrorCode in keyof Templates & string]: {
     errorCode: ErrorCode;
+    cause?: unknown;
   } & ResolvePlaceholderArgs<GetAllPlaceholders<Templates[ErrorCode]>>;
 }[keyof Templates & string];
 
@@ -29,8 +30,9 @@ type ExtractPlaceholders<Template extends string> =
     : never;
 
 export class FrameworkError<
-  Templates extends Record<string, ErrorMessage> = typeof frameworkErrors,
+  Templates extends ErrorTemplates = typeof frameworkErrors,
 > extends Error {
+  public readonly errorCode: keyof Templates;
   public readonly rawMessage: ErrorMessage;
 
   constructor(
@@ -50,16 +52,19 @@ export class FrameworkError<
     errorTemplates = frameworkErrors,
     errorCode,
     args,
+    cause,
   }: {
-    errorTemplates?: Record<string, ErrorMessage> | undefined;
+    errorTemplates?: ErrorTemplates | undefined;
     errorCode: string;
     args?: Record<string, string>;
+    cause?: unknown;
   }) {
     const rawMessage = resolveTemplates(errorTemplates, errorCode, args);
     const message = createMessage(rawMessage);
 
-    super(message);
+    super(message, { cause });
 
+    this.errorCode = errorCode;
     this.rawMessage = rawMessage;
     this.name = new.target.name;
 
@@ -68,7 +73,7 @@ export class FrameworkError<
 }
 
 function resolveTemplates(
-  errorTemplates: Record<string, ErrorMessage>,
+  errorTemplates: ErrorTemplates,
   errorCode: string,
   args?: Record<string, string>,
 ): ErrorMessage {
@@ -124,15 +129,4 @@ const frameworkErrors = {
       "The error code {NAME} does not exist in the errorTemplates.\nOrigin: {ORIGIN}",
     fix: "Please ensure that the error code is defined in the specified errorTemplates.",
   },
-  ERR_INVALID_DECORATOR_TARGET: {
-    headline: "Invalid decorator target",
-    details:
-      "Decorator @{DECORATOR} can only be used on constructor parameters, not method parameters.",
-    fix: "Please ensure the @{DECORATOR} decorator is used on a constructor parameter.",
-  },
-  ERR_DECORATOR_CAN_ONLY_BE_USED_ONCE: {
-    headline: "Decorator can only be used once",
-    details: "Decorator @{DECORATOR} can only be used once per constructor.",
-    fix: "Please ensure the @{DECORATOR} decorator is only used once per constructor.",
-  },
-} as const satisfies Record<string, ErrorMessage>;
+} as const satisfies ErrorTemplates;

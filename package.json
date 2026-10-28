@@ -12,11 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "chalk": "^4.1.2",
-    "dotenv": "^16.4.7",
-    "node-fetch": "^2.7.0",
-    "reflect-metadata": "^0.2.2",
-    "terminal-kit": "^3.1.2"
+    "reflect-metadata": "^0.2.2"
   },
   "devDependencies": {
     "@types/node": "^25.8.0",

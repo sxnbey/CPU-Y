@@ -1,4 +1,4 @@
-import type { ErrorMessage } from "#contract";
+import type { ErrorTemplates } from "#contract";
 
 import { FrameworkError, type ErrorParameter } from "./framework-error.js";
 
@@ -29,8 +29,8 @@ const dependencyInjectionErrors = {
   },
   ERR_MISSING_CONFIG: {
     headline: "Missing configuration",
-    details: 'Class "{NAME}" requires a config, but none was provided.',
-    fix: "Please ensure it has been passed to the bootstrap.",
+    details: 'Class "{NAME}" requires a configuration, but none was provided.',
+    fix: "Please ensure the configuration has been passed to the bootstrap.",
   },
   ERR_MISSING_DEPENDENCY_DECORATOR: {
     headline: "Missing dependency decorator",
@@ -54,7 +54,7 @@ const dependencyInjectionErrors = {
       'Dependency "{DEPENDENCY}" for {SERVICE} was not found.\nPath: {PATH}',
     fix: "Please ensure the dependency id is correct or the dependency is in the load path.",
   },
-} as const satisfies Record<string, ErrorMessage>;
+} as const satisfies ErrorTemplates;
 
 //
 
@@ -86,4 +86,137 @@ const registryErrors = {
     details: `The entry with id "{NAME}" does not exist.\n${originString}`,
     fix: "Please ensure that the entry is registered before attempting to access it.",
   },
-} as const satisfies Record<string, ErrorMessage>;
+} as const satisfies ErrorTemplates;
+
+//
+
+export class LoadError extends FrameworkError<typeof loadErrors> {
+  constructor(params: ErrorParameter<typeof loadErrors>) {
+    super({ errorTemplates: loadErrors, ...params });
+  }
+}
+
+const loadErrors = {
+  ERR_PATH_NOT_ABSOLUTE: {
+    headline: "Loading path is not absolute",
+    details: 'Loading path "{PATH}" must be absolute.',
+    fix: 'Use join(import.meta.dirname, "yourDir") or new URL("yourDir", import.meta.url).',
+  },
+  ERR_PATH_NOT_FOUND: {
+    headline: "Loading path does not exist",
+    details: 'Loading path "{PATH}" does not exist.',
+    fix: 'Please ensure path "{PATH}" is a valid path.',
+  },
+  ERR_PATH_NOT_A_DIRECTORY: {
+    headline: "Loading path is not a directory",
+    details: 'Loading path "{PATH}" is not a directory.',
+    fix: 'Please ensure the path "{PATH}" leads to a directory.',
+  },
+  ERR_DIRECTORY_READ_FAILED: {
+    headline: "Directory read failed",
+    details: 'An error occurred while reading path "{PATH}".',
+  },
+  ERR_IMPORT_FAILED: {
+    headline: "File import failed",
+    details: 'An error occurred while importing file "{FILE}".',
+  },
+} as const satisfies ErrorTemplates;
+
+//
+
+export class InstallError extends FrameworkError<typeof installErrors> {
+  constructor(params: ErrorParameter<typeof installErrors>) {
+    super({ errorTemplates: installErrors, ...params });
+  }
+}
+
+const installErrors = {
+  ERR_BUILDER_ALREADY_REGISTERED: {
+    headline: "Builder already registered",
+    details: 'Builder for registry "{NAME}" is already registered.',
+    fix: "Please ensure only one builder per registry is being registered.",
+  },
+  ERR_MISSING_BUILDER: {
+    headline: "Missing builder",
+    details:
+      'No builder exists for registry "{REGISTRYNAME}". Used by "{NAME}" in "{FILE}".',
+    fix: "Please ensure a builder for this registry has been registered.",
+  },
+  ERR_DUPLICATE_ID: {
+    headline: "Duplicate id",
+    details:
+      'Export with id "{ID}" as "{NAME}" in "{FILE}" and as "{EXISTINGNAME}" in "{EXISTINGFILE}" has the same id.',
+    fix: "Please make sure the ids are unique.",
+  },
+  ERR_ID_ALREADY_REGISTERED: {
+    headline: "Id is already registered",
+    details:
+      'Export with id "{ID}" as "{NAME}" in "{FILE}" is already registered.',
+    fix: "Please make sure the ids are unique.",
+  },
+  ERR_MISSING_CONFIG: {
+    headline: "Missing configuration",
+    details:
+      'Export with id "{ID}" as "{NAME}" in "{FILE}" requires a configuration, but none was provided.',
+    fix: "Please ensure the configuration has been passed to the bootstrap.",
+  },
+  ERR_UNEXPECTED_CONFIG: {
+    headline: "Unexpected configuration",
+    details:
+      'Export with id "{ID}" as "{NAME}" in "{FILE}" has no @Config decorator, but one was provided.',
+    fix: 'Please ensure the provided configuration object is needed by export "{NAME}".',
+  },
+  ERR_UNRESOLVABLE_CONFIG: {
+    headline: "Configuration is unresolvable",
+    details:
+      'A configuration for id "{ID}" was provided, but no matching export is being installed.',
+    fix: "Please ensure the right id was provided to the bootstrap.",
+  },
+  ERR_UNKNOWN_ID: {
+    headline: "Internal error: Unknown id",
+    details: 'Sorter returned unknown id "{ID}".',
+  },
+  ERR_SOURCE_IS_NOT_CLASS: {
+    headline: "Provided source is not a class",
+    details: 'The provided source "{SOURCE}" is not a class.',
+    fix: "Please ensure the provided source is a class.",
+  },
+  ERR_SOURCE_IS_NOT_FUNCTION: {
+    headline: "Provided source is not a function",
+    details: 'The provided source "{SOURCE}" is not a function.',
+    fix: "Please ensure the provided source is a function.",
+  },
+  ERR_BUILD_FAILED: {
+    headline: "Failed to build service",
+    details:
+      'Building "{ID}" as "{NAME}" in "{FILE}" failed. The install was rolled back.\nRolled back: {ROLLEDBACK}',
+  },
+} as const satisfies ErrorTemplates;
+
+//
+
+const decoratorErrors = {
+  ERR_INVALID_DECORATOR_TARGET: {
+    headline: "Invalid decorator target",
+    details:
+      "Decorator @{DECORATOR} can only be used on constructor parameters, not method parameters.",
+    fix: "Please ensure the @{DECORATOR} decorator is used on a constructor parameter.",
+  },
+  ERR_DECORATOR_CAN_ONLY_BE_USED_ONCE: {
+    headline: "Decorator can only be used once",
+    details: "Decorator @{DECORATOR} can only be used once per constructor.",
+    fix: "Please ensure the @{DECORATOR} decorator is only used once per constructor.",
+  },
+  ERR_PARAMETER_INDEX_ALREADY_USED: {
+    headline: "Parameter already decorated",
+    details:
+      '@{DECORATOR} cannot be applied to parameter "{INDEX}" in class "{TARGET}" because it is already decorated.',
+    fix: "Please ensure only one decorator is being used per parameter.",
+  },
+} as const satisfies ErrorTemplates;
+
+export class DecoratorError extends FrameworkError<typeof decoratorErrors> {
+  constructor(params: ErrorParameter<typeof decoratorErrors>) {
+    super({ errorTemplates: decoratorErrors, ...params });
+  }
+}
