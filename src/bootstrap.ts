@@ -1,15 +1,11 @@
-import {
-  type CorePreset,
-  type CoreOverrides,
-  CORE_SERVICES_PRESET,
-} from "./core-preset.js";
-import type { Config } from "#contract";
+import type { Config, CoreOverrides } from "#contract";
+
+import { createLayer } from "#kernel/registry/create-registry-layer";
+import { CORE_SERVICES_PRESET } from "./core-preset.js";
+import { Installer } from "#kernel/install/installer";
 
 import { System } from "./system.js";
-
-import { MainRegistry } from "#kernel/registry/main-registry";
-import { RegistryResolver } from "#kernel/registry/registry-resolver";
-import { Installer } from "#kernel/install/installer";
+import type { RegistryResolver } from "#kernel/registry/registry-resolver";
 
 type BootstrapOptions = {
   path: string;
@@ -17,60 +13,39 @@ type BootstrapOptions = {
   overrides?: CoreOverrides;
 };
 
-export function bootstrap(options: BootstrapOptions) {
-  console.log(`${logPrefix} starting...`);
+export function bootstrap(options: BootstrapOptions): System {
+  const preset = { ...CORE_SERVICES_PRESET, ...options.overrides };
+  const registries = preset.registries.map(({ registry }) => registry);
+  const core = createLayer(registries);
 
-  const preset: CorePreset = { ...CORE_SERVICES_PRESET, ...options.overrides };
-  const {
-    logStream: LogStreamClass,
-    logger: LoggerClass,
-    loader,
-    registries,
-  } = preset;
-  const mainRegistry = new MainRegistry();
-  const registryResolver = new RegistryResolver(mainRegistry);
-  const installer = new Installer(registryResolver);
+  const installer = new Installer();
 
-  const registrationLog = (registry: string, id: string) =>
-    console.log(`${logPrefix} entry "${id}" just registered in "${registry}"`);
+  for (const { registry, build } of preset.registries)
+    installer.addBuilder(registry, build);
 
-  mainRegistry.addListener("register", registrationLog);
+  const newLayer = (parent?: RegistryResolver) =>
+    createLayer(registries, parent);
 
-  console.log(`${logPrefix} registering registries...`);
+  const logStream = new preset.logStream();
 
-  registries.forEach((entry) => {
-    const registry = new entry.registry();
+  core.registryResolver
+    .getRegistry("instanceRegistry")
+    .register({ id: "logStream", value: logStream });
 
-    mainRegistry.register(registry.getName(), registry);
+  const logger = new preset.logger(logStream);
 
-    installer.addBuilder(registry.getName(), entry.build);
-  });
-
-  const instanceRegistry = registryResolver.getRegistry("instanceRegistry");
-
-  console.log(`${logPrefix} registering instances...`);
-
-  const logStream = new LogStreamClass();
-
-  instanceRegistry.register({ id: "logStream", value: logStream });
-
-  const logger = new LoggerClass(logStream);
-
-  instanceRegistry.register({ id: "logger", value: logger });
-
-  console.log(`${logPrefix} registering functions...`);
-
-  console.log(`${logPrefix} finishing up...`);
-
-  console.log(`${logPrefix} done 😋`);
-  console.log();
-
-  mainRegistry.off("register", registrationLog);
+  core.registryResolver
+    .getRegistry("instanceRegistry")
+    .register({ id: "logger", value: logger });
 
   return new System(
-    { logger, loader, installer, registryResolver },
-    { path: options.path, configs: options.configs ?? {} },
+    {
+      newLayer,
+      logger,
+      installer,
+      loader: preset.loader,
+      coreResolver: core.registryResolver,
+    },
+    { configs: options.configs ?? {}, path: options.path },
   );
 }
-
-const logPrefix = "[bootstrap]";

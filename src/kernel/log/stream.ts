@@ -1,10 +1,8 @@
 import { Writable, type WritableOptions } from "node:stream";
 
-import type { LogPayload } from "#contract";
+import type { LogPayload, Writer } from "#contract";
 
 import { formatToString, formatToError } from "#util";
-
-type Writer = (payload: LogPayload) => void | Promise<void>;
 
 export class LogStream extends Writable {
   private writer: Writer;

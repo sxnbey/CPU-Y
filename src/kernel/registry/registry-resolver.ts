@@ -1,19 +1,19 @@
-import type { KnownRegistries, Registry } from "#contract";
+import type { Registry, RegistryName } from "#contract";
 import type { MainRegistry } from "./main-registry.js";
 
 import { RegistryError } from "#kernel/error/errors";
 
 export class RegistryResolver {
-  constructor(private readonly mainRegistry: MainRegistry) {}
+  constructor(
+    private readonly mainRegistry: MainRegistry,
+    private readonly parent?: RegistryResolver,
+  ) {}
 
-  public getRegistry<K extends keyof KnownRegistries>(
-    registryName: K,
-  ): KnownRegistries[K];
-
-  public getRegistry(registryName: string): Registry;
-
-  public getRegistry(registryName: string): Registry {
-    return this.mainRegistry.get(registryName);
+  public getRegistry(registryName: RegistryName): Registry {
+    return (
+      this.mainRegistry.get(registryName) ||
+      this.parent?.getRegistry(registryName)
+    );
   }
 
   public get(id: string): unknown {
@@ -50,8 +50,11 @@ export class RegistryResolver {
     return this.locate(id) !== undefined;
   }
 
-  private locate(id: string): Registry | undefined {
-    for (const registry of this.mainRegistry.getAllRegistries())
+  public locate(id: string): Registry | undefined {
+    for (const registry of [
+      ...this.mainRegistry.getAllRegistries(),
+      ...(this.parent?.mainRegistry.getAllRegistries() || []),
+    ])
       if (registry.has(id)) return registry;
   }
 }

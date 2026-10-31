@@ -220,3 +220,23 @@ export class DecoratorError extends FrameworkError<typeof decoratorErrors> {
     super({ errorTemplates: decoratorErrors, ...params });
   }
 }
+
+//
+
+const lifecycleErrors = {
+  ERR_START_FAILED: {
+    headline: "Start failed",
+    details:
+      'Service with id "{ID}" failed to start. See the cause below. The install was rolled back.\nRolled back: {ROLLEDBACK}',
+  },
+  ERR_STOP_FAILED: {
+    headline: "Stop failed",
+    details: 'Service with id "{ID}" failed to stop. See the cause below.',
+  },
+} as const satisfies ErrorTemplates;
+
+export class LifecycleError extends FrameworkError<typeof lifecycleErrors> {
+  constructor(params: ErrorParameter<typeof lifecycleErrors>) {
+    super({ errorTemplates: lifecycleErrors, ...params });
+  }
+}

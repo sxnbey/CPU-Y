@@ -4,7 +4,9 @@ import {
   type Config,
   type EntryBuilder,
   type LoadedExport,
-  type RegistryName,
+  type Registry,
+  type Constructor,
+  type RegistryEntry,
 } from "#contract";
 import type { RegistryResolver } from "#kernel/registry/registry-resolver";
 
@@ -23,33 +25,37 @@ type Installable = {
 };
 
 export class Installer {
-  private builderMap: Map<RegistryName, EntryBuilder> = new Map();
-
-  constructor(private readonly registryResolver: RegistryResolver) {}
+  private builderMap: Map<Constructor<Registry>, EntryBuilder> = new Map();
 
   public install(
     exports: LoadedExport[],
     configs: Record<string, Config>,
-  ): void {
-    const installables = this.validate(exports, configs);
-    const sorted = this.order(installables);
+    registryResolver: RegistryResolver,
+  ): RegistryEntry<unknown>[] {
+    const installables = this.validate(exports, configs, registryResolver);
+    const sorted = this.order(installables, registryResolver);
+    const installedIds = this.build(sorted, installables, registryResolver);
 
-    this.build(sorted, installables);
+    return installedIds;
   }
 
-  public addBuilder(registryName: RegistryName, builder: EntryBuilder): void {
-    if (this.builderMap.has(registryName))
+  public addBuilder(
+    registry: Constructor<Registry>,
+    builder: EntryBuilder,
+  ): void {
+    if (this.builderMap.has(registry))
       throw new InstallError({
         errorCode: "ERR_BUILDER_ALREADY_REGISTERED",
-        args: { name: registryName },
+        args: { name: registry.name },
       });
 
-    this.builderMap.set(registryName, builder);
+    this.builderMap.set(registry, builder);
   }
 
   private validate(
     exports: LoadedExport[],
     configs: Record<string, Config>,
+    registryResolver: RegistryResolver,
   ): Map<string, Installable> {
     const installables: Map<string, Installable> = new Map();
 
@@ -76,7 +82,7 @@ export class Installer {
           },
         });
 
-      if (this.registryResolver.has(id))
+      if (registryResolver.has(id))
         throw new InstallError({
           errorCode: "ERR_ID_ALREADY_REGISTERED",
           args: {
@@ -86,7 +92,10 @@ export class Installer {
           },
         });
 
-      const builder = this.builderMap.get(targetRegistry);
+      const registry = registryResolver.getRegistry(targetRegistry);
+      const builder = this.builderMap.get(
+        registry.constructor as Constructor<Registry>,
+      );
 
       if (builder === undefined)
         throw new InstallError({
@@ -138,18 +147,22 @@ export class Installer {
     return installables;
   }
 
-  private order(installables: Map<string, Installable>): string[] {
+  private order(
+    installables: Map<string, Installable>,
+    registryResolver: RegistryResolver,
+  ): string[] {
     const toSort: Record<string, unknown> = {};
 
-    installables.forEach((entry, key) => (toSort[key] = entry.source));
+    for (const [serviceId, service] of installables)
+      toSort[serviceId] = service.source;
 
-    const doesExist = (id: string) => this.registryResolver.has(id);
+    const doesExist = (id: string) => registryResolver.has(id);
     const infoById = (id: string) => {
       const installable = installables.get(id);
 
-      return installable
-        ? `"${id}" as "${installable.origin.name}" in "${installable.origin.file}"`
-        : `"${id}"`;
+      return installable === undefined
+        ? `"${id}"`
+        : `"${id}" as "${installable.origin.name}" in "${installable.origin.file}"`;
     };
 
     const sorted = sort(toSort, { doesExist, infoById });
@@ -160,8 +173,10 @@ export class Installer {
   private build(
     sorted: string[],
     installables: Map<string, Installable>,
-  ): void {
-    const installedIds: string[] = [];
+    registryResolver: RegistryResolver,
+  ): RegistryEntry<unknown>[] {
+    const installedServices: { id: string; entry: RegistryEntry<unknown> }[] =
+      [];
 
     for (const id of sorted) {
       const installable = installables.get(id);
@@ -179,17 +194,17 @@ export class Installer {
           source: installable.source,
           metadata: installable.metadata,
           config: installable.config,
-          lookup: (dependencyId) => this.registryResolver.find(dependencyId),
+          lookup: (dependencyId) => registryResolver.find(dependencyId),
         });
 
-        this.registryResolver
+        registryResolver
           .getRegistry(installable.metadata.targetRegistry)
           .registerWrapped(entry);
 
-        installedIds.push(id);
+        installedServices.push({ id, entry });
       } catch (e) {
-        for (const installedId of [...installedIds].reverse())
-          this.registryResolver.delete(installedId);
+        for (const { id: installedId } of [...installedServices].reverse())
+          registryResolver.delete(installedId);
 
         throw new InstallError({
           errorCode: "ERR_BUILD_FAILED",
@@ -198,11 +213,15 @@ export class Installer {
             name: installable.origin.name,
             file: installable.origin.file,
             rolledback:
-              installedIds.length > 0 ? installedIds.join(", ") : "none",
+              installedServices.length > 0
+                ? installedServices.map(({ id }) => id).join(", ")
+                : "none",
           },
           cause: e,
         });
       }
     }
+
+    return installedServices.map(({ entry }) => entry);
   }
 }
