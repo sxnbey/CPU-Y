@@ -1,7 +1,7 @@
 import type { LogStream } from "./stream.js";
 import type { LogPayload } from "#contract";
 
-import { formatToString } from "#kernel/util/formatter";
+import { formatToString, isError, describeError } from "#util";
 
 const prefix = "CPU-Y";
 
@@ -35,8 +35,34 @@ export class Logger {
   }
 
   private static formatMessage(target: unknown): string {
-    return target instanceof Error
-      ? target.stack || target.message
-      : formatToString(target);
+    if (!isError(target)) return formatToString(target);
+
+    const lines = [describeError(target)];
+
+    let current = target.cause;
+
+    const seen = new Set([target]);
+
+    while (current !== undefined) {
+      if (!isError(current)) {
+        lines.push(`Caused by: ${formatToString(current)}`);
+
+        break;
+      }
+
+      if (seen.has(current)) {
+        lines.push("Caused by: [circular]");
+
+        break;
+      }
+
+      lines.push(`Caused by: ${describeError(current)}`);
+
+      seen.add(current);
+
+      current = current.cause;
+    }
+
+    return lines.join("\n");
   }
 }

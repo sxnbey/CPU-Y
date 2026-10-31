@@ -1,11 +1,11 @@
 import type { Config, CoreOverrides } from "#contract";
+import type { RegistryResolver } from "#kernel/registry/registry-resolver";
 
 import { createLayer } from "#kernel/registry/create-registry-layer";
-import { CORE_SERVICES_PRESET } from "./core-preset.js";
 import { Installer } from "#kernel/install/installer";
 
+import { CORE_PRESET } from "./core-preset.js";
 import { System } from "./system.js";
-import type { RegistryResolver } from "#kernel/registry/registry-resolver";
 
 type BootstrapOptions = {
   path: string;
@@ -14,7 +14,7 @@ type BootstrapOptions = {
 };
 
 export function bootstrap(options: BootstrapOptions): System {
-  const preset = { ...CORE_SERVICES_PRESET, ...options.overrides };
+  const preset = { ...CORE_PRESET, ...options.overrides };
   const registries = preset.registries.map(({ registry }) => registry);
   const core = createLayer(registries);
 

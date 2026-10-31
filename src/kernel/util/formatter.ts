@@ -16,6 +16,10 @@ export function formatToError(target: unknown): Error {
   return target instanceof Error ? target : new Error(formatToString(target));
 }
 
-export function formatDecoratorTarget(target: object) {
+export function formatDecoratorTarget(target: object): string {
   return typeof target === "function" ? target.name : formatToString(target);
+}
+
+export function describeError(error: Error): string {
+  return error.stack || `${error.name}: ${error.message}`;
 }

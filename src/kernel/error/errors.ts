@@ -227,11 +227,16 @@ const lifecycleErrors = {
   ERR_START_FAILED: {
     headline: "Start failed",
     details:
-      'Service with id "{ID}" failed to start. See the cause below. The install was rolled back.\nRolled back: {ROLLEDBACK}',
+      'Service with id "{ID}" failed to start. See the cause below. Already started services were stopped.\nStopped: {STOPPED}',
   },
   ERR_STOP_FAILED: {
     headline: "Stop failed",
     details: 'Service with id "{ID}" failed to stop. See the cause below.',
+  },
+  ERR_ALREADY_BOOTED: {
+    headline: "System already booted",
+    details: "The system has already booted.",
+    fix: "Please ensure stop() has been called before booting again.",
   },
 } as const satisfies ErrorTemplates;
 

@@ -27,6 +27,9 @@ export class System {
   ) {}
 
   public async boot(): Promise<void> {
+    if (this.app !== undefined)
+      throw new LifecycleError({ errorCode: "ERR_ALREADY_BOOTED" });
+
     const app = await this.createApp();
 
     await this.startServices(app.entries);
@@ -70,7 +73,7 @@ export class System {
           errorCode: "ERR_START_FAILED",
           args: {
             id: entry.metadata.id,
-            rolledback:
+            stopped:
               startedServices.length > 0
                 ? startedServices
                     .map((service) => service.metadata.id)

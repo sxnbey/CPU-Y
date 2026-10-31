@@ -103,7 +103,7 @@ function resolveTemplates(
 }
 
 function createMessage(rawMessage: ErrorMessage): string {
-  const message = [rawMessage.headline, "\n", `Cause: ${rawMessage.details}`];
+  const message = [rawMessage.headline, "\n", `Details: ${rawMessage.details}`];
 
   if (rawMessage.fix) message.push(`\nPotential fix: ${rawMessage.fix}`);
 

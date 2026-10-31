@@ -10,6 +10,10 @@ export function isClass(
   return string.startsWith("class ") || string.startsWith("class{");
 }
 
+export function isError(target: unknown): target is Error {
+  return target instanceof Error;
+}
+
 export function isMetadata(target: unknown): target is BaseMetadata {
   if (typeof target !== "object" || target === null) return false;
 
