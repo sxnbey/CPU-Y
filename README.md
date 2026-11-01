@@ -2,28 +2,28 @@
 
 ![Tech-Stack](https://skillicons.dev/icons?i=ts,nodejs)
 
-CPU-Y ist ein TypeScript-Framework für Terminal-Apps mit Dependency Injection, Lifecycle und Hot Reload mit State-Preservation.
+CPU-Y is a TypeScript framework for terminal apps with dependency injection, lifecycle hooks and hot reload with state preservation.
 
-> **Work in progress:** Fundament steht, Hot Reload und das Terminal-Modul sind in Arbeit.
+> **Work in progress:** The foundation is in place, hot reload and the terminal module are in progress.
 
 ## Status
 
-**Läuft**
+**Working**
 
-- **Dependency Injection** über Decorators (`@Instance`, `@Inject`, `@Config`). Abhängigkeiten werden sortiert und Zyklen erkannt.
-- **Rollback-Installation**: Wirft ein Service beim Bau einen Fehler, werden alle schon gebauten wieder entfernt.
-- **Lifecycle** mit `onStart` & `onStop`-Hooks: Gestartet wird in Abhängigkeitsreihenfolge, gestoppt wird rückwärts. Wirft ein `onStart`, werden die schon gestarteten Services wieder gestoppt.
-- **Module**: Erweiterungen mit eigenen Registries und Services.
-- **Scopes**: `persistent` Services überleben einen Reload, alle anderen werden neu gebaut.
-- **Strikt typisierte und detaillierte Fehlermeldungen** mit Datei, Export, Ursachenkette und Lösungsvorschlag.
-- **Loader**: lädt alle Exporte aus einem Ordner, ohne dass sie einzeln registriert werden müssen.
+- **Dependency injection** via decorators (`@Instance`, `@Inject`, `@Config`). Dependencies are sorted and cycles are detected.
+- **Rollback on install**: If a service throws while being built, all services built so far are removed again.
+- **Lifecycle** with `onStart` & `onStop` hooks: Services start in dependency order and stop in reverse. If an `onStart` throws, the services that were already started are stopped again.
+- **Modules**: Extensions with their own registries and services.
+- **Scopes**: `persistent` services survive a reload, all others are rebuilt.
+- **Strictly typed, detailed error messages** with file, export, cause chain and a suggested fix.
+- **Loader**: loads all exports from a folder, so they don't have to be registered one by one.
 
-**In Arbeit**
+**In progress**
 
-- Hot Reload mit State-Preservation (`onSnapshot` & `onRestore`)
-- Terminal-Modul (Input, Commands, Renderer)
+- Hot reload with state preservation (`onSnapshot` & `onRestore`)
+- Terminal module (input, commands, renderer)
 
-## Beispiel
+## Example
 
 ```typescript
 import type { Logger } from "#kernel/log/logger";
@@ -71,18 +71,18 @@ await system.boot();
 await system.stop();
 ```
 
-Ausgabe:
+Output:
 
 ```
 [info \ CPU-Y / 2026-11-01T19:59:54.260Z] - Moin, senbey!
 [info \ CPU-Y / 2026-11-01T19:59:54.263Z] - Tschüss!
 ```
 
-## Konzepte
+## Concepts
 
 ### Services
 
-Ein Service ist eine Klasse oder Funktion, die das Framework aufbaut und verwaltet. Jeder Service hat eine **eindeutige** `id`.
+A service is a class or function that the framework builds and manages. Every service has a **unique** `id`.
 
 ```typescript
 @Instance({ id: "greeter" })
@@ -91,61 +91,61 @@ export class Greeter { … }
 export const formatGreeting = decorateFunction({ id: "formatGreeting" }, (text: string) => { … });
 ```
 
-Funktionen müssen mit `decorateFunction` dekoriert werden, weil `@Decorator` nicht auf normalen Funktionen angewendet werden können.
+Functions are marked with `decorateFunction`, because TypeScript decorators can't be applied to plain functions.
 
-Abhängigkeiten werden im Constructor angegeben:
+Dependencies are declared in the constructor:
 
-- `@Inject("id")`: ein anderer Service
-- `@Config()`: die Konfiguration aus `bootstrap({ configs: { … } })`, nur einmal pro Service
+- `@Inject("id")`: another service
+- `@Config()`: the configuration from `bootstrap({ configs: { … } })`, at most once per service
 
-Ein Parameter ohne Decorator führt zu einem Fehler, außer er ist der am Ende stehende Parameter und hat einen Standardwert.
-Exporte ohne `@Instance` oder `decorateFunction()` werden ignoriert, also können auch andere Funktionen, Konstanten etc. in den Dateien liegen.
+A parameter without a decorator causes an error, unless it comes at the end and has a default value.
+Exports without `@Instance` or `decorateFunction()` are ignored, so helper functions, constants etc. can live in the same files.
 
 ### Scopes
 
-Der Scope eines Services bestimmt, wie lange er lebt.
+A service's scope determines how long it lives.
 
-- `reloadable` (Default): Wird bei jedem Reload neu gebaut.
-- `persistent`: Bleibt nach Reload bestehen.
+- `reloadable` (default): rebuilt on every reload.
+- `persistent`: stays alive across reloads.
 
 ```typescript
 @Instance({ id: "evoMortar", scope: "persistent" })
 ```
 
-Persistente Services liegen deswegen auch in einer höheren Schicht, damit die reloadable Schicht einfach ausgetauscht werden kann.
+That's why persistent services live in a higher layer, so the reloadable layer can simply be swapped out.
 
-Ein persistenter Service kann auch **nicht** von einem reloadable Service abhängen, da er sonst sein Leben lang eine veraltete Version festhält, auch wenn die Abhängigkeit schon mehrmals neu geladen wurde. Andersherum geht es aber problemlos.
+A persistent service **cannot** depend on a reloadable service. Otherwise it would hold on to an outdated instance for its entire lifetime, even after that dependency has been reloaded several times. The other way around works just fine.
 
 ### Lifecycle
 
-Services können optional `onStart()` und `onStop()`-Hooks implementieren, synchron oder `async`.
+Services can optionally implement `onStart()` and `onStop()` hooks, either synchronous or `async`.
 
 ```typescript
 @Instance({ id: "database" })
 export class Database implements OnStart, OnStop {
   async onStart() {
-    /* Verbindung aufbauen */
+    /* open connection */
   }
 
   async onStop() {
-    /* Verbindung schließen */
+    /* close connection */
   }
 }
 ```
 
-- **Start**: in Abhängigkeitsreihenfolge. Ein Service kann erst starten, wenn all seine Abhängigkeiten schon gestartet sind. Persistente Services starten vor den reloadable.
+- **Start**: in dependency order. A service can only start once all of its dependencies have started. Persistent services start before reloadable ones.
 
-- **Stopp**: in umgekehrter Reihenfolge, heißt erst die reloadable und anschließend die persistenten.
+- **Stop**: in reverse order, meaning reloadable services first, then the persistent ones.
 
-**Verhalten bei Fehlern:**
+**Error handling:**
 
-- `onStart()`: alle gestarteten Services werden gestoppt, `boot()` wirft einen `LifecycleError` mit dem ursprünglichen Fehler als `cause`.
+- `onStart()`: all services started so far are stopped, and `boot()` throws a `LifecycleError` with the original error as its `cause`.
 
-- `onStop()`: der Fehler wird geloggt, die weiteren Services werden trotzdem gestoppt.
+- `onStop()`: the error is logged, and the remaining services are still stopped.
 
-### Module
+### Modules
 
-Ein Modul erweitert das Framework um weitere Registries und Services. Modul-Services sind ganz normale Services mit Decoratorn, Scope und Lifecycle.
+A module extends the framework with additional registries and services. Module services are completely normal services with decorators, scopes and lifecycle hooks.
 
 ```typescript
 import type { Module } from "#contract";
@@ -164,15 +164,15 @@ const system = bootstrap({
 });
 ```
 
-Modul-Services können auch als Abhängigkeit genutzt werden und Exporte mit dem Ziel einer Modul-Registry landen auch dort.
+Module services can be injected like any other service, and exports targeting a module's registry end up in that registry.
 
-**`modules` & `overrides` Unterschiede**
+**`modules` vs. `overrides`**
 
-- `modules` ergänzt: neue Registries und Services als Erweiterung zum Framework.
-- `overrides` ersetzt Teile des Kerns, zum Beispiel ein eigener Logger:
+- `modules` adds: new registries and services that extend the framework.
+- `overrides` replaces parts of the core, for example with a custom logger:
 
 ```typescript
 bootstrap({ path, overrides: { logger: CustomLogger } });
 ```
 
-## Architektur
+## Architecture
