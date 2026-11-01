@@ -3,7 +3,8 @@ import { bootstrap } from "./bootstrap.js";
 
 const system = bootstrap({
   path: join(import.meta.dirname, "example/"),
-  configs: { secondExample: { name: "senbey" } },
+  configs: { welcome: { name: "senbey" } },
+  modules: [{ name: "terminalModule", services: {}, registries: [] }],
 });
 
 await system.boot();
