@@ -15,6 +15,17 @@ export function createLoader({ extensions = [".js", ".mjs"] } = {}): Loader {
   };
 }
 
+export function collectExports(
+  exports: Record<string, unknown>,
+  file: string,
+): LoadedExport[] {
+  return Object.entries(exports).map(([name, value]) => ({
+    value,
+    name,
+    file,
+  }));
+}
+
 function resolveRoot(loadPath: string | URL): string {
   if (loadPath instanceof URL) return fileURLToPath(loadPath);
 
@@ -88,8 +99,7 @@ async function importAll(files: string[]): Promise<LoadedExport[]> {
       });
     }
 
-    for (const [name, value] of Object.entries(imported))
-      loaded.push({ value, name, file });
+    loaded.push(...collectExports(imported, file));
   }
 
   return loaded;

@@ -1,16 +1,30 @@
 import type { Logger } from "#kernel/log/logger";
 import type { Installer } from "#kernel/install/installer";
-import type { Config, Loader, RegistryEntry } from "#contract";
+import type {
+  Config,
+  LoadedExport,
+  Loader,
+  RegistryEntry,
+  Scope,
+} from "#contract";
 import type { RegistryResolver } from "#kernel/registry/registry-resolver";
 import type { RegistryLayer } from "#kernel/registry/create-registry-layer";
 
+import { MetadataKey } from "#contract";
 import { hasOnStart, hasOnStop } from "#util";
+import { getMetadata } from "#kernel/metadata/metadata-accessor";
 import { LifecycleError } from "#kernel/error/errors";
 
 type App = { layer: RegistryLayer; entries: RegistryEntry<unknown>[] };
 
+type Partition = {
+  services: LoadedExport[];
+  configs: Record<string, Config>;
+};
+
 export class System {
   private app: App | undefined;
+  private persistent: App | undefined;
 
   constructor(
     private readonly dependencies: {
@@ -19,45 +33,80 @@ export class System {
       loader: Loader;
       installer: Installer;
       coreResolver: RegistryResolver;
+      moduleExports: LoadedExport[];
     },
     private readonly options: {
-      path: string;
+      path: string | URL;
       configs: Record<string, Config>;
     },
   ) {}
 
   public async boot(): Promise<void> {
-    if (this.app !== undefined)
+    if (this.app !== undefined || this.persistent !== undefined)
       throw new LifecycleError({ errorCode: "ERR_ALREADY_BOOTED" });
 
-    const app = await this.createApp();
+    const { persistent, reloadable } = await this.collectServices(
+      this.dependencies.moduleExports,
+    );
 
-    await this.startServices(app.entries);
+    const persistentApp = this.installLayer(
+      persistent.services,
+      persistent.configs,
+      this.dependencies.coreResolver,
+    );
 
-    this.app = app;
+    await this.startServices(persistentApp.entries);
+
+    try {
+      const app = this.installLayer(
+        reloadable.services,
+        reloadable.configs,
+        persistentApp.layer.registryResolver,
+      );
+
+      await this.startServices(app.entries);
+
+      this.persistent = persistentApp;
+      this.app = app;
+    } catch (e) {
+      await this.stopServices(persistentApp.entries);
+
+      throw e;
+    }
   }
 
   public async stop(): Promise<void> {
     await this.stopServices(this.app?.entries ?? []);
+    await this.stopServices(this.persistent?.entries ?? []);
 
     this.app = undefined;
+    this.persistent = undefined;
   }
 
-  private async createApp(): Promise<App> {
-    const { loader, newLayer, coreResolver, installer } = this.dependencies;
-    const layer = newLayer(coreResolver);
-    const exports = await loader(this.options.path);
+  private async collectServices(
+    moduleExports: LoadedExport[],
+  ): Promise<Record<Scope, Partition>> {
+    const allServices = [
+      ...moduleExports,
+      ...(await this.dependencies.loader(this.options.path)),
+    ];
 
-    const entries = installer.install(
+    return splitByScope(allServices, this.options.configs);
+  }
+
+  private installLayer(
+    exports: LoadedExport[],
+    configs: Record<string, Config>,
+    parent: RegistryResolver,
+  ): App {
+    const layer = this.dependencies.newLayer(parent);
+    const entries = this.dependencies.installer.install(
       exports,
-      this.options.configs,
+      configs,
       layer.registryResolver,
     );
 
-    return {
-      layer,
-      entries,
-    };
+    return { layer, entries };
   }
 
   private async startServices(entries: App["entries"]) {
@@ -102,4 +151,36 @@ export class System {
         );
       }
   }
+}
+
+function splitByScope(
+  services: LoadedExport[],
+  configs: Record<string, Config>,
+): Record<Scope, Partition> {
+  const partitions: Record<Scope, Partition> = {
+    persistent: { services: [], configs: {} },
+    reloadable: { services: [], configs: {} },
+  };
+  const persistentIds = new Set<string>();
+
+  for (const service of services) {
+    if (typeof service.value !== "function") continue;
+
+    const metadata = getMetadata(MetadataKey.METADATA, service.value);
+
+    if (metadata === undefined) continue;
+
+    const scope = metadata.scope ?? "reloadable";
+
+    partitions[scope].services.push(service);
+
+    if (scope === "persistent") persistentIds.add(metadata.id);
+  }
+
+  for (const [id, config] of Object.entries(configs))
+    partitions[persistentIds.has(id) ? "persistent" : "reloadable"].configs[
+      id
+    ] = config;
+
+  return partitions;
 }

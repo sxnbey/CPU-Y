@@ -15,4 +15,7 @@ export interface MetadataMap {
 export interface BaseMetadata {
   id: string;
   targetRegistry: RegistryName;
+  scope?: Scope;
 }
+
+export type Scope = "persistent" | "reloadable";

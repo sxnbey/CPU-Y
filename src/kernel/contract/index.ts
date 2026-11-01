@@ -15,3 +15,5 @@ export type * from "./lifecycle.js";
 export type * from "./preset.js";
 
 export type * from "./util.js";
+
+export type * from "./module.js";

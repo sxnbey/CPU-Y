@@ -62,7 +62,7 @@ export class FrameworkError<
     const rawMessage = resolveTemplates(errorTemplates, errorCode, args);
     const message = createMessage(rawMessage);
 
-    super(message, { cause });
+    super(message, cause !== undefined ? { cause } : undefined);
 
     this.errorCode = errorCode;
     this.rawMessage = rawMessage;

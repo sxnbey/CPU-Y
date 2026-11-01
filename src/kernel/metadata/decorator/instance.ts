@@ -8,7 +8,9 @@ import { setMetadata } from "../metadata-accessor.js";
 
 const registryName = "instanceRegistry" satisfies keyof KnownRegistries;
 
-export function Instance(input: Pick<BaseMetadata, "id">): ClassDecorator {
+export function Instance(
+  input: Pick<BaseMetadata, "id" | "scope">,
+): ClassDecorator {
   return (target) => {
     setMetadata(
       MetadataKey.METADATA,

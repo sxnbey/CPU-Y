@@ -11,16 +11,6 @@ export class DependencyInjectionError extends FrameworkError<
 }
 
 const dependencyInjectionErrors = {
-  ERR_MISSING_METADATA: {
-    headline: "Missing metadata",
-    details: 'The metadata is missing for class with name "{NAME}".',
-    fix: 'Please ensure class "{NAME}" is properly decorated with @Decorators.',
-  },
-  ERR_INVALID_SOURCE: {
-    headline: "Invalid source",
-    details: `The source provided is not a class.\nSource: "{SOURCE}"`,
-    fix: 'Please ensure the provided source "{SOURCE}" is a Class.',
-  },
   ERR_UNEXPECTED_CONFIG: {
     headline: "Unexpected configuration",
     details:
@@ -190,6 +180,12 @@ const installErrors = {
     headline: "Failed to build service",
     details:
       'Building "{ID}" as "{NAME}" in "{FILE}" failed. The install was rolled back.\nRolled back: {ROLLEDBACK}',
+  },
+  ERR_UNKNOWN_TARGET_REGISTRY: {
+    headline: "Unknown target registry",
+    details:
+      'Target registry "{TARGETREGISTRY}" for export "{NAME}" in "{FILE}" is not registered.',
+    fix: "Please ensure the module that provides the target registry is added.",
   },
 } as const satisfies ErrorTemplates;
 

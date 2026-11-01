@@ -22,6 +22,7 @@ type Installable = {
   builder: EntryBuilder;
   origin: Pick<LoadedExport, "name" | "file">;
   config: Config | undefined;
+  registry: Registry;
 };
 
 export class Installer {
@@ -34,9 +35,9 @@ export class Installer {
   ): RegistryEntry<unknown>[] {
     const installables = this.validate(exports, configs, registryResolver);
     const sorted = this.order(installables, registryResolver);
-    const installedIds = this.build(sorted, installables, registryResolver);
+    const entries = this.build(sorted, installables, registryResolver);
 
-    return installedIds;
+    return entries;
   }
 
   public addBuilder(
@@ -92,6 +93,16 @@ export class Installer {
           },
         });
 
+      if (!registryResolver.hasRegistry(targetRegistry))
+        throw new InstallError({
+          errorCode: "ERR_UNKNOWN_TARGET_REGISTRY",
+          args: {
+            targetregistry: targetRegistry,
+            name,
+            file,
+          },
+        });
+
       const registry = registryResolver.getRegistry(targetRegistry);
       const builder = this.builderMap.get(
         registry.constructor as Constructor<Registry>,
@@ -132,6 +143,7 @@ export class Installer {
         builder,
         config,
         origin: { name, file },
+        registry,
       });
     }
 
@@ -197,9 +209,7 @@ export class Installer {
           lookup: (dependencyId) => registryResolver.find(dependencyId),
         });
 
-        registryResolver
-          .getRegistry(installable.metadata.targetRegistry)
-          .registerWrapped(entry);
+        installable.registry.registerWrapped(entry);
 
         installedServices.push({ id, entry });
       } catch (e) {

@@ -10,10 +10,11 @@ export class RegistryResolver {
   ) {}
 
   public getRegistry(registryName: RegistryName): Registry {
-    return (
-      this.mainRegistry.get(registryName) ||
-      this.parent?.getRegistry(registryName)
-    );
+    return this.mainRegistry.get(registryName);
+  }
+
+  public hasRegistry(registryName: RegistryName): boolean {
+    return this.mainRegistry.has(registryName);
   }
 
   public get(id: string): unknown {
@@ -39,7 +40,7 @@ export class RegistryResolver {
   }
 
   public delete(id: string): boolean {
-    const registry = this.locate(id);
+    const registry = this.locateOwn(id);
 
     if (registry === undefined) return false;
 
@@ -51,10 +52,12 @@ export class RegistryResolver {
   }
 
   public locate(id: string): Registry | undefined {
-    for (const registry of [
-      ...this.mainRegistry.getAllRegistries(),
-      ...(this.parent?.mainRegistry.getAllRegistries() || []),
-    ])
-      if (registry.has(id)) return registry;
+    return this.locateOwn(id) || this.parent?.locate(id);
+  }
+
+  private locateOwn(id: string): Registry | undefined {
+    return this.mainRegistry
+      .getAllRegistries()
+      .find((registry) => registry.has(id));
   }
 }

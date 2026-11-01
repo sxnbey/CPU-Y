@@ -12,8 +12,8 @@ export function createLayer(
   const mainRegistry = new MainRegistry();
   const registryResolver = new RegistryResolver(mainRegistry, parent);
 
-  for (const Registry of registries) {
-    const instance = new Registry();
+  for (const registry of registries) {
+    const instance = new registry();
 
     mainRegistry.register(instance.getName(), instance);
   }
