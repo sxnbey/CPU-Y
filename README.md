@@ -1,11 +1,12 @@
-```
+<div align="center"><pre>
 ___________________ ____ ___         _____.___.
 \_   ___ \______   \    |   \        \__  |   |
 /    \  \/|     ___/    |   /  ______ /   |   |
 \     \___|    |   |    |  /  /_____/ \____   |
  \______  /____|   |______/           / ______|
-        \/                            \/       
-```
+        \/                            \/
+</pre></div>
+
 # CPU-Y ![Status](https://img.shields.io/badge/Status-Work_in_progress-yellow)
 
 ![Tech-Stack](https://skillicons.dev/icons?i=ts,nodejs)
