@@ -139,7 +139,7 @@ export class Greeter { … }
 export const formatGreeting = decorateFunction({ id: "formatGreeting" }, (text: string) => { … });
 ```
 
-Functions are decorated with `decorateFunction`, because TypeScript decorators can't be applied to plain functions.
+Functions are decorated with `decorateFunction()`, because TypeScript decorators can't be applied to plain functions.
 
 Dependencies are declared in the constructor:
 
