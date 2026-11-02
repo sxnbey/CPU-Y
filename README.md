@@ -76,11 +76,11 @@ export class Greeter implements OnStop {
   constructor(@Inject("logger") private readonly logger: Logger) {}
 
   public greet(name: string): void {
-    this.logger.info(`Hello, ${name}!`);
+    this.logger.info(`Moin, ${name}!`);
   }
 
   public onStop(): void {
-    this.logger.info("Bye!");
+    this.logger.info("Tschüss!");
   }
 }
 
