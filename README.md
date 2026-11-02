@@ -12,8 +12,8 @@ CPU-Y is a TypeScript framework for terminal apps with dependency injection, lif
 - [Requirements](#requirements)
 - [Getting started](#getting-started)
 - [Example](#example)
-- [Concepts](#concepts): [Services](#services) · [Scopes](#scopes) · [Lifecycle](#lifecycle) · [Modules](#modules)
-- [Architecture](#architecture): [Boot sequence](#boot-sequence) · [Layers](#layers) · [Folder structure](#folder-structure) · [Design decisions](#design-decisions)
+- [Concepts](#concepts): [Services](#services) · [Scopes](#scopes) - [Lifecycle](#lifecycle) - [Modules](#modules)
+- [Architecture](#architecture): [Boot sequence](#boot-sequence) - [Layers](#layers) - [Folder structure](#folder-structure) - [Design decisions](#design-decisions)
 - [Roadmap](#roadmap)
 - [License](#license)
 
