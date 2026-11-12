@@ -2,8 +2,11 @@ import type { LogStream } from "./stream.js";
 import type { LogPayload } from "#contract";
 
 import { formatToString, isError, describeError } from "#util";
+import { token } from "#kernel/token";
 
 const prefix = "CPU-Y";
+
+export const LOGGER = token<Logger>("logger");
 
 export class Logger {
   constructor(private readonly stream: LogStream) {}

@@ -1,4 +1,10 @@
-import type { Registry, RegistryName } from "#contract";
+import type {
+  KnownRegistries,
+  Registry,
+  RegistryMap,
+  RegistryName,
+  Token,
+} from "#contract";
 import type { MainRegistry } from "./main-registry.js";
 
 import { RegistryError } from "#kernel/error/errors";
@@ -9,6 +15,12 @@ export class RegistryResolver {
     private readonly parent?: RegistryResolver,
   ) {}
 
+  public getRegistry<KnownRegistry extends keyof KnownRegistries>(
+    registryName: KnownRegistry,
+  ): RegistryMap[KnownRegistry];
+
+  public getRegistry(registryName: RegistryName): Registry;
+
   public getRegistry(registryName: RegistryName): Registry {
     return this.mainRegistry.get(registryName);
   }
@@ -16,6 +28,8 @@ export class RegistryResolver {
   public hasRegistry(registryName: RegistryName): boolean {
     return this.mainRegistry.has(registryName);
   }
+
+  public get<T>(token: Token<T>): T;
 
   public get(id: string): unknown {
     const registry = this.locate(id);
@@ -28,6 +42,8 @@ export class RegistryResolver {
 
     return registry.get(id);
   }
+
+  public find<T>(token: Token<T>): T | undefined;
 
   public find(id: string): unknown {
     return this.locate(id)?.get(id);

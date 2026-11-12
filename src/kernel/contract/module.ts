@@ -1,4 +1,4 @@
-import type { RegistryDefinition } from "./preset.js";
+import type { RegistryDefinition } from "../../core-preset.js";
 
 export interface Module {
   name: string;

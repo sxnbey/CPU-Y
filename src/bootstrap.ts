@@ -1,12 +1,14 @@
-import type { Config, CoreOverrides, Module } from "#contract";
+import type { Config, Module, Application } from "#contract";
 import type { RegistryResolver } from "#kernel/registry/registry-resolver";
 
 import { createLayer } from "#kernel/registry/create-registry-layer";
 import { Installer } from "#kernel/install/installer";
 import { collectExports } from "#kernel/load/loader";
 
-import { CORE_PRESET } from "./core-preset.js";
+import { CORE_PRESET, type CoreOverrides } from "./core-preset.js";
 import { System } from "./system.js";
+import { LOGGER } from "#kernel/log/logger";
+import { LOG_STREAM } from "#kernel/log/stream";
 
 type BootstrapOptions = {
   path: string | URL;
@@ -15,7 +17,7 @@ type BootstrapOptions = {
   overrides?: CoreOverrides;
 };
 
-export function bootstrap(options: BootstrapOptions): System {
+export function bootstrap(options: BootstrapOptions): Application {
   const preset = { ...CORE_PRESET, ...options.overrides };
   const registryDefinitions = [
     ...preset.registries,
@@ -45,13 +47,13 @@ export function bootstrap(options: BootstrapOptions): System {
 
   core.registryResolver
     .getRegistry("instanceRegistry")
-    .register({ id: "logStream", value: logStream });
+    .register({ id: LOG_STREAM, value: logStream });
 
   const logger = new preset.logger(logStream);
 
   core.registryResolver
     .getRegistry("instanceRegistry")
-    .register({ id: "logger", value: logger });
+    .register({ id: LOGGER, value: logger });
 
   return new System(
     {

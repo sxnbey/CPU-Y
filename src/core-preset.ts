@@ -1,4 +1,4 @@
-import type { CorePreset } from "#contract";
+import type { Constructor, EntryBuilder, Loader, Registry } from "#contract";
 
 import { Logger } from "#kernel/log/logger";
 import {
@@ -17,4 +17,18 @@ export const CORE_PRESET: CorePreset = {
     { registry: InstanceRegistry, build: buildInstance },
     { registry: FunctionRegistry, build: buildFunction },
   ],
+};
+
+export interface CorePreset {
+  logStream: Constructor<LogStream>;
+  logger: Constructor<Logger>;
+  loader: Loader;
+  registries: RegistryDefinition[];
+}
+
+export type CoreOverrides = Partial<CorePreset>;
+
+export type RegistryDefinition = {
+  registry: Constructor<Registry>;
+  build: EntryBuilder;
 };

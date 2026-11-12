@@ -1,12 +1,12 @@
 import { join } from "node:path";
 import { bootstrap } from "./bootstrap.js";
 
-const system = bootstrap({
+const app = bootstrap({
   path: join(import.meta.dirname, "example/"),
   configs: { welcome: { name: "senbey" } },
-  modules: [{ name: "terminalModule", services: {}, registries: [] }],
+  // modules: [{ name: "terminal", services: {}, registries: [] }],
 });
 
-await system.boot();
+await app.boot();
 
-await system.stop();
+await app.stop();

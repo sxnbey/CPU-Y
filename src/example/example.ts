@@ -1,4 +1,4 @@
-import type { Logger } from "#kernel/log/logger";
+import { LOGGER, type Logger } from "#kernel/log/logger";
 import type { OnStart, OnStop } from "#contract";
 import {
   Instance,
@@ -9,7 +9,7 @@ import {
 
 @Instance({ id: "greeter", scope: "persistent" })
 export class Greeter implements OnStop {
-  constructor(@Inject("logger") private readonly logger: Logger) {}
+  constructor(@Inject(LOGGER) private readonly logger: Logger) {}
 
   public greet(name: string): void {
     this.logger.info(`Moin, ${name}!`);

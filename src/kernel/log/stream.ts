@@ -3,6 +3,9 @@ import { Writable, type WritableOptions } from "node:stream";
 import type { LogPayload, Writer } from "#contract";
 
 import { formatToString, formatToError } from "#util";
+import { token } from "#kernel/token";
+
+export const LOG_STREAM = token<LogStream>("logStream");
 
 export class LogStream extends Writable {
   private writer: Writer;

@@ -6,6 +6,8 @@ import type {
   Loader,
   RegistryEntry,
   Scope,
+  SystemControl,
+  Application,
 } from "#contract";
 import type { RegistryResolver } from "#kernel/registry/registry-resolver";
 import type { RegistryLayer } from "#kernel/registry/create-registry-layer";
@@ -14,6 +16,7 @@ import { MetadataKey } from "#contract";
 import { hasOnStart, hasOnStop } from "#util";
 import { getMetadata } from "#kernel/metadata/metadata-accessor";
 import { LifecycleError } from "#kernel/error/errors";
+import { token } from "#kernel/token";
 
 type App = { layer: RegistryLayer; entries: RegistryEntry<unknown>[] };
 
@@ -22,9 +25,12 @@ type Partition = {
   configs: Record<string, Config>;
 };
 
-export class System {
+export const SYSTEM_CONTROL = token<SystemControl>("systemControl");
+
+export class System implements Application {
   private app: App | undefined;
   private persistent: App | undefined;
+  private readonly systemControl: SystemControl = { stop: () => this.stop() };
 
   constructor(
     private readonly dependencies: {
@@ -39,7 +45,11 @@ export class System {
       path: string | URL;
       configs: Record<string, Config>;
     },
-  ) {}
+  ) {
+    this.dependencies.coreResolver
+      .getRegistry("instanceRegistry")
+      .register({ id: SYSTEM_CONTROL, value: this.systemControl });
+  }
 
   public async boot(): Promise<void> {
     if (this.app !== undefined || this.persistent !== undefined)
