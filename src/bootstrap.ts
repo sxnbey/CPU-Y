@@ -9,8 +9,9 @@ import { CORE_PRESET, type CoreOverrides } from "./core-preset.js";
 import { System } from "./system.js";
 import { LOGGER } from "#kernel/log/logger";
 import { LOG_STREAM } from "#kernel/log/stream";
+import { registryToken } from "#kernel/registry/registry-token";
 
-type BootstrapOptions = {
+export type BootstrapOptions = {
   path: string | URL;
   configs?: Record<string, Config>;
   modules?: Module[];
@@ -20,15 +21,23 @@ type BootstrapOptions = {
 export function bootstrap(options: BootstrapOptions): Application {
   const preset = { ...CORE_PRESET, ...options.overrides };
   const registryDefinitions = [
-    ...preset.registries,
+    ...CORE_PRESET.registries,
     ...(options.modules ?? []).flatMap((module) => module.registries ?? []),
   ];
   const registries = registryDefinitions.map(
     (definition) => definition.registry,
   );
 
-  const newLayer = (parent?: RegistryResolver) =>
-    createLayer(registries, parent);
+  const newLayer = (parent?: RegistryResolver) => {
+    const resolver = createLayer(registries, parent);
+
+    for (const registry of resolver.getAllRegistries())
+      resolver
+        .getRegistry("instanceRegistry")
+        .register({ id: registryToken(registry.getName()), value: registry });
+
+    return resolver;
+  };
 
   const moduleExports = (options.modules ?? []).flatMap((module) => {
     const services = module.services ?? {};
@@ -45,15 +54,13 @@ export function bootstrap(options: BootstrapOptions): Application {
 
   const logStream = new preset.logStream();
 
-  core.registryResolver
+  core
     .getRegistry("instanceRegistry")
     .register({ id: LOG_STREAM, value: logStream });
 
   const logger = new preset.logger(logStream);
 
-  core.registryResolver
-    .getRegistry("instanceRegistry")
-    .register({ id: LOGGER, value: logger });
+  core.getRegistry("instanceRegistry").register({ id: LOGGER, value: logger });
 
   return new System(
     {
@@ -61,7 +68,7 @@ export function bootstrap(options: BootstrapOptions): Application {
       logger,
       installer,
       loader: preset.loader,
-      coreResolver: core.registryResolver,
+      coreResolver: core,
       moduleExports,
     },
     { configs: options.configs ?? {}, path: options.path },

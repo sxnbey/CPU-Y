@@ -1,4 +1,4 @@
-import type { Constructor, EntryBuilder, Loader, Registry } from "#contract";
+import type { Constructor, Loader, RegistryDefinition } from "#contract";
 
 import { Logger } from "#kernel/log/logger";
 import {
@@ -26,9 +26,4 @@ export interface CorePreset {
   registries: RegistryDefinition[];
 }
 
-export type CoreOverrides = Partial<CorePreset>;
-
-export type RegistryDefinition = {
-  registry: Constructor<Registry>;
-  build: EntryBuilder;
-};
+export type CoreOverrides = Partial<Omit<CorePreset, "registries">>;

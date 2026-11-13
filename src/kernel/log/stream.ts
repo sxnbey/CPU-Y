@@ -3,7 +3,7 @@ import { Writable, type WritableOptions } from "node:stream";
 import type { LogPayload, Writer } from "#contract";
 
 import { formatToString, formatToError } from "#util";
-import { token } from "#kernel/token";
+import { token } from "#kernel/di/token";
 
 export const LOG_STREAM = token<LogStream>("logStream");
 

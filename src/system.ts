@@ -10,15 +10,14 @@ import type {
   Application,
 } from "#contract";
 import type { RegistryResolver } from "#kernel/registry/registry-resolver";
-import type { RegistryLayer } from "#kernel/registry/create-registry-layer";
 
 import { MetadataKey } from "#contract";
 import { hasOnStart, hasOnStop } from "#util";
 import { getMetadata } from "#kernel/metadata/metadata-accessor";
 import { LifecycleError } from "#kernel/error/errors";
-import { token } from "#kernel/token";
+import { token } from "#kernel/di/token";
 
-type App = { layer: RegistryLayer; entries: RegistryEntry<unknown>[] };
+type App = { resolver: RegistryResolver; entries: RegistryEntry<unknown>[] };
 
 type Partition = {
   services: LoadedExport[];
@@ -34,7 +33,7 @@ export class System implements Application {
 
   constructor(
     private readonly dependencies: {
-      newLayer: (parent: RegistryResolver) => RegistryLayer;
+      newLayer: (parent: RegistryResolver) => RegistryResolver;
       logger: Logger;
       loader: Loader;
       installer: Installer;
@@ -71,7 +70,7 @@ export class System implements Application {
       const app = this.installLayer(
         reloadable.services,
         reloadable.configs,
-        persistentApp.layer.registryResolver,
+        persistentApp.resolver,
       );
 
       await this.startServices(app.entries);
@@ -109,14 +108,14 @@ export class System implements Application {
     configs: Record<string, Config>,
     parent: RegistryResolver,
   ): App {
-    const layer = this.dependencies.newLayer(parent);
+    const resolver = this.dependencies.newLayer(parent);
     const entries = this.dependencies.installer.install(
       exports,
       configs,
-      layer.registryResolver,
+      resolver,
     );
 
-    return { layer, entries };
+    return { resolver, entries };
   }
 
   private async startServices(entries: App["entries"]) {

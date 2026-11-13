@@ -1,16 +1,26 @@
 {
-  "name": "cpu-y",
-  "version": "1.0.0",
-  "description": "",
-  "main": "dist/index.js",
+  "name": "cpuy",
+  "version": "0.1.0",
+  "description": "TypeScript framework for terminal apps with DI, lifecycle hooks and hot reload",
+  "author": "senbey",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "imports": {
+    "#kernel/*": "./dist/kernel/*.js",
+    "#contract": "./dist/kernel/contract/index.js",
+    "#util": "./dist/kernel/util/index.js"
+  },
   "scripts": {
     "build": "rimraf dist && tsc",
-    "start": "node dist/index.js",
-    "dev": "tsc-watch --onSuccess \"node dist/index.js\""
+    "start": "node dist/example/main.js",
+    "dev": "tsc-watch --onSuccess \"node dist/example/main.js\""
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "reflect-metadata": "^0.2.2"
   },
@@ -20,11 +30,5 @@
     "tsc-watch": "^7.2.1",
     "tsx": "^4.23.12",
     "typescript": "7.0.2"
-  },
-  "type": "module",
-  "imports": {
-    "#kernel/*": "./dist/kernel/*.js",
-    "#contract": "./dist/kernel/contract/index.js",
-    "#util": "./dist/kernel/util/index.js"
   }
 }

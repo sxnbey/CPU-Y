@@ -2,7 +2,7 @@ import type { LogStream } from "./stream.js";
 import type { LogPayload } from "#contract";
 
 import { formatToString, isError, describeError } from "#util";
-import { token } from "#kernel/token";
+import { token } from "#kernel/di/token";
 
 const prefix = "CPU-Y";
 

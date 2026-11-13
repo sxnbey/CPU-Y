@@ -38,15 +38,7 @@ export type KnownRegistries = {
   [R in keyof RegistryPayloadMap]: Registry<R, RegistryPayloadMap[R]>;
 };
 
-export type CustomRegistries = {
-  [registryName: string]: Registry<string>;
-};
-
-export type RegistryMap = KnownRegistries & CustomRegistries;
-
-// & {} ensures this type doesn't get reduced to string.
-
-export type RegistryName = keyof KnownRegistries | (string & {});
+export type RegistryName = keyof RegistryPayloadMap;
 
 export interface RegistryEntry<V, M extends BaseMetadata = BaseMetadata> {
   value: V;
