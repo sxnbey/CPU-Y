@@ -132,6 +132,11 @@ const installErrors = {
       'No builder exists for registry "{REGISTRYNAME}". Used by "{NAME}" in "{FILE}".',
     fix: "Please ensure a builder for this registry has been registered.",
   },
+  ERR_EMPTY_ID: {
+    headline: "Empty id",
+    details: 'Export with name "{NAME}" in "{FILE}" has an empty id.',
+    fix: "Please ensure the id contains characters and does not fully consist of spaces.",
+  },
   ERR_DUPLICATE_ID: {
     headline: "Duplicate id",
     details:
@@ -175,6 +180,12 @@ const installErrors = {
     headline: "Provided source is not a function",
     details: 'The provided source "{SOURCE}" is not a function.',
     fix: "Please ensure the provided source is a function.",
+  },
+  ERR_RETURN_VALUE_OF_FACTORY_IS_NOT_FUNCTION: {
+    headline: "Return value of factory is not a function",
+    details:
+      'The provided factory function returned "{RESULT}" instead of a plain function.',
+    fix: "Please ensure the outer function returns a plain function.\nFor example: (deps) => (args) => ...",
   },
   ERR_BUILD_FAILED: {
     headline: "Failed to build service",

@@ -1,5 +1,4 @@
-import { isClass } from "#util";
-import { readParameterSlots } from "./dependency-resolver.js";
+import { readParameterSlots, hasDependencies } from "./dependency-resolver.js";
 import { DependencyInjectionError } from "#kernel/error/errors";
 
 type DoesExist = (id: string) => boolean;
@@ -26,7 +25,7 @@ function buildDependencyMap(services: Record<string, unknown>): {
 
     const currentDeps = dependencyMap[serviceId];
 
-    if (!isClass(service)) continue;
+    if (!hasDependencies(service)) continue;
 
     for (const slot of readParameterSlots(service))
       if (slot.kind === "dependency") currentDeps.push(slot.id);

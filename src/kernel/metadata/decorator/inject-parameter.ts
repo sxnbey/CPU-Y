@@ -2,7 +2,7 @@ import { MetadataKey } from "#contract";
 
 import { setMetadata, getInheritedMetadata } from "../metadata-accessor.js";
 import { DecoratorError } from "#kernel/error/errors";
-import { formatDecoratorTarget } from "#kernel/util/formatter";
+import { formatToString } from "#util";
 
 export function Inject(id: string): ParameterDecorator {
   return (
@@ -29,7 +29,7 @@ export function Inject(id: string): ParameterDecorator {
         errorCode: "ERR_PARAMETER_INDEX_ALREADY_USED",
         args: {
           index: parameterIndex.toString(),
-          target: formatDecoratorTarget(target),
+          target: formatToString(target),
           decorator: "Inject",
         },
       });

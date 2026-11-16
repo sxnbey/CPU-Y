@@ -1,20 +1,17 @@
-import {
-  MetadataKey,
-  type BaseMetadata,
-  type KnownRegistries,
-} from "#contract";
+import { MetadataKey, type BaseMetadata, type Token } from "#contract";
 
 import { setMetadata } from "../metadata-accessor.js";
 
-const registryName = "functionRegistry" satisfies keyof KnownRegistries;
-
-export function decorateFunction<T extends (...args: any[]) => unknown>(
-  input: Pick<BaseMetadata, "id" | "scope">,
-  targetFunction: T,
-): T {
+export function decorateFunction<
+  Fn extends (...args: never[]) => unknown,
+  Target extends Fn,
+>(
+  input: Pick<BaseMetadata, "scope"> & { id: Token<Fn> | string },
+  targetFunction: Target,
+): Target {
   setMetadata(
     MetadataKey.METADATA,
-    { ...input, targetRegistry: registryName },
+    { ...input, targetRegistry: "functionRegistry" },
     targetFunction,
   );
 

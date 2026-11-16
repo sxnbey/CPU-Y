@@ -1,12 +1,14 @@
-import type { BaseMetadata, RegistryEntry, Config } from "#contract";
+import type {
+  BaseMetadata,
+  RegistryEntry,
+  Config,
+  Constructor,
+} from "#contract";
 
-type DependencyResolver = (
-  source: new (...args: any[]) => unknown,
-  config?: Config,
-) => unknown[];
+type DependencyResolver = (source: Constructor, config?: Config) => unknown[];
 
 export function create<T>(
-  Class: new (...args: any[]) => T,
+  Class: Constructor<T>,
   metadata: BaseMetadata,
   resolveDependencies: DependencyResolver,
   config?: Config,

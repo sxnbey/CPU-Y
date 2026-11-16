@@ -1,20 +1,19 @@
 import {
   MetadataKey,
   type BaseMetadata,
-  type KnownRegistries,
+  type Constructor,
+  type Token,
 } from "#contract";
 
 import { setMetadata } from "../metadata-accessor.js";
 
-const registryName = "instanceRegistry" satisfies keyof KnownRegistries;
-
-export function Instance(
-  input: Pick<BaseMetadata, "id" | "scope">,
-): ClassDecorator {
+export function Instance<T>(
+  input: Pick<BaseMetadata, "scope"> & { id: Token<T> | string },
+): (target: Constructor<T>) => void {
   return (target) => {
     setMetadata(
       MetadataKey.METADATA,
-      { ...input, targetRegistry: registryName },
+      { ...input, targetRegistry: "instanceRegistry" },
       target,
     );
   };

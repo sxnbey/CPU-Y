@@ -1,28 +1,19 @@
-import type { BaseMetadata, OnStart, OnStop } from "#contract";
+import type { Constructor, Func, OnStart, OnStop } from "#contract";
 
-export function isClass(
-  target: unknown,
-): target is new (...args: any[]) => unknown {
+export function isClass(target: unknown): target is Constructor {
   if (typeof target !== "function") return false;
 
-  const string = Function.prototype.toString.call(target);
+  return (
+    Object.getOwnPropertyDescriptor(target, "prototype")?.writable === false
+  );
+}
 
-  return string.startsWith("class ") || string.startsWith("class{");
+export function isPlainFunction(target: unknown): target is Func {
+  return typeof target === "function" && !isClass(target);
 }
 
 export function isError(target: unknown): target is Error {
   return target instanceof Error;
-}
-
-export function isMetadata(target: unknown): target is BaseMetadata {
-  if (typeof target !== "object" || target === null) return false;
-
-  return (
-    "id" in target &&
-    typeof (target as BaseMetadata).id === "string" &&
-    "targetRegistry" in target &&
-    typeof (target as BaseMetadata).targetRegistry === "string"
-  );
 }
 
 export function hasOnStart(target: unknown): target is OnStart {

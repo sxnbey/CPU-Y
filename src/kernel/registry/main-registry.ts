@@ -1,15 +1,11 @@
 import type { Registry, RegistryName } from "#contract";
 
-import { EventEmitter } from "node:events";
 import { RegistryError } from "#kernel/error/errors";
 
-export class MainRegistry extends EventEmitter {
-  private registries: Map<RegistryName, Registry> = new Map();
+export class MainRegistry {
+  private readonly registries: Map<RegistryName, Registry> = new Map();
 
-  public register<N extends RegistryName>(
-    registryName: N,
-    registry: Registry,
-  ): void {
+  public register(registryName: RegistryName, registry: Registry): void {
     if (this.registries.has(registryName))
       throw new RegistryError({
         errorCode: "ERR_REGISTRY_ALREADY_REGISTERED",
@@ -17,12 +13,6 @@ export class MainRegistry extends EventEmitter {
       });
 
     this.registries.set(registryName, registry);
-
-    registry.addListener("register", (id, entry) =>
-      this.emit("register", registryName, id, entry),
-    );
-
-    this.emit("register", "MainRegistry", registryName, registry);
   }
 
   public get(registry: RegistryName): Registry {

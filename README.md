@@ -23,15 +23,14 @@ CPU-Y is a TypeScript framework for terminal apps with dependency injection, lif
 - [Example](#example)
 - [Concepts](#concepts): [Services](#services) - [Tokens](#tokens) - [Scopes](#scopes) - [Lifecycle](#lifecycle) - [Modules](#modules)
 - [Architecture](#architecture): [Boot sequence](#boot-sequence) - [Layers](#layers) - [Folder structure](#folder-structure) - [Design decisions](#design-decisions)
-- [Roadmap](#roadmap)
 - [License](#license)
 
 ## Status
 
 **Working**
 
-- **Dependency injection** via decorators (`@Instance`, `@Inject`, `@Config`). Dependencies are sorted and cycles are detected.
-- **Typed tokens**: ids are declared once with `token<T>()` instead of repeating strings everywhere.
+- **Dependency injection** for classes via decorators (`@Instance`, `@Inject`, `@Config`) and for functions via `decorateFactory()`. Dependencies are sorted and cycles are detected.
+- **Typed tokens**: ids are declared once with `token<T>()` instead of repeating strings everywhere. A token checks the service that is registered under it and types the dependencies of functions.
 - **Rollback on install**: If a service throws while being built, all services built so far are removed again.
 - **Lifecycle** with `onStart` & `onStop` hooks: Services start in dependency order and stop in reverse. If an `onStart` throws, the services that were already started are stopped again.
 - **Modules**: Extensions with their own registries and services. Registries are strictly typed and can be injected with `registryToken()`.
@@ -166,7 +165,7 @@ Potential fix: Please ensure the module that provides the target registry is add
 
 ### Services
 
-A service is a class or function that the framework builds and manages. Every service has a **unique** `id`.
+A service is a class or function that the framework builds and manages. Every service has a **unique** `id` that can't be empty.
 
 ```typescript
 @Instance({ id: "greeter" })
@@ -177,17 +176,37 @@ export const formatGreeting = decorateFunction({ id: "formatGreeting" }, (text: 
 
 Functions are decorated with `decorateFunction()`, because TypeScript decorators can't be applied to plain functions.
 
+Exports without `@Instance`, `decorateFunction()` or `decorateFactory()` are ignored, so helper functions, constants etc. can live in the same files.
+
+**Dependencies of a class**
+
 Dependencies are declared in the constructor:
 
 - `@Inject("id")` or `@Inject(TOKEN)`: another service (see [Tokens](#tokens))
 - `@Config()`: the configuration from `bootstrap({ configs: { … } })`, at most once per service
 
 A parameter without a decorator causes an error, unless it comes at the end and has a default value.
-Exports without `@Instance` or `decorateFunction()` are ignored, so helper functions, constants etc. can live in the same files.
+
+**Dependencies of a function**
+
+A function that needs other services is decorated with `decorateFactory()` instead of `decorateFunction()`:
+
+```typescript
+export const greet = decorateFactory(
+  { id: "greet", deps: [LOGGER] },
+  (logger) => (name: string) => logger.info(`Grüße, ${name}!`),
+);
+```
+
+- The outer function is the factory. It receives the services listed in `deps`, in the same order, and returns the actual function.
+- The framework calls the factory once per boot and registers the function it returns.
+- `deps` only takes tokens, because the types of the factory's parameters come from them.
+- The export is the factory, not the finished function.
+- Functions can't receive a configuration.
 
 ### Tokens
 
-A token is an id with a type attached. It is declared once and used everywhere instead of repeating the string.
+A token is an id with a type attached. It is declared once with `token<T>()` and used everywhere instead of repeating the string.
 
 ```typescript
 import { token } from "cpuy";
@@ -202,9 +221,22 @@ export class Greeter { … }
 constructor(@Inject(GREETER) private readonly greeter: Greeter) {}
 ```
 
+> **Note:** A token doesn't type a constructor parameter. Parameter decorators can't change the type of a parameter.
+
 A typo in a token is a compile error, a typo in a string is only noticed at boot.
 
-> **Note:** A token doesn't type the constructor parameter. Parameter decorators can't change the type of a parameter, so the type still has to be written next to it.
+With a token as an `id`, the function's parameters are typed by the token:
+
+```typescript
+export const GREET = token<(name: string) => string>("greet");
+
+export const greet = decorateFunction(
+  { id: GREET },
+  (name) => `Grüße, ${name}!`,
+);
+```
+
+Returning a number here would be an error, because `GREET` promises a string.
 
 CPU-Y comes with these tokens:
 
@@ -225,6 +257,8 @@ A service's scope determines how long it lives.
 @Instance({ id: "evoMortar", scope: "persistent" })
 
 decorateFunction({ id: "formatGreeting", scope: "persistent" }, …)
+
+decorateFactory({ id: "greet", scope: "persistent", deps: [LOGGER] }, …)
 ```
 
 That's why persistent services live in a higher layer, so the reloadable layer can simply be swapped out.
@@ -365,34 +399,20 @@ This is also why a persistent service can't depend on a reloadable one (see [Sco
 | `install/`  | Brings everything together: validates exports, orders them and installs the entries into the registries, with rollback.             |
 | `load/`     | The loader that scans a folder and imports all exports.                                                                             |
 | `log/`      | The logger and its stream, where custom output can be plugged in.                                                                   |
-| `metadata/` | Everything that handles metadata: the decorators and the metadata accessor.                                                         |
+| `metadata/` | Everything that handles metadata: the decorators for classes and functions and the metadata accessor.                               |
 | `registry/` | The base registry, the concrete registries, the main registry, registry tokens and the resolver that answers lookups across layers. |
 | `util/`     | Small helpers: formatters and type guards.                                                                                          |
 
 ### Design decisions
 
-- **Rollback by throwing away a layer.** If a boot fails, the new layer is simply discarded instead of deleting entries one by one, because nothing depends on the layer. Hot reload uses the exact same mechanism.
+- **Rollback by throwing away a layer.** If a boot fails, the new layer is simply discarded, because nothing depends on the it. Hot reload uses the exact same mechanism.
 - **Validate first, then build.** Everything that can be checked upfront is checked before a single service is built. Errors that can't be predicted are handled by a rollback.
 - **Everything is a service.** Module services are passed on as normal exports and go through the same installer as app services. Validation, ordering, rollback, lifecycle and scopes work for them without a second code path.
+- **Factories instead of a second injection mechanism.** A function gets its dependencies through an outer function. Its dependencies are stored in the same format as those of a class, so everything (except configs) work for functions without extra code.
+- **Tokens are strings with a hidden type.** At runtime a token is just its id, so it works everywhere an id is expected.
 - **Typed error templates.** Placeholders like `{ID}` in a message template are inferred as required arguments, so an error with missing details doesn't compile. Every error has a fixed code that tests can check against.
-- **Strict registry names.** A registry only exists for TypeScript once it is added to `RegistryPayloadMap`. There's no fallback for plain strings, so a misspelled registry name is a compile error instead of a runtime error.
-- **One public entry point.** Everything public is exported from `cpuy`. The `exports` field in `package.json` blocks access to internal files, so the internals can change without breaking apps.
-
-## Roadmap
-
-1. **Hot reload with state preservation**
-
-   Swap the app layer on file changes and carry state over with `onSnapshot` / `onRestore`.
-
-2. **Terminal module**
-   - **Terminal:** wraps terminal-kit and turns every keypress into key events.
-   - **Prompt:** the input line with its buffer and command history.
-   - **CommandRunner:** runs the matching command from the command registry.
-   - **Renderer:** a tree of elements, similar to the DOM, drawn into a screen buffer. Each element draws only into its own area, and elements can be found and manipulated with `getElement()`.
-
-3. **Release on npm**
-
-   The kernel as `cpuy` and the terminal module as a seperate release.
+- **Strict registry names.** A registry only exists once it is added to `RegistryPayloadMap`. There's no fallback for plain strings, so a misspelled registry name is a compile error.
+- **One public entry point.** Everything public is exported from `cpuy`. The `exports` field in `package.json` blocks access to internal files.
 
 ## License
 

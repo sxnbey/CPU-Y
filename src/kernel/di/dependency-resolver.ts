@@ -1,18 +1,31 @@
-import { MetadataKey, type Config, type Lookup } from "#contract";
+import {
+  MetadataKey,
+  type Config,
+  type Lookup,
+  type Constructor,
+  type Func,
+} from "#contract";
 
 import { getMetadata } from "#kernel/metadata/metadata-accessor";
 import { DependencyInjectionError } from "#kernel/error/errors";
 
 type ParameterSlot = { kind: "dependency"; id: string } | { kind: "config" };
 
-export function expectsConfig(
-  target: new (...args: any[]) => unknown,
-): boolean {
+type Injectable = Constructor | Func;
+
+export function expectsConfig(target: Injectable): boolean {
   return readParameterSlots(target).some((slot) => slot.kind === "config");
 }
 
+export function hasDependencies(target: unknown): target is Injectable {
+  return (
+    typeof target === "function" &&
+    !!getMetadata(MetadataKey.DEPENDENCIES, target)
+  );
+}
+
 export function resolveDependencies(
-  target: new (...args: any[]) => unknown,
+  target: Injectable,
   lookup: Lookup,
   config?: Config,
 ): unknown[] {
@@ -36,9 +49,7 @@ export function resolveDependencies(
   );
 }
 
-export function readParameterSlots(
-  target: new (...args: any[]) => unknown,
-): ParameterSlot[] {
+export function readParameterSlots(target: Injectable): ParameterSlot[] {
   const slots: ParameterSlot[] = [];
   const { configIndex, dependencies } = getParameterMetadata(target);
   const parameterCount = getParameterCount(configIndex, dependencies, target);
@@ -70,7 +81,7 @@ export function readParameterSlots(
   return slots;
 }
 
-function getParameterMetadata(target: new (...args: any[]) => unknown): {
+function getParameterMetadata(target: Injectable): {
   configIndex: number | undefined;
   dependencies: Record<number, string>;
 } {
@@ -83,7 +94,7 @@ function getParameterMetadata(target: new (...args: any[]) => unknown): {
 function getParameterCount(
   configIndex: number | undefined,
   dependencies: Record<number, string>,
-  target: new (...args: any[]) => unknown,
+  target: Injectable,
 ): number {
   const lengthFromConfigIndex = configIndex !== undefined ? configIndex + 1 : 0;
   const lengthFromDependencies =
@@ -95,7 +106,7 @@ function getParameterCount(
 function lookupOrThrow(
   dependencyId: string,
   lookup: Lookup,
-  target: new (...args: any[]) => unknown,
+  target: Injectable,
 ): unknown {
   const dependency = lookup(dependencyId);
 

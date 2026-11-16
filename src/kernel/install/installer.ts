@@ -69,6 +69,12 @@ export class Installer {
 
       const { id, targetRegistry } = metadata;
 
+      if (id.trim() === "")
+        throw new InstallError({
+          errorCode: "ERR_EMPTY_ID",
+          args: { file, name },
+        });
+
       const existing = installables.get(id);
 
       if (existing !== undefined)

@@ -26,6 +26,7 @@ export {
   Inject,
   Config,
   decorateFunction,
+  decorateFactory,
 } from "#kernel/metadata/decorator/index";
 export { token } from "#kernel/di/token";
 

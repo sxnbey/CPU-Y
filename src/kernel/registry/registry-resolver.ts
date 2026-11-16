@@ -39,8 +39,6 @@ export class RegistryResolver {
     return registry.get(id);
   }
 
-  public find<T>(token: Token<T>): T | undefined;
-
   public find(id: string): unknown {
     return this.locate(id)?.get(id);
   }
