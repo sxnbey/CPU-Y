@@ -1,7 +1,7 @@
 {
   "name": "cpuy",
   "version": "0.2.0",
-  "description": "TypeScript framework for terminal apps with DI, lifecycle hooks and hot reload",
+  "description": "TypeScript framework for terminal apps.",
   "author": "senbey",
   "license": "MIT",
   "type": "module",

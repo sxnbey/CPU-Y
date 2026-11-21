@@ -7,48 +7,26 @@ ___________________ ____ ___         _____.___.
         \/                            \/
 </pre></div>
 
-# CPU-Y ![Status](https://img.shields.io/badge/Status-Work_in_progress-yellow)
+# CPU-Y
 
-![Tech-Stack](https://skillicons.dev/icons?i=ts,nodejs)
+CPU-Y is a TypeScript framework with dependency injection, lifecycle hooks and (soon) hot reload with state preservation. A terminal module will be the first module.
 
-CPU-Y is a TypeScript framework for terminal apps with dependency injection, lifecycle hooks and hot reload with state preservation.
+## Why?
 
-> **Work in progress:** The foundation and the public API are in place, hot reload and the terminal module are in progress.
-
-## Contents
-
-- [Status](#status)
-- [Requirements](#requirements)
-- [Getting started](#getting-started)
-- [Example](#example)
-- [Concepts](#concepts): [Services](#services) - [Tokens](#tokens) - [Scopes](#scopes) - [Lifecycle](#lifecycle) - [Modules](#modules)
-- [Architecture](#architecture): [Boot sequence](#boot-sequence) - [Layers](#layers)
-- [License](#license)
+I started building an app that displays output in the terminal and I was very annoyed that I had to hardcode so much stuff and used many cheap and hacky solutions. So I started building ways that made building a terminal app much easier for me and it was so much fun that at some point I had a clearer vision: I want to build a framework for terminal apps. Later this project turned more into a universal kernel + a terminal module.
 
 ## Status
 
-**Working**
-
-- **Dependency injection** for classes via decorators (`@Instance`, `@Inject`, `@Config`) and for functions via `decorateFactory()`. Dependencies are sorted and cycles are detected.
-- **Typed tokens**: ids are declared once with `token<T>()` instead of repeating strings everywhere. A token checks the service that is registered under it and types the dependencies of functions.
-- **Rollback on install**: If a service throws while being built, all services built so far are removed again.
-- **Lifecycle** with `onStart` & `onStop` hooks: Services start in dependency order and stop in reverse. If an `onStart` throws, the services that were already started are stopped again.
-- **Modules**: Extensions with their own registries and services. Registries are strictly typed and can be injected with `registryToken()`.
-- **Scopes**: `persistent` services survive a reload, all others are rebuilt.
-- **Strictly typed, detailed error messages** with file, export, cause chain and a suggested fix.
-- **Loader**: loads all exports from a folder, so they don't have to be registered one by one.
-- **Public API**: everything is imported from `cpuy`, internal files can't be reached from outside.
-
-**In progress**
+Foundation works, these are in progress:
 
 - Hot reload with state preservation (`onSnapshot` & `onRestore`)
 - Terminal module (input, commands, renderer)
 
 ## Requirements
 
-- **Node.js 22** or newer
-- **ES modules**: CPU-Y is an ES module, so your project needs `"type": "module"` in its `package.json`.
-- **TypeScript** with these options:
+- Node.js 22 or newer
+- ES modules: CPU-Y is an ES module, so your project needs `"type": "module"` in its `package.json`.
+- TypeScript with these options:
 
 ```json
 {
@@ -64,7 +42,7 @@ This framework uses the legacy decorator implementation on purpose because param
 
 ## Getting started
 
-**Running the example**
+### Running the example
 
 ```bash
 git clone https://github.com/sxnbey/CPU-Y.git
@@ -76,7 +54,7 @@ npm start
 
 `npm start` runs the example from `src/example/`. During development, `npm run dev` rebuilds on every change and starts the example again. It keeps watching for changes until you stop it with `Ctrl+C`.
 
-**Using CPU-Y in your own project**
+### Using CPU-Y in your own project
 
 CPU-Y isn't on npm yet. Until then, it can be added as a local dependency:
 
@@ -88,7 +66,8 @@ CPU-Y isn't on npm yet. Until then, it can be added as a local dependency:
 
 After `npm install`, everything is imported from `cpuy`. CPU-Y has to be built first and rebuilt after every change, or you keep `npm run dev` running in the CPU-Y folder.
 
-> **Note:** The folder passed to `bootstrap()` is loaded completely. Keep your entry file outside of it, otherwise the loader imports it a second time and `boot()` never finishes.
+> [!NOTE]
+> The folder passed to `bootstrap()` is loaded completely. Keep your entry file outside of it, otherwise the loader imports it a second time and `boot()` never finishes.
 
 ## Example
 
@@ -165,7 +144,7 @@ Potential fix: Please ensure the module that provides the target registry is add
 
 ### Services
 
-A service is a class or function that the framework builds and manages. Every service has a **unique** `id` that can't be empty.
+A service is a class or function that the framework builds and manages. Every service has a unique `id` that can't be empty.
 
 ```typescript
 @Instance({ id: "greeter" })
@@ -221,7 +200,8 @@ export class Greeter { … }
 constructor(@Inject(GREETER) private readonly greeter: Greeter) {}
 ```
 
-> **Note:** A token doesn't type a constructor parameter. Parameter decorators can't change the type of a parameter.
+> [!NOTE]
+> A token doesn't type a constructor parameter. Parameter decorators can't change the type of a parameter.
 
 A typo in a token is a compile error, a typo in a string is only noticed at boot.
 
@@ -254,16 +234,14 @@ A service's scope determines how long it lives.
 - `persistent`: stays alive across reloads.
 
 ```typescript
-@Instance({ id: "evoMortar", scope: "persistent" })
+@Instance({ id: "greeter", scope: "persistent" })
 
 decorateFunction({ id: "formatGreeting", scope: "persistent" }, …)
 
 decorateFactory({ id: "greet", scope: "persistent", deps: [LOGGER] }, …)
 ```
 
-That's why persistent services live in a higher layer, so the reloadable layer can simply be swapped out.
-
-A persistent service **cannot** depend on a reloadable service. Otherwise it would hold on to an outdated instance for its entire lifetime, even after that dependency has been reloaded several times. The other way around works just fine.
+A persistent service cannot depend on a reloadable service. Otherwise it would hold on to an outdated instance for its entire lifetime, even after that dependency has been reloaded several times. The other way around works just fine.
 
 ### Lifecycle
 
@@ -282,17 +260,18 @@ export class Database implements OnStart, OnStop {
 }
 ```
 
-- **Start**: in dependency order. A service can only start once all of its dependencies have started. Persistent services start before reloadable ones.
+- Start: in dependency order. A service can only start once all of its dependencies have started. Persistent services start before reloadable ones.
 
-- **Stop**: in reverse order, meaning reloadable services first, then the persistent ones.
+- Stop: in reverse order, meaning reloadable services first, then the persistent ones.
 
-**Error handling:**
+Error handling:
 
 - `onStart()`: all services started so far are stopped, and `boot()` throws a `LifecycleError` with the original error as its `cause`.
 
 - `onStop()`: the error is logged, and the remaining services are still stopped.
 
-> **Note:** After `system.stop()` the process ends by itself. If it doesn't, a service forgot to clean up something in `onStop()`, like an open connection or a listener on the keyboard.
+> [!NOTE]
+> After `system.stop()` the process ends by itself. If it doesn't, a service forgot to clean up something in `onStop()`, like an open connection or a listener on the keyboard.
 
 ### Modules
 
@@ -353,27 +332,6 @@ constructor(
 ```typescript
 bootstrap({ path, overrides: { logger: CustomLogger } });
 ```
-
-## Architecture
-
-### Boot sequence
-
-**`bootstrap()`** wires everything together once:
-
-1. Collects the registries from the core preset and all modules.
-2. Creates the core layer and registers the `logStream` and `logger` in it.
-3. Creates the installer and adds an entry builder for every registry.
-4. Collects the services of all modules and hands everything over to the `System`, which registers the `systemControl` in the core layer.
-
-Every layer, the core included, gets its own instance of every registry and registers them in itself under `reg:<name>`, so they can be injected.
-
-**`system.boot()`** builds and starts the app:
-
-1. The loader imports all exports from the app folder and adds the module services.
-2. All services are split by scope into `persistent` and `reloadable`.
-3. The persistent services are installed into a new layer below the core and started.
-4. The reloadable services are installed into a third layer below the persistent one and started.
-5. If step 4 fails, the persistent services are stopped again and `system.boot()` throws. Nothing is kept, so `system.boot()` can be called again.
 
 ### Layers
 
