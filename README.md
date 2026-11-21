@@ -67,7 +67,7 @@ CPU-Y isn't on npm yet. Until then, it can be added as a local dependency:
 After `npm install`, everything is imported from `cpuy`. CPU-Y has to be built first and rebuilt after every change, or you keep `npm run dev` running in the CPU-Y folder.
 
 > [!NOTE]
-> The folder passed to `bootstrap()` is loaded completely. Keep your entry file outside of it, otherwise the loader imports it a second time and `boot()` never finishes.
+> Keep your entry file outside the folder passed to bootstrap(). The loader imports every file in that folder. If your entry file awaits boot() at the top level, it ends up waiting for itself and the process hangs.
 
 ## Example
 
