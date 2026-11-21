@@ -387,7 +387,7 @@ Services live in three layers. Each layer can only look up services in itself an
 
 Since lookups only go upwards, nothing depends on the app layer. During a hot reload, the app layer is simply swapped for a fresh one.
 
-This is also why a persistent service can't depend on a reloadable one (see [Scopes](#scopes)). |
+This is also why a persistent service can't depend on a reloadable one (see [Scopes](#scopes)).
 
 ## License
 
