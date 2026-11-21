@@ -12,7 +12,7 @@ import { LOG_STREAM } from "#kernel/log/stream";
 import { registryToken } from "#kernel/registry/registry-token";
 
 export type BootstrapOptions = {
-  path: string | URL;
+  path?: string | URL;
   configs?: Record<string, Config>;
   modules?: Module[];
   overrides?: CoreOverrides;
@@ -62,6 +62,8 @@ export function bootstrap(options: BootstrapOptions): Application {
 
   core.getRegistry("instanceRegistry").register({ id: LOGGER, value: logger });
 
+  const path = options.path ? { path: options.path } : undefined;
+
   return new System(
     {
       newLayer,
@@ -71,6 +73,6 @@ export function bootstrap(options: BootstrapOptions): Application {
       coreResolver: core,
       moduleExports,
     },
-    { configs: options.configs ?? {}, path: options.path },
+    { configs: options.configs ?? {}, ...path },
   );
 }

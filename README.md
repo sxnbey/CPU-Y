@@ -22,7 +22,7 @@ CPU-Y is a TypeScript framework for terminal apps with dependency injection, lif
 - [Getting started](#getting-started)
 - [Example](#example)
 - [Concepts](#concepts): [Services](#services) - [Tokens](#tokens) - [Scopes](#scopes) - [Lifecycle](#lifecycle) - [Modules](#modules)
-- [Architecture](#architecture): [Boot sequence](#boot-sequence) - [Layers](#layers) - [Folder structure](#folder-structure) - [Design decisions](#design-decisions)
+- [Architecture](#architecture): [Boot sequence](#boot-sequence) - [Layers](#layers)
 - [License](#license)
 
 ## Status
@@ -387,32 +387,7 @@ Services live in three layers. Each layer can only look up services in itself an
 
 Since lookups only go upwards, nothing depends on the app layer. During a hot reload, the app layer is simply swapped for a fresh one.
 
-This is also why a persistent service can't depend on a reloadable one (see [Scopes](#scopes)).
-
-### Folder structure
-
-| Folder      | Responsibility                                                                                                                      |
-| ----------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `contract/` | All shared types, interfaces and enums. Contains no logic.                                                                          |
-| `di/`       | Dependency injection: tokens, sorting services by their dependencies, resolving them and creating the instances.                    |
-| `error/`    | The base `FrameworkError` and all error groups with their typed message templates.                                                  |
-| `install/`  | Brings everything together: validates exports, orders them and installs the entries into the registries, with rollback.             |
-| `load/`     | The loader that scans a folder and imports all exports.                                                                             |
-| `log/`      | The logger and its stream, where custom output can be plugged in.                                                                   |
-| `metadata/` | Everything that handles metadata: the decorators for classes and functions and the metadata accessor.                               |
-| `registry/` | The base registry, the concrete registries, the main registry, registry tokens and the resolver that answers lookups across layers. |
-| `util/`     | Small helpers: formatters and type guards.                                                                                          |
-
-### Design decisions
-
-- **Rollback by throwing away a layer.** If a boot fails, the new layer is simply discarded, because nothing depends on the it. Hot reload uses the exact same mechanism.
-- **Validate first, then build.** Everything that can be checked upfront is checked before a single service is built. Errors that can't be predicted are handled by a rollback.
-- **Everything is a service.** Module services are passed on as normal exports and go through the same installer as app services. Validation, ordering, rollback, lifecycle and scopes work for them without a second code path.
-- **Factories instead of a second injection mechanism.** A function gets its dependencies through an outer function. Its dependencies are stored in the same format as those of a class, so everything (except configs) work for functions without extra code.
-- **Tokens are strings with a hidden type.** At runtime a token is just its id, so it works everywhere an id is expected.
-- **Typed error templates.** Placeholders like `{ID}` in a message template are inferred as required arguments, so an error with missing details doesn't compile. Every error has a fixed code that tests can check against.
-- **Strict registry names.** A registry only exists once it is added to `RegistryPayloadMap`. There's no fallback for plain strings, so a misspelled registry name is a compile error.
-- **One public entry point.** Everything public is exported from `cpuy`. The `exports` field in `package.json` blocks access to internal files.
+This is also why a persistent service can't depend on a reloadable one (see [Scopes](#scopes)). |
 
 ## License
 

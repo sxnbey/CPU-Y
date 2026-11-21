@@ -17,7 +17,7 @@ import { getMetadata } from "#kernel/metadata/metadata-accessor";
 import { LifecycleError } from "#kernel/error/errors";
 import { token } from "#kernel/di/token";
 
-type App = { resolver: RegistryResolver; entries: RegistryEntry<unknown>[] };
+type Layer = { resolver: RegistryResolver; entries: RegistryEntry<unknown>[] };
 
 type Partition = {
   services: LoadedExport[];
@@ -27,8 +27,8 @@ type Partition = {
 export const SYSTEM_CONTROL = token<SystemControl>("systemControl");
 
 export class System implements Application {
-  private app: App | undefined;
-  private persistent: App | undefined;
+  private reloadable: Layer | undefined;
+  private persistent: Layer | undefined;
   private readonly systemControl: SystemControl = { stop: () => this.stop() };
 
   constructor(
@@ -41,7 +41,7 @@ export class System implements Application {
       moduleExports: LoadedExport[];
     },
     private readonly options: {
-      path: string | URL;
+      path?: string | URL;
       configs: Record<string, Config>;
     },
   ) {
@@ -51,54 +51,55 @@ export class System implements Application {
   }
 
   public async boot(): Promise<void> {
-    if (this.app !== undefined || this.persistent !== undefined)
+    if (this.reloadable !== undefined || this.persistent !== undefined)
       throw new LifecycleError({ errorCode: "ERR_ALREADY_BOOTED" });
 
     const { persistent, reloadable } = await this.collectServices(
       this.dependencies.moduleExports,
     );
 
-    const persistentApp = this.installLayer(
+    const persistentLayer = this.installLayer(
       persistent.services,
       persistent.configs,
       this.dependencies.coreResolver,
     );
 
-    await this.startServices(persistentApp.entries);
+    await this.startServices(persistentLayer.entries);
 
     try {
-      const app = this.installLayer(
+      const reloadableLayer = this.installLayer(
         reloadable.services,
         reloadable.configs,
-        persistentApp.resolver,
+        persistentLayer.resolver,
       );
 
-      await this.startServices(app.entries);
+      await this.startServices(reloadableLayer.entries);
 
-      this.persistent = persistentApp;
-      this.app = app;
+      this.persistent = persistentLayer;
+      this.reloadable = reloadableLayer;
     } catch (e) {
-      await this.stopServices(persistentApp.entries);
+      await this.stopServices(persistentLayer.entries);
 
       throw e;
     }
   }
 
   public async stop(): Promise<void> {
-    await this.stopServices(this.app?.entries ?? []);
+    await this.stopServices(this.reloadable?.entries ?? []);
     await this.stopServices(this.persistent?.entries ?? []);
 
-    this.app = undefined;
+    this.reloadable = undefined;
     this.persistent = undefined;
   }
 
   private async collectServices(
     moduleExports: LoadedExport[],
   ): Promise<Record<Scope, Partition>> {
-    const allServices = [
-      ...moduleExports,
-      ...(await this.dependencies.loader(this.options.path)),
-    ];
+    const loadedServices = this.options.path
+      ? await this.dependencies.loader(this.options.path)
+      : [];
+
+    const allServices = [...moduleExports, ...loadedServices];
 
     return splitByScope(allServices, this.options.configs);
   }
@@ -107,7 +108,7 @@ export class System implements Application {
     exports: LoadedExport[],
     configs: Record<string, Config>,
     parent: RegistryResolver,
-  ): App {
+  ): Layer {
     const resolver = this.dependencies.newLayer(parent);
     const entries = this.dependencies.installer.install(
       exports,
@@ -118,7 +119,7 @@ export class System implements Application {
     return { resolver, entries };
   }
 
-  private async startServices(entries: App["entries"]) {
+  private async startServices(entries: Layer["entries"]) {
     const startedServices: typeof entries = [];
 
     for (const entry of entries) {
@@ -146,7 +147,7 @@ export class System implements Application {
     }
   }
 
-  private async stopServices(entries: App["entries"]): Promise<void> {
+  private async stopServices(entries: Layer["entries"]): Promise<void> {
     for (const entry of [...entries].reverse())
       try {
         if (hasOnStop(entry.value)) await entry.value.onStop();
