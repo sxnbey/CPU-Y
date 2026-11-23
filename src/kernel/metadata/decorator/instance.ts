@@ -13,8 +13,10 @@ export function Instance<T>(
   return (target) => {
     setMetadata(
       MetadataKey.METADATA,
-      { ...input, targetRegistry: "instanceRegistry" },
+      { ...input, targetRegistry: "serviceRegistry" },
       target,
     );
+
+    setMetadata(MetadataKey.KIND, "class", target);
   };
 }

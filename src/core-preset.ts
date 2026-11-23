@@ -1,10 +1,7 @@
 import type { Constructor, Loader, RegistryDefinition } from "#contract";
 
 import { Logger } from "#kernel/log/logger";
-import {
-  InstanceRegistry,
-  FunctionRegistry,
-} from "#kernel/registry/registries";
+import { ServiceRegistry } from "#kernel/registry/service-registry";
 import { LogStream } from "#kernel/log/stream";
 import { createLoader } from "#kernel/load/loader";
 import { buildFunction, buildInstance } from "#kernel/install/entry-builders";
@@ -13,10 +10,7 @@ export const CORE_PRESET: CorePreset = {
   logStream: LogStream,
   logger: Logger,
   loader: createLoader(),
-  registries: [
-    { registry: InstanceRegistry, build: buildInstance },
-    { registry: FunctionRegistry, build: buildFunction },
-  ],
+  registries: [{ registry: ServiceRegistry, build: buildInstance }],
 };
 
 export interface CorePreset {

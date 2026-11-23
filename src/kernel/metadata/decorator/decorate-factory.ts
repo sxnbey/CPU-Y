@@ -28,9 +28,11 @@ export function decorateFactory<
 
   setMetadata(
     MetadataKey.METADATA,
-    { ...rest, targetRegistry: "functionRegistry" },
+    { ...rest, targetRegistry: "serviceRegistry" },
     factory,
   );
+
+  setMetadata(MetadataKey.KIND, "factory", factory);
 
   return factory;
 }

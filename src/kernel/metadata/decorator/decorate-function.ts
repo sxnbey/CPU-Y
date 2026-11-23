@@ -11,9 +11,11 @@ export function decorateFunction<
 ): Target {
   setMetadata(
     MetadataKey.METADATA,
-    { ...input, targetRegistry: "functionRegistry" },
+    { ...input, targetRegistry: "serviceRegistry" },
     targetFunction,
   );
+
+  setMetadata(MetadataKey.KIND, "function", targetFunction);
 
   return targetFunction;
 }

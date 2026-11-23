@@ -33,7 +33,7 @@ export function bootstrap(options: BootstrapOptions): Application {
 
     for (const registry of resolver.getAllRegistries())
       resolver
-        .getRegistry("instanceRegistry")
+        .getRegistry("serviceRegistry")
         .register({ id: registryToken(registry.getName()), value: registry });
 
     return resolver;
@@ -55,12 +55,12 @@ export function bootstrap(options: BootstrapOptions): Application {
   const logStream = new preset.logStream();
 
   core
-    .getRegistry("instanceRegistry")
+    .getRegistry("serviceRegistry")
     .register({ id: LOG_STREAM, value: logStream });
 
   const logger = new preset.logger(logStream);
 
-  core.getRegistry("instanceRegistry").register({ id: LOGGER, value: logger });
+  core.getRegistry("serviceRegistry").register({ id: LOGGER, value: logger });
 
   const path = options.path ? { path: options.path } : undefined;
 

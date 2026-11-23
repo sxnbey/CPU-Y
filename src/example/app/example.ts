@@ -31,8 +31,8 @@ export class Welcome implements OnStart {
   constructor(
     @Inject("greeter") private readonly greeter: Greeter,
     @Config() private readonly config: { name: string },
-    @Inject(registryToken("functionRegistry"))
-    private readonly registry: KnownRegistries["functionRegistry"],
+    @Inject(registryToken("serviceRegistry"))
+    private readonly registry: KnownRegistries["serviceRegistry"],
   ) {}
 
   public onStart(): void {

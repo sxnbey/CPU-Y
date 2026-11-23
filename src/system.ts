@@ -46,7 +46,7 @@ export class System implements Application {
     },
   ) {
     this.dependencies.coreResolver
-      .getRegistry("instanceRegistry")
+      .getRegistry("serviceRegistry")
       .register({ id: SYSTEM_CONTROL, value: this.systemControl });
   }
 
